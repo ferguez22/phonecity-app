@@ -1,0 +1,43 @@
+<div class="login-wrapper d-flex align-items-center justify-content-center">
+  <div class="card shadow-sm login-card">
+    <div class="card-body p-4">
+      <h1 class="h4 mb-4 text-center">PhoneCity</h1>
+
+      <form (ngSubmit)="onSubmit()">
+        <div class="mb-3">
+          <label class="form-label" for="usuario">Usuario</label>
+          <input
+            id="usuario"
+            name="usuario"
+            type="text"
+            class="form-control"
+            [(ngModel)]="nombreUsuario"
+            required
+            autocomplete="username"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label" for="password">Contrasena</label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            class="form-control"
+            [(ngModel)]="password"
+            required
+            autocomplete="current-password"
+          />
+        </div>
+
+        @if (error()) {
+          <div class="alert alert-danger py-2">{{ error() }}</div>
+        }
+
+        <button type="submit" class="btn btn-primary w-100" [disabled]="cargando()">
+          {{ cargando() ? 'Entrando...' : 'Entrar' }}
+        </button>
+      </form>
+    </div>
+  </div>
+</div>

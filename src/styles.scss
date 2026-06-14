@@ -1,1 +1,6 @@
-/* You can add global styles to this file, and also import other style files */
+/* Estilos globales. Bootstrap se carga desde angular.json. */
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
