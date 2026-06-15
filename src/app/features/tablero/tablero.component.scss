@@ -1,0 +1,43 @@
+.busqueda {
+  max-width: 320px;
+  min-width: 200px;
+}
+
+// Botones de estado
+.boton-estado {
+  border: 1px solid #ccc;
+  background: #f8f9fa;
+  color: #333;
+  white-space: nowrap;
+  font-size: 0.78rem;
+
+  &:hover   { background: #e9ecef; }
+  &.activo  { background: #212529; color: #fff; border-color: #212529; }
+}
+
+// Tabla
+.tabla-lineas {
+  font-size: 0.82rem;
+  border-collapse: collapse;
+}
+
+.tabla-lineas th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.fila-linea {
+  cursor: pointer;
+  transition: filter 0.1s;
+
+  td { vertical-align: middle; }
+  &:hover { filter: brightness(0.93); }
+}
+
+.col-pieza {
+  max-width: 180px;
+}

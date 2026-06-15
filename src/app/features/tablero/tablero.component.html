@@ -1,0 +1,98 @@
+<!-- CABECERA -->
+<nav class="navbar navbar-dark bg-dark px-3 py-2">
+  <span class="navbar-brand fw-bold">PhoneCity</span>
+  <div class="d-flex align-items-center gap-3">
+    <span class="text-white-50 small">{{ total() }} líneas</span>
+    <button class="btn btn-sm btn-outline-light" (click)="logout()">Salir</button>
+  </div>
+</nav>
+
+<div class="container-fluid py-3">
+
+  <!-- FILTROS DE BUSQUEDA + ORDEN -->
+  <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
+    <input
+      type="text"
+      class="form-control form-control-sm busqueda"
+      placeholder="Buscar L-id, modelo, cliente, teléfono..."
+      [ngModel]="busqueda()"
+      (ngModelChange)="busqueda.set($event)"
+    />
+    <button class="btn btn-sm btn-outline-secondary" (click)="toggleOrderBy()">
+      Orden: {{ orderBy() === 'fecha_entrada' ? 'Fecha entrada' : 'Días en espera' }}
+    </button>
+    <button class="btn btn-sm btn-outline-secondary" (click)="toggleOrder()">
+      {{ orderDir() === 'desc' ? '↓ Más reciente' : '↑ Más antiguo' }}
+    </button>
+  </div>
+
+  <!-- BOTONES DE ESTADO -->
+  <div class="d-flex flex-wrap gap-2 mb-3">
+    @for (boton of botones; track boton.label) {
+      <button
+        class="btn btn-sm boton-estado"
+        [class.activo]="botonActivo() === boton.label"
+        (click)="seleccionarBoton(boton)"
+      >
+        {{ boton.label }}
+      </button>
+    }
+  </div>
+
+  <!-- ESTADO CARGA / ERROR -->
+  @if (cargando()) {
+    <div class="text-center text-muted py-5">Cargando...</div>
+  } @else if (error()) {
+    <div class="alert alert-danger">{{ error() }}</div>
+  } @else if (lineasFiltradas().length === 0) {
+    <div class="text-center text-muted py-5">
+      No hay líneas en este estado.
+    </div>
+  } @else {
+
+    <!-- TABLA -->
+    <div class="table-responsive">
+      <table class="table table-sm table-hover tabla-lineas">
+        <thead class="table-dark">
+          <tr>
+            <th>L-ID</th>
+            <th>Estado</th>
+            <th>Modelo</th>
+            <th>Cliente</th>
+            <th>Teléfono</th>
+            <th>€</th>
+            <th>Problema / Pieza</th>
+            <th>Fecha entrada</th>
+            <th>Días</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (linea of lineasFiltradas(); track linea.id) {
+            <tr
+              class="fila-linea"
+              [style.background-color]="getColor(linea)"
+              (click)="verDetalle(linea.id)"
+            >
+              <td class="fw-bold">L-{{ linea.id }}</td>
+              <td>
+                <span class="badge-estado">{{ getEtiqueta(linea) }}</span>
+              </td>
+              <td>{{ linea.modelo ?? '—' }}</td>
+              <td>{{ linea.cliente_nombre ?? 'TIENDA' }}</td>
+              <td>{{ linea.cliente_telefono ?? '—' }}</td>
+              <td>{{ linea.importe != null ? (linea.importe | number:'1.0-0') + ' €' : '—' }}</td>
+              <td class="text-truncate col-pieza">{{ linea.problema_o_pieza ?? '—' }}</td>
+              <td>{{ linea.fecha_entrada ?? '—' }}</td>
+              <td>
+                @if (linea.fecha_entrada) {
+                  {{ diasDesde(linea.fecha_entrada) }}d
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+  }
+</div>

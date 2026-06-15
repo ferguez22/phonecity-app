@@ -14,5 +14,12 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/tablero/tablero.component').then((m) => m.TableroComponent),
   },
+  {
+    path: 'linea/:id',
+    canActivate: [authGuard],
+    // Placeholder — se implementa en 1.6
+    loadComponent: () =>
+      import('./features/tablero/tablero.component').then((m) => m.TableroComponent),
+  },
   { path: '**', redirectTo: 'tablero' },
 ];
