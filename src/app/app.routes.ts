@@ -29,9 +29,10 @@ export const routes: Routes = [
   {
     path: 'linea/:id',
     canActivate: [authGuard],
-    // Placeholder ficha de detalle — se implementa en 1.6
     loadComponent: () =>
-      import('./features/tablero/tablero.component').then((m) => m.TableroComponent),
+      import('./features/linea-detalle/linea-detalle.component').then(
+        (m) => m.LineaDetalleComponent,
+      ),
   },
   { path: '**', redirectTo: 'tablero' },
 ];

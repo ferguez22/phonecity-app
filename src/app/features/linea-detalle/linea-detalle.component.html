@@ -1,0 +1,180 @@
+<nav class="navbar navbar-dark bg-dark px-3 py-2">
+  <span class="navbar-brand fw-bold">Ficha de línea</span>
+  <div class="d-flex gap-2">
+    @if (linea()) {
+      <a [routerLink]="['/linea', linea()!.id, 'editar']"
+         class="btn btn-sm btn-warning">✏️ Editar</a>
+    }
+    <button class="btn btn-sm btn-outline-light" (click)="volver()">← Volver</button>
+  </div>
+</nav>
+
+<div class="container py-4" style="max-width:720px">
+
+  @if (cargando()) {
+    <div class="text-center text-muted py-5">Cargando...</div>
+  } @else if (error()) {
+    <div class="alert alert-danger">{{ error() }}</div>
+  } @else if (linea()) {
+    @let l = linea()!;
+
+    <!-- CABECERA -->
+    <div class="card mb-3" [style.border-left]="'5px solid ' + getColor(l)">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <h5 class="mb-1">L-{{ l.id }} — {{ l.modelo ?? 'Sin modelo' }}</h5>
+            <span class="badge-estado px-2 py-1 rounded"
+                  [style.background-color]="getColor(l)">
+              {{ getEtiqueta(l) }}
+            </span>
+          </div>
+          @if (l.fecha_entrada) {
+            <span class="text-muted small">
+              {{ diasDesde(l.fecha_entrada) }} días
+            </span>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- CLIENTE -->
+    <div class="card mb-3">
+      <div class="card-header fw-semibold">Cliente</div>
+      <div class="card-body">
+        <dl class="row mb-0">
+          <dt class="col-5">Nombre</dt>
+          <dd class="col-7">{{ l.cliente_nombre ?? 'TIENDA' }}</dd>
+
+          <dt class="col-5">Teléfono</dt>
+          <dd class="col-7">{{ l.cliente_telefono ?? '—' }}</dd>
+
+          <dt class="col-5">Tel. alternativo</dt>
+          <dd class="col-7">{{ l.telefono_alternativo ?? '—' }}</dd>
+
+          <dt class="col-5">Código dispositivo</dt>
+          <dd class="col-7">{{ l.codigo_dispositivo ?? '—' }}</dd>
+        </dl>
+      </div>
+    </div>
+
+    <!-- REPARACION -->
+    <div class="card mb-3">
+      <div class="card-header fw-semibold">Reparación</div>
+      <div class="card-body">
+        <dl class="row mb-0">
+          <dt class="col-5">Flujo</dt>
+          <dd class="col-7">{{ l.flujo }}</dd>
+
+          <dt class="col-5">Problema / Pieza</dt>
+          <dd class="col-7">{{ l.problema_o_pieza ?? '—' }}</dd>
+
+          <dt class="col-5">Fecha entrada</dt>
+          <dd class="col-7">{{ l.fecha_entrada ?? '—' }}</dd>
+
+          @if (l.proveedor_id) {
+            <dt class="col-5">Proveedor ID</dt>
+            <dd class="col-7">{{ l.proveedor_id }}</dd>
+
+            <dt class="col-5">Fecha pedido</dt>
+            <dd class="col-7">{{ l.fecha_pedido ?? '—' }}</dd>
+          }
+
+          @if (l.taller) {
+            <dt class="col-5">Taller</dt>
+            <dd class="col-7">{{ l.taller }}</dd>
+
+            <dt class="col-5">Envío taller</dt>
+            <dd class="col-7">{{ l.fecha_envio_taller ?? '—' }}</dd>
+
+            <dt class="col-5">Retorno taller</dt>
+            <dd class="col-7">{{ l.fecha_retorno_taller ?? '—' }}</dd>
+          }
+
+          @if (l.fecha_recogida_prevista) {
+            <dt class="col-5">Recogida prevista</dt>
+            <dd class="col-7">{{ l.fecha_recogida_prevista }}</dd>
+          }
+        </dl>
+      </div>
+    </div>
+
+    <!-- COBRO -->
+    <div class="card mb-3">
+      <div class="card-header fw-semibold">Cobro</div>
+      <div class="card-body">
+        <dl class="row mb-0">
+          <dt class="col-5">Importe</dt>
+          <dd class="col-7">
+            {{ l.importe != null ? (l.importe | number:'1.0-2') + ' €' : '—' }}
+          </dd>
+
+          <dt class="col-5">Tipo</dt>
+          <dd class="col-7">{{ l.tipo_cobro }}</dd>
+        </dl>
+      </div>
+    </div>
+
+    <!-- NOTAS -->
+    @if (l.notas) {
+      <div class="card mb-3">
+        <div class="card-header fw-semibold">Notas</div>
+        <div class="card-body">
+          <p class="mb-0" style="white-space:pre-wrap">{{ l.notas }}</p>
+        </div>
+      </div>
+    }
+
+    <!-- CREDENCIALES -->
+    <div class="card mb-3">
+      <div class="card-header fw-semibold">Credenciales del dispositivo</div>
+      <div class="card-body">
+        @if (credenciales(); as c) {
+          <dl class="row mb-0">
+            <dt class="col-5">PIN SIM</dt>
+            <dd class="col-7">{{ c.pin_sim ?? '—' }}</dd>
+
+            <dt class="col-5">Código desbloqueo</dt>
+            <dd class="col-7">{{ c.codigo_desbloqueo ?? '—' }}</dd>
+
+            <dt class="col-5">Correos Google</dt>
+            <dd class="col-7" style="white-space:pre-wrap">{{ c.correos_google ?? '—' }}</dd>
+
+            <dt class="col-5">Password recuperación</dt>
+            <dd class="col-7">{{ c.password_recuperacion ?? '—' }}</dd>
+          </dl>
+        } @else {
+          <span class="text-muted">Sin credenciales registradas.</span>
+        }
+      </div>
+    </div>
+
+    <!-- HISTORIAL -->
+    <div class="card mb-3">
+      <div class="card-header fw-semibold">Historial de estados</div>
+      <div class="card-body p-0">
+        @if (historial().length === 0) {
+          <p class="text-muted p-3 mb-0">Sin historial.</p>
+        } @else {
+          <table class="table table-sm mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Fecha</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (h of historial(); track h.id) {
+                <tr>
+                  <td class="text-nowrap small text-muted">{{ h.fecha | date:'dd/MM/yy HH:mm' }}</td>
+                  <td>{{ etiquetaFase(h) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      </div>
+    </div>
+
+  }
+</div>

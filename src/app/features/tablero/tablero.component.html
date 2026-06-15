@@ -71,7 +71,7 @@
           @for (linea of lineasFiltradas(); track linea.id) {
             <tr
               class="fila-linea"
-              [style.background-color]="getColor(linea)"
+              [style.--bs-table-bg]="getColor(linea)"
               (click)="verDetalle(linea.id)"
             >
               <td class="fw-bold">L-{{ linea.id }}</td>
