@@ -1,0 +1,273 @@
+<nav class="navbar navbar-dark bg-dark px-3 py-2">
+  <span class="navbar-brand fw-bold">
+    {{ modoEdicion() ? 'Editar línea' : 'Nueva línea' }}
+  </span>
+  <button class="btn btn-sm btn-outline-light" (click)="volver()">← Volver</button>
+</nav>
+
+<div class="container py-4" style="max-width:720px">
+
+  @if (cargando()) {
+    <div class="text-center text-muted py-5">Cargando...</div>
+  } @else {
+
+    <form (ngSubmit)="onSubmit()">
+
+      <!-- ── TIPO ───────────────────────────────────────────── -->
+      <div class="card mb-3">
+        <div class="card-header fw-semibold">Tipo</div>
+        <div class="card-body row g-3">
+
+          <div class="col-6">
+            <label class="form-label">Flujo</label>
+            <select class="form-select" [(ngModel)]="flujo" name="flujo"
+                    (ngModelChange)="onFlujoChange()">
+              @for (f of flujos; track f.val) {
+                <option [value]="f.val">{{ f.label }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="col-6">
+            <label class="form-label">Estado</label>
+            <select class="form-select" [(ngModel)]="fase" name="fase">
+              @for (f of fases; track f.val) {
+                <option [value]="f.val">{{ f.label }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="col-6 d-flex gap-4 align-items-center pt-2">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="avisado"
+                     [(ngModel)]="avisado" name="avisado" />
+              <label class="form-check-label" for="avisado">Avisado</label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="movil"
+                     [(ngModel)]="movil_en_tienda" name="movil_en_tienda" />
+              <label class="form-check-label" for="movil">📱 Móvil en tienda</label>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── DISPOSITIVO ───────────────────────────────────── -->
+      <div class="card mb-3">
+        <div class="card-header fw-semibold">Dispositivo</div>
+        <div class="card-body row g-3">
+
+          <div class="col-12">
+            <label class="form-label">Modelo</label>
+            <input type="text" class="form-control" [(ngModel)]="modelo"
+                   name="modelo" placeholder="ej. iPhone 11, Redmi 13C..." />
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Problema / Pieza</label>
+            <input type="text" class="form-control" [(ngModel)]="problema_o_pieza"
+                   name="problema_o_pieza" placeholder="ej. Pantalla, Batería..." />
+          </div>
+
+          <div class="col-6">
+            <label class="form-label">Código desbloqueo <span class="text-muted">(visual)</span></label>
+            <input type="text" class="form-control" [(ngModel)]="codigo_dispositivo"
+                   name="codigo_dispositivo" placeholder="ej. patrón, PIN..." />
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── CLIENTE ───────────────────────────────────────── -->
+      <div class="card mb-3">
+        <div class="card-header fw-semibold">Cliente</div>
+        <div class="card-body row g-3">
+
+          <div class="col-12 position-relative">
+            <label class="form-label">Buscar cliente</label>
+            <input type="text" class="form-control"
+                   [ngModel]="busqCliente()"
+                   (ngModelChange)="onBuscarCliente($event)"
+                   name="busqCliente"
+                   placeholder="Nombre o teléfono..." />
+            @if (clienteSelec()) {
+              <small class="text-success">✓ {{ clienteSelec()!.nombre }} ({{ clienteSelec()!.telefono ?? 'sin tel.' }})</small>
+            }
+            @if (resultClientes().length > 0) {
+              <ul class="dropdown-clientes list-group shadow-sm">
+                @for (c of resultClientes(); track c.id) {
+                  <li class="list-group-item list-group-item-action"
+                      (click)="seleccionarCliente(c)">
+                    {{ c.nombre }} — {{ c.telefono ?? 'sin tel.' }}
+                  </li>
+                }
+              </ul>
+            }
+          </div>
+
+          <div class="col-12">
+            <button type="button" class="btn btn-sm btn-outline-primary"
+                    (click)="toggleNuevoCliente()">
+              {{ mostrarNuevoCliente() ? '✕ Cancelar' : '+ Cliente nuevo' }}
+            </button>
+          </div>
+
+          @if (mostrarNuevoCliente()) {
+            <div class="col-6">
+              <input type="text" class="form-control" placeholder="Nombre *"
+                     [ngModel]="nuevoClienteNombre()"
+                     (ngModelChange)="nuevoClienteNombre.set($event)"
+                     name="nuevoNombre" />
+            </div>
+            <div class="col-6">
+              <input type="tel" class="form-control" placeholder="Teléfono"
+                     [ngModel]="nuevoClienteTel()"
+                     (ngModelChange)="nuevoClienteTel.set($event)"
+                     name="nuevoTel" />
+            </div>
+            <div class="col-12">
+              <button type="button" class="btn btn-sm btn-success" (click)="crearCliente()">
+                Crear y seleccionar
+              </button>
+            </div>
+          }
+
+          <div class="col-6">
+            <label class="form-label">Teléfono alternativo</label>
+            <input type="tel" class="form-control" [(ngModel)]="telefono_alternativo"
+                   name="telefono_alternativo" />
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── PROVEEDOR (pieza/accesorio) ───────────────────── -->
+      @if (esPieza) {
+        <div class="card mb-3">
+          <div class="card-header fw-semibold">Proveedor</div>
+          <div class="card-body row g-3">
+
+            <div class="col-6">
+              <label class="form-label">Proveedor</label>
+              <select class="form-select" [(ngModel)]="proveedor_id" name="proveedor_id">
+                <option [ngValue]="null">— Sin asignar —</option>
+                @for (p of proveedores(); track p.id) {
+                  <option [ngValue]="p.id">{{ p.nombre }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="col-6">
+              <label class="form-label">Fecha pedido</label>
+              <input type="date" class="form-control" [(ngModel)]="fecha_pedido"
+                     name="fecha_pedido" />
+            </div>
+
+          </div>
+        </div>
+      }
+
+      <!-- ── TALLER (reparacion) ───────────────────────────── -->
+      @if (esReparacion) {
+        <div class="card mb-3">
+          <div class="card-header fw-semibold">Taller (si aplica)</div>
+          <div class="card-body row g-3">
+
+            <div class="col-6">
+              <label class="form-label">Taller</label>
+              <select class="form-select" [(ngModel)]="taller" name="taller">
+                <option value="">— Sin taller —</option>
+                <option value="Phonestorm">Phonestorm</option>
+                <option value="Infotec">Infotec</option>
+              </select>
+            </div>
+
+            <div class="col-6">
+              <label class="form-label">Fecha envío</label>
+              <input type="date" class="form-control" [(ngModel)]="fecha_envio_taller"
+                     name="fecha_envio_taller" />
+            </div>
+
+            <div class="col-6">
+              <label class="form-label">Fecha retorno</label>
+              <input type="date" class="form-control" [(ngModel)]="fecha_retorno_taller"
+                     name="fecha_retorno_taller" />
+            </div>
+
+          </div>
+        </div>
+      }
+
+      <!-- ── COBRO ─────────────────────────────────────────── -->
+      <div class="card mb-3">
+        <div class="card-header fw-semibold">Cobro</div>
+        <div class="card-body row g-3">
+
+          <div class="col-6">
+            <label class="form-label">Importe (€)</label>
+            <input type="number" class="form-control" [(ngModel)]="importe"
+                   name="importe" min="0" step="0.01" />
+          </div>
+
+          <div class="col-6">
+            <label class="form-label">Tipo</label>
+            <select class="form-select" [(ngModel)]="tipo_cobro" name="tipo_cobro">
+              <option value="normal">Normal</option>
+              <option value="garantia">Garantía</option>
+              <option value="presupuesto_taller">Presupuesto taller</option>
+            </select>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── FECHAS ────────────────────────────────────────── -->
+      <div class="card mb-3">
+        <div class="card-header fw-semibold">Fechas</div>
+        <div class="card-body row g-3">
+
+          <div class="col-6">
+            <label class="form-label">Fecha entrada</label>
+            <input type="date" class="form-control" [(ngModel)]="fecha_entrada"
+                   name="fecha_entrada" />
+          </div>
+
+          <div class="col-6">
+            <label class="form-label">Recogida prevista</label>
+            <input type="datetime-local" class="form-control"
+                   [(ngModel)]="fecha_recogida_prevista"
+                   name="fecha_recogida_prevista" />
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── NOTAS ─────────────────────────────────────────── -->
+      <div class="card mb-4">
+        <div class="card-header fw-semibold">Notas</div>
+        <div class="card-body">
+          <textarea class="form-control" rows="3" [(ngModel)]="notas"
+                    name="notas" placeholder="Observaciones técnicas, referencias...">
+          </textarea>
+        </div>
+      </div>
+
+      <!-- ── ERRORES + BOTONES ─────────────────────────────── -->
+      @if (error()) {
+        <div class="alert alert-danger">{{ error() }}</div>
+      }
+
+      <div class="d-flex gap-2 justify-content-end">
+        <button type="button" class="btn btn-outline-secondary" (click)="volver()">
+          Cancelar
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="guardando()">
+          {{ guardando() ? 'Guardando...' : (modoEdicion() ? 'Guardar cambios' : 'Crear línea') }}
+        </button>
+      </div>
+
+    </form>
+
+  }
+</div>

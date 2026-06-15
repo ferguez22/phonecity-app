@@ -15,9 +15,21 @@ export const routes: Routes = [
       import('./features/tablero/tablero.component').then((m) => m.TableroComponent),
   },
   {
+    path: 'linea/nueva',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/linea-form/linea-form.component').then((m) => m.LineaFormComponent),
+  },
+  {
+    path: 'linea/:id/editar',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/linea-form/linea-form.component').then((m) => m.LineaFormComponent),
+  },
+  {
     path: 'linea/:id',
     canActivate: [authGuard],
-    // Placeholder — se implementa en 1.6
+    // Placeholder ficha de detalle — se implementa en 1.6
     loadComponent: () =>
       import('./features/tablero/tablero.component').then((m) => m.TableroComponent),
   },

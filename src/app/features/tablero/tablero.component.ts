@@ -1,6 +1,6 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
-import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/services/auth.service';
 import { LineaService, LineaFiltros } from '../../core/services/linea.service';
@@ -15,7 +15,7 @@ interface Boton {
 @Component({
   selector: 'app-tablero',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './tablero.component.html',
   styleUrl: './tablero.component.scss',
 })
