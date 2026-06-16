@@ -1,21 +1,107 @@
-.busqueda {
-  max-width: 320px;
-  min-width: 200px;
+// ── HOST ─────────────────────────────────────────────────────────────────────
+:host {
+  display: block;
 }
 
-// Botones de estado
+// ── ANIMACIONES ───────────────────────────────────────────────────────────────
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slideFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes inputAppear {
+  from {
+    opacity: 0;
+    transform: scaleY(0.9);
+  }
+
+  to {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+// ── STICKY HEADER (fixed) ─────────────────────────────────────────────────────
+.sticky-controls {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 200;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.13);
+}
+
+.controles-bar {
+  border-bottom: 1px solid #e9ecef;
+}
+
+.botones-bar {
+  background: #f8f9fa;
+  overflow-x: auto;
+  flex-wrap: nowrap !important;
+}
+
+.busqueda {
+  max-width: 300px;
+  min-width: 180px;
+}
+
+// ── CONTENT AREA (offset del header fijo) ────────────────────────────────────
+.table-area {
+  padding-top: var(--controls-h, 148px);
+}
+
+// ── BOTONES ESTADO ────────────────────────────────────────────────────────────
 .boton-estado {
   border: 1px solid #ccc;
-  background: #f8f9fa;
+  background: #fff;
   color: #333;
   white-space: nowrap;
-  font-size: 0.78rem;
+  font-size: 0.75rem;
+  flex-shrink: 0;
 
-  &:hover   { background: #e9ecef; }
-  &.activo  { background: #212529; color: #fff; border-color: #212529; }
+  &:hover {
+    background: #e9ecef;
+  }
+
+  &.activo {
+    background: #212529;
+    color: #fff;
+    border-color: #212529;
+  }
 }
 
-// Tabla
+// ── TABLA ─────────────────────────────────────────────────────────────────────
 .tabla-lineas {
   font-size: 0.82rem;
   border-collapse: collapse;
@@ -23,21 +109,223 @@
 
 .tabla-lineas th {
   position: sticky;
-  top: 0;
+  top: var(--controls-h, 148px);
   z-index: 1;
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+  white-space: nowrap;
 }
 
 .fila-linea {
   cursor: pointer;
-  transition: filter 0.1s;
+  transition: filter 0.12s ease;
 
-  td { vertical-align: middle; }
-  &:hover { filter: brightness(0.93); }
+  td {
+    vertical-align: middle;
+  }
+
+  &:hover {
+    filter: brightness(0.92);
+  }
 }
 
 .col-pieza {
   max-width: 180px;
+}
+
+// ── BADGE ESTADO ──────────────────────────────────────────────────────────────
+.td-estado {
+  overflow: visible;
+}
+
+.estado-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.badge-estado {
+  font-size: 0.76rem;
+  font-weight: 500;
+  padding: 3px 7px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  user-select: none;
+  white-space: nowrap;
+  cursor: default;
+  display: inline-block;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+
+  .estado-wrapper:hover & {
+    border-color: rgba(0, 0, 0, 0.3);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+  }
+}
+
+// ── DROPDOWN HOVER DE ESTADO ──────────────────────────────────────────────────
+.estado-menu {
+  position: fixed;
+  left: calc(100% + 8px);
+  transform: translateY(-50%);
+  z-index: 500;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.14);
+  min-width: 210px;
+  overflow: hidden;
+  animation: slideFromLeft 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow-y: auto;
+}
+
+.estado-opt {
+  padding: 7px 14px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.1s;
+
+  &:hover {
+    background: #f0f4ff;
+  }
+
+  &.activo {
+    background: #212529;
+    color: #fff;
+    font-weight: 600;
+  }
+}
+
+// ── MODAL ─────────────────────────────────────────────────────────────────────
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: fadeIn 0.18s ease;
+}
+
+.modal-card {
+  background: #fff;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 580px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.22);
+  animation: slideUp 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 14px 16px;
+  border-bottom: 1px solid #e9ecef;
+  border-left: 5px solid #ccc;
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 1;
+}
+
+.modal-card-body {
+  padding: 0 16px 16px;
+}
+
+.modal-section {
+  padding-top: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f2f2f2;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.modal-section-title {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #aaa;
+  margin-bottom: 6px;
+}
+
+.btn-close-modal {
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  width: 28px;
+  height: 28px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: #666;
+  transition: background 0.15s, color 0.15s;
+
+  &:hover {
+    background: #f0f0f0;
+    color: #333;
+  }
+}
+
+// ── CAMPOS EDITABLES EN MODAL ─────────────────────────────────────────────────
+.editable-field {
+  cursor: text;
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid #dadce0;
+  background: #fff;
+  display: inline-block;
+  min-height: 22px;
+  min-width: 60px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+
+  &:hover {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.15);
+  }
+
+  &::after {
+    display: none;
+  }
+}
+
+.edit-input {
+  border: 1.5px solid #0d6efd;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-size: inherit;
+  width: 100%;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.12);
+  animation: inputAppear 0.12s ease;
+  background: #fff;
+}
+
+.edit-textarea {
+  resize: vertical;
+  min-height: 64px;
+}
+
+// ── HISTORIAL ─────────────────────────────────────────────────────────────────
+.historial-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.historial-item {
+  display: flex;
+  gap: 8px;
+  padding: 3px 0;
+  border-bottom: 1px dotted #eee;
+
+  &:last-child {
+    border-bottom: none;
+  }
 }
