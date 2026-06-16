@@ -42,7 +42,7 @@
 </div>
 
 <!-- ── TABLA ──────────────────────────────────────────────────────────────── -->
-<div class="table-area container-fluid py-2">
+<div class="table-area container-fluid">
 
   @if (cargando()) {
     <div class="text-center text-muted py-5">Cargando...</div>
@@ -51,7 +51,7 @@
   } @else if (lineasFiltradas().length === 0) {
     <div class="text-center text-muted py-5">No hay líneas en este estado.</div>
   } @else {
-    <div class="table-responsive">
+    <div>
       <table class="table table-sm table-hover tabla-lineas">
         <thead class="table-dark">
           <tr>

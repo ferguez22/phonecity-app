@@ -78,7 +78,7 @@
 
 // ── CONTENT AREA (offset del header fijo) ────────────────────────────────────
 .table-area {
-  padding-top: var(--controls-h, 148px);
+  padding-top: calc(var(--controls-h, 148px) + 2px);
 }
 
 // ── BOTONES ESTADO ────────────────────────────────────────────────────────────
@@ -110,7 +110,7 @@
 .tabla-lineas th {
   position: sticky;
   top: var(--controls-h, 148px);
-  z-index: 1;
+  z-index: 10;
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.04em;

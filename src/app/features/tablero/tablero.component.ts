@@ -35,9 +35,9 @@ export const ESTADO_OPTIONS: EstadoOption[] = [
   { label: 'Reparado - Avisado',            flujo: 'reparacion', fase: 'reparado',           avisado: true,  movil_en_tienda: false },
   { label: 'Enviar a taller',               flujo: 'reparacion', fase: 'por_enviar_taller',  avisado: false, movil_en_tienda: false },
   { label: 'Enviado a taller',              flujo: 'reparacion', fase: 'en_taller',          avisado: false, movil_en_tienda: false },
-  { label: 'Cancelado',                     flujo: 'reparacion', fase: 'cancelado',          avisado: false, movil_en_tienda: false },
-  { label: 'No se puede reparar - Avisado', flujo: 'reparacion', fase: 'no_reparable',       avisado: true,  movil_en_tienda: false },
-  { label: 'Finalizado',                    flujo: 'reparacion', fase: 'entregado',          avisado: false, movil_en_tienda: false },
+  { label: 'Cancelado', flujo: 'reparacion', fase: 'cancelado', avisado: false, movil_en_tienda: false },
+  { label: 'No se puede reparar', flujo: 'reparacion', fase: 'no_reparable', avisado: false, movil_en_tienda: false },
+  { label: 'No se puede reparar - Entregado', flujo: 'reparacion', fase: 'no_reparable', avisado: true, movil_en_tienda: false }, { label: 'Finalizado', flujo: 'reparacion', fase: 'entregado', avisado: false, movil_en_tienda: false },
   // Venta / Compra
   { label: 'Venta de Dispositivo',          flujo: 'venta',      fase: 'entregado',          avisado: false, movil_en_tienda: false, subtipo: 'venta'  },
   { label: 'Compra de Dispositivo',         flujo: 'venta',      fase: 'entregado',          avisado: false, movil_en_tienda: false, subtipo: 'compra' },
@@ -52,6 +52,7 @@ interface Boton { label: string; filtros: LineaFiltros; }
   templateUrl: './tablero.component.html',
   styleUrl: './tablero.component.scss',
 })
+  
 export class TableroComponent implements OnInit, AfterViewInit {
   @ViewChild('controlsRef') controlsRef!: ElementRef<HTMLElement>;
 
@@ -89,9 +90,10 @@ export class TableroComponent implements OnInit, AfterViewInit {
     { label: 'Reparar',                   filtros: { flujo: 'reparacion', fase: 'por_reparar' } },
     { label: 'Reparado - Avisado',        filtros: { flujo: 'reparacion', fase: 'reparado', avisado: true } },
     { label: 'Enviar a taller',           filtros: { fase: 'por_enviar_taller' } },
-    { label: 'Enviado a taller',          filtros: { fase: 'en_taller' } },
-    { label: 'No se puede reparar',       filtros: { fase: 'no_reparable' } },
-    { label: 'Venta de Dispositivo',      filtros: { flujo: 'venta', subtipo: 'venta'  } },
+    { label: 'Enviado a taller', filtros: { fase: 'en_taller' } },
+    { label: 'No se puede reparar', filtros: { fase: 'no_reparable', avisado: false } },
+    { label: 'No se puede reparar - Entregado', filtros: { fase: 'no_reparable', avisado: true } },
+    { label: 'Venta de Dispositivo', filtros: { flujo: 'venta', subtipo: 'venta' } },
     { label: 'Compra de Dispositivo',     filtros: { flujo: 'venta', subtipo: 'compra' } },
   ];
 
@@ -108,6 +110,7 @@ export class TableroComponent implements OnInit, AfterViewInit {
   });
 
   readonly total       = computed(() => this.lineasFiltradas().length);
+  
   readonly activeLinea = computed(() => {
     const id = this.editingId();
     return id !== null ? (this.lineas().find(l => l.id === id) ?? null) : null;
@@ -119,7 +122,7 @@ export class TableroComponent implements OnInit, AfterViewInit {
     setTimeout(() => {
       const h = this.controlsRef?.nativeElement?.offsetHeight ?? 148;
       document.documentElement.style.setProperty('--controls-h', `${h}px`);
-    }, 0);
+    }, 100);
   }
 
   seleccionarBoton(boton: Boton): void {
@@ -130,7 +133,7 @@ export class TableroComponent implements OnInit, AfterViewInit {
   }
 
   toggleOrder(): void { this.orderDir.update(d => d === 'desc' ? 'asc' : 'desc'); this.cargar(); }
-
+  
   toggleOrderBy(): void {
     this.orderBy.update(o => o === 'id' ? 'fecha_entrada' : o === 'fecha_entrada' ? 'dias_reparacion' : 'id');
     this.cargar();
@@ -145,6 +148,10 @@ export class TableroComponent implements OnInit, AfterViewInit {
         this.lineas.set(data);
         this.cargando.set(false);
         setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'instant' }), 80);
+        setTimeout(() => {
+          const h = this.controlsRef?.nativeElement?.offsetHeight ?? 148;
+          document.documentElement.style.setProperty('--controls-h', `${h}px`);
+        }, 100);
       },
       error: () => { this.error.set('Error al cargar'); this.cargando.set(false); },
     });
@@ -259,7 +266,7 @@ export class TableroComponent implements OnInit, AfterViewInit {
       entregado: 'Finalizado', cancelado: 'Cancelado', no_reparable: 'No se puede reparar',
     };
     let label = map[h.fase] ?? h.fase;
-    if (h.avisado && h.fase === 'no_reparable') label = 'No se puede reparar - Avisado';
+    if (h.avisado && h.fase === 'no_reparable') label = 'No se puede reparar - Entregado';
     if (h.movil_en_tienda) label += ' · 📱';
     return label;
   }
