@@ -37,21 +37,25 @@ export function getColor(linea: Linea): string {
 
 // Etiqueta legible del estado para mostrar en la tabla
 export function getEtiqueta(linea: Linea): string {
+  if (linea.fase === 'entregado' && linea.flujo === 'venta') {
+    return (linea as any).subtipo === 'compra' ? 'Compra de Dispositivo' : 'Venta de Dispositivo';
+  }
+  if (linea.fase === 'no_reparable' && linea.avisado) {
+    return 'No se puede reparar - Avisado';
+  }
   const map: Record<string, string> = {
-    por_pedir:          'Pedir',
-    pedido:             'Pedido',
-    en_tienda:          'En tienda - Avisado',
-    por_reparar:        'Reparando',
-    por_enviar_taller:  'Enviar a taller',
-    en_taller:          'En taller',
-    reparado:           'Reparado - Avisado',
-    entregado:          'Finalizado',
-    cancelado:          'Cancelado',
-    no_reparable:       'No reparable',
+    por_pedir:         'Pedir pieza',
+    pedido:            'Pieza pedida',
+    en_tienda:         'Pieza en tienda - Avisado',
+    por_reparar:       'Reparar',
+    por_enviar_taller: 'Enviar a taller',
+    en_taller:         'Enviado a taller',
+    reparado:          'Reparado - Avisado',
+    entregado:         'Finalizado',
+    cancelado:         'Cancelado',
+    no_reparable:      'No se puede reparar',
   };
   let label = map[linea.fase] ?? linea.fase;
-  if (linea.movil_en_tienda && linea.fase !== 'entregado') {
-    label += ' 📱';
-  }
+  if (linea.movil_en_tienda && linea.fase !== 'entregado') label += ' 📱';
   return label;
 }

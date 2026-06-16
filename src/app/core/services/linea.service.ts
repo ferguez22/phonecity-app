@@ -12,8 +12,9 @@ export interface LineaFiltros {
   movil_en_tienda?: boolean;
   orderBy?: 'fecha_entrada' | 'dias_reparacion' | 'id';
   order?: 'asc' | 'desc';
+  vista?: string;      // ← añadir
+  subtipo?: string;    // ← añadir
 }
-
 export type LineaPayload = Partial<Omit<Linea,
   'id' | 'cliente_nombre' | 'cliente_telefono' | 'credenciales_borradas'
 >>;

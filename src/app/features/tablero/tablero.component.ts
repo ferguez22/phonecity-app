@@ -11,27 +11,36 @@ import { Credenciales } from '../../core/models/credenciales.model';
 import { getColor, getEtiqueta } from './color.util';
 
 export interface EstadoOption {
-  label: string; flujo: Flujo; fase: Fase;
-  avisado: boolean; movil_en_tienda: boolean;
+  label: string;
+  flujo: Flujo;
+  fase: Fase;
+  avisado: boolean;
+  movil_en_tienda: boolean;
+  subtipo?: 'venta' | 'compra' | null;
 }
 
 export const ESTADO_OPTIONS: EstadoOption[] = [
-  { label: 'Reparando',                 flujo: 'reparacion', fase: 'por_reparar',        avisado: false, movil_en_tienda: false },
-  { label: 'Reparado - Avisado',        flujo: 'reparacion', fase: 'reparado',           avisado: true,  movil_en_tienda: false },
-  { label: 'Enviar a taller',           flujo: 'reparacion', fase: 'por_enviar_taller',  avisado: false, movil_en_tienda: false },
-  { label: 'Enviado a taller',          flujo: 'reparacion', fase: 'en_taller',          avisado: false, movil_en_tienda: false },
-  { label: 'No reparable',              flujo: 'reparacion', fase: 'no_reparable',       avisado: false, movil_en_tienda: false },
-  { label: 'Finalizado',                flujo: 'reparacion', fase: 'entregado',          avisado: false, movil_en_tienda: false },
-  { label: 'Cancelado',                 flujo: 'reparacion', fase: 'cancelado',          avisado: false, movil_en_tienda: false },
-  { label: 'Pedir pieza',               flujo: 'pieza',      fase: 'por_pedir',          avisado: false, movil_en_tienda: false },
-  { label: 'Pedir pieza 📱',            flujo: 'pieza',      fase: 'por_pedir',          avisado: false, movil_en_tienda: true  },
-  { label: 'Pieza pedida',              flujo: 'pieza',      fase: 'pedido',             avisado: false, movil_en_tienda: false },
-  { label: 'Pieza pedida 📱',           flujo: 'pieza',      fase: 'pedido',             avisado: false, movil_en_tienda: true  },
-  { label: 'Pieza en tienda - Avisado', flujo: 'pieza',      fase: 'en_tienda',          avisado: true,  movil_en_tienda: false },
-  { label: 'Pedir accesorio',           flujo: 'accesorio',  fase: 'por_pedir',          avisado: false, movil_en_tienda: false },
-  { label: 'Accesorio pedido',          flujo: 'accesorio',  fase: 'pedido',             avisado: false, movil_en_tienda: false },
-  { label: 'Accesorio en tienda',       flujo: 'accesorio',  fase: 'en_tienda',          avisado: true,  movil_en_tienda: false },
-  { label: 'Venta de Dispositivo',      flujo: 'venta',      fase: 'entregado',          avisado: false, movil_en_tienda: false },
+  // Pieza
+  { label: 'Pedir Pieza - Móvil en tienda', flujo: 'pieza',      fase: 'por_pedir', avisado: false, movil_en_tienda: true  },
+  { label: 'Pieza pedida - Móvil en tienda',flujo: 'pieza',      fase: 'pedido',    avisado: false, movil_en_tienda: true  },
+  { label: 'Pedir pieza',                   flujo: 'pieza',      fase: 'por_pedir', avisado: false, movil_en_tienda: false },
+  { label: 'Pieza pedida',                  flujo: 'pieza',      fase: 'pedido',    avisado: false, movil_en_tienda: false },
+  { label: 'Pieza en tienda - Avisado',     flujo: 'pieza',      fase: 'en_tienda', avisado: true,  movil_en_tienda: false },
+  // Accesorio
+  { label: 'Pedir Accesorio',               flujo: 'accesorio',  fase: 'por_pedir', avisado: false, movil_en_tienda: false },
+  { label: 'Accesorio Pedido',              flujo: 'accesorio',  fase: 'pedido',    avisado: false, movil_en_tienda: false },
+  { label: 'Accesorio en tienda - Avisado', flujo: 'accesorio',  fase: 'en_tienda', avisado: true,  movil_en_tienda: false },
+  // Reparación
+  { label: 'Reparar',                       flujo: 'reparacion', fase: 'por_reparar',        avisado: false, movil_en_tienda: false },
+  { label: 'Reparado - Avisado',            flujo: 'reparacion', fase: 'reparado',           avisado: true,  movil_en_tienda: false },
+  { label: 'Enviar a taller',               flujo: 'reparacion', fase: 'por_enviar_taller',  avisado: false, movil_en_tienda: false },
+  { label: 'Enviado a taller',              flujo: 'reparacion', fase: 'en_taller',          avisado: false, movil_en_tienda: false },
+  { label: 'Cancelado',                     flujo: 'reparacion', fase: 'cancelado',          avisado: false, movil_en_tienda: false },
+  { label: 'No se puede reparar - Avisado', flujo: 'reparacion', fase: 'no_reparable',       avisado: true,  movil_en_tienda: false },
+  { label: 'Finalizado',                    flujo: 'reparacion', fase: 'entregado',          avisado: false, movil_en_tienda: false },
+  // Venta / Compra
+  { label: 'Venta de Dispositivo',          flujo: 'venta',      fase: 'entregado',          avisado: false, movil_en_tienda: false, subtipo: 'venta'  },
+  { label: 'Compra de Dispositivo',         flujo: 'venta',      fase: 'entregado',          avisado: false, movil_en_tienda: false, subtipo: 'compra' },
 ];
 
 interface Boton { label: string; filtros: LineaFiltros; }
@@ -52,51 +61,38 @@ export class TableroComponent implements OnInit, AfterViewInit {
   private readonly histSvc = inject(HistorialService);
   private readonly router  = inject(Router);
 
-  // ── Tabla ─────────────────────────────────────────────────────────────────
-  readonly lineas      = signal<Linea[]>([]);
-  readonly cargando    = signal(false);
-  readonly error       = signal<string | null>(null);
-  readonly busqueda    = signal('');
-  readonly orderDir    = signal<'asc' | 'desc'>('asc');
-  readonly orderBy     = signal<'fecha_entrada' | 'dias_reparacion' | 'id'>('id');
-  readonly botonActivo = signal('Todo');
+  readonly lineas       = signal<Linea[]>([]);
+  readonly cargando     = signal(false);
+  readonly error        = signal<string | null>(null);
+  readonly busqueda     = signal('');
+  readonly orderDir     = signal<'asc' | 'desc'>('asc');
+  readonly orderBy      = signal<'fecha_entrada' | 'dias_reparacion' | 'id'>('id');
+  readonly botonActivo  = signal('Todo');
   private filtrosActivos: LineaFiltros = {};
 
-  // ── Hover estado ──────────────────────────────────────────────────────────
-  readonly editingId     = signal<number | null>(null);
+  readonly editingId       = signal<number | null>(null);
   readonly guardandoInline = signal(false);
-  readonly menuStyle = signal<{ top: string; left: string; maxHeight: string }>({
-  top: '0', left: '0', maxHeight: '520px'});
-  readonly estadoOptions = ESTADO_OPTIONS;
+  readonly estadoOptions   = ESTADO_OPTIONS;
+  readonly menuStyle       = signal<{ top: string; left: string; maxHeight: string }>({ top: '0', left: '0', maxHeight: '520px' });
   private hoverTimer: ReturnType<typeof setTimeout> | null = null;
 
-  // ── Modal detalle ─────────────────────────────────────────────────────────
   readonly lineaModal        = signal<Linea | null>(null);
   readonly modalHistorial    = signal<EntradaHistorial[]>([]);
   readonly modalCredenciales = signal<Credenciales | null>(null);
   readonly modalCargando     = signal(false);
-
-  // ── Edición inline modal ──────────────────────────────────────────────────
-  readonly modalEditField = signal<string | null>(null);
-  readonly modalEditValue = signal<string>('');
+  readonly modalEditField    = signal<string | null>(null);
+  readonly modalEditValue    = signal<string>('');
 
   readonly botones: Boton[] = [
-    { label: 'Todo',                     filtros: {} },
-    { label: '📱 En tienda ahora',       filtros: { movil_en_tienda: true } },
-    { label: 'Reparando',                filtros: { flujo: 'reparacion', fase: 'por_reparar' } },
-    { label: 'Reparado - Avisado',       filtros: { flujo: 'reparacion', fase: 'reparado', avisado: true } },
-    { label: 'Enviar a taller',          filtros: { fase: 'por_enviar_taller' } },
-    { label: 'Enviado a taller',         filtros: { fase: 'en_taller' } },
-    { label: 'Pedir pieza',              filtros: { flujo: 'pieza', fase: 'por_pedir' } },
-    { label: 'Pieza pedida',             filtros: { flujo: 'pieza', fase: 'pedido' } },
-    { label: 'Pieza en tienda',          filtros: { flujo: 'pieza', fase: 'en_tienda', avisado: true } },
-    { label: 'Pedir accesorio',          filtros: { flujo: 'accesorio', fase: 'por_pedir' } },
-    { label: 'Accesorio pedido',         filtros: { flujo: 'accesorio', fase: 'pedido' } },
-    { label: 'Accesorio en tienda',      filtros: { flujo: 'accesorio', fase: 'en_tienda', avisado: true } },
-    { label: 'No reparable (en tienda)', filtros: { fase: 'no_reparable', movil_en_tienda: true } },
-    { label: 'No reparable (recogido)',  filtros: { fase: 'no_reparable', movil_en_tienda: false } },
-    { label: 'Cancelado',                filtros: { fase: 'cancelado' } },
-    { label: 'Finalizado',               filtros: { fase: 'entregado' } },
+    { label: 'Todo',                      filtros: {} },
+    { label: '📱 Móviles en tienda',      filtros: { vista: 'moviles_en_tienda' } },
+    { label: 'Reparar',                   filtros: { flujo: 'reparacion', fase: 'por_reparar' } },
+    { label: 'Reparado - Avisado',        filtros: { flujo: 'reparacion', fase: 'reparado', avisado: true } },
+    { label: 'Enviar a taller',           filtros: { fase: 'por_enviar_taller' } },
+    { label: 'Enviado a taller',          filtros: { fase: 'en_taller' } },
+    { label: 'No se puede reparar',       filtros: { fase: 'no_reparable' } },
+    { label: 'Venta de Dispositivo',      filtros: { flujo: 'venta', subtipo: 'venta'  } },
+    { label: 'Compra de Dispositivo',     filtros: { flujo: 'venta', subtipo: 'compra' } },
   ];
 
   readonly lineasFiltradas = computed(() => {
@@ -111,24 +107,20 @@ export class TableroComponent implements OnInit, AfterViewInit {
     );
   });
 
-  readonly total = computed(() => this.lineasFiltradas().length);
+  readonly total       = computed(() => this.lineasFiltradas().length);
   readonly activeLinea = computed(() => {
-  const id = this.editingId();
-  return id !== null ? (this.lineas().find(l => l.id === id) ?? null) : null;
-});
+    const id = this.editingId();
+    return id !== null ? (this.lineas().find(l => l.id === id) ?? null) : null;
+  });
 
   ngOnInit(): void { this.cargar(); }
 
-  ngAfterViewInit(): void { this.updateHeaderHeight(); }
-
-  private updateHeaderHeight(): void {
+  ngAfterViewInit(): void {
     setTimeout(() => {
       const h = this.controlsRef?.nativeElement?.offsetHeight ?? 148;
       document.documentElement.style.setProperty('--controls-h', `${h}px`);
     }, 0);
   }
-
-  // ── Carga ─────────────────────────────────────────────────────────────────
 
   seleccionarBoton(boton: Boton): void {
     this.filtrosActivos = boton.filtros;
@@ -154,38 +146,38 @@ export class TableroComponent implements OnInit, AfterViewInit {
         this.cargando.set(false);
         setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'instant' }), 80);
       },
-      error: () => { this.error.set('Error al cargar las líneas'); this.cargando.set(false); },
+      error: () => { this.error.set('Error al cargar'); this.cargando.set(false); },
     });
   }
 
-  // ── Hover estado ──────────────────────────────────────────────────────────
+  // ── Hover estado ─────────────────────────────────────────────────────────
 
-onEstadoHover(event: MouseEvent, id: number): void {
-  if (this.hoverTimer) clearTimeout(this.hoverTimer);
-  const badge = (event.currentTarget as HTMLElement).querySelector('.badge-estado') as HTMLElement;
-  if (badge) {
-    const rect  = badge.getBoundingClientRect();
-    const maxH  = Math.max(150, window.innerHeight - rect.top - 12);
-    this.menuStyle.set({
-      top:       `${rect.top}px`,
-      left:      `${rect.right + 8}px`,
-      maxHeight: `${maxH}px`,
-    });
+  onEstadoHover(event: MouseEvent, id: number): void {
+    if (this.hoverTimer) clearTimeout(this.hoverTimer);
+    const badge = (event.currentTarget as HTMLElement).querySelector('.badge-estado') as HTMLElement;
+    if (badge) {
+      const rect  = badge.getBoundingClientRect();
+      const maxH  = Math.max(150, window.innerHeight - rect.top - 12);
+      this.menuStyle.set({ top: `${rect.top}px`, left: `${rect.right + 4}px`, maxHeight: `${maxH}px` });
+    }
+    this.editingId.set(id);
   }
-  this.editingId.set(id);
-}
-
-onMenuHover(): void {
-  if (this.hoverTimer) clearTimeout(this.hoverTimer);
-}
 
   onEstadoLeave(): void {
     this.hoverTimer = setTimeout(() => this.editingId.set(null), 300);
   }
 
+  onMenuHover(): void {
+    if (this.hoverTimer) clearTimeout(this.hoverTimer);
+  }
+
   esOpcionActual(opt: EstadoOption, linea: Linea): boolean {
+    const subtipoMatch = opt.subtipo != null
+      ? opt.subtipo === (linea as any).subtipo
+      : true;
     return opt.flujo === linea.flujo && opt.fase === linea.fase &&
-           opt.avisado === !!linea.avisado && opt.movil_en_tienda === !!linea.movil_en_tienda;
+           opt.avisado === !!linea.avisado && opt.movil_en_tienda === !!linea.movil_en_tienda &&
+           subtipoMatch;
   }
 
   seleccionarEstado(event: Event, opt: EstadoOption, linea: Linea): void {
@@ -201,6 +193,7 @@ onMenuHover(): void {
     this.lineas$.update(linea.id, {
       flujo: opt.flujo, fase: opt.fase,
       avisado: opt.avisado as any, movil_en_tienda: opt.movil_en_tienda as any,
+      subtipo: opt.subtipo ?? null,
     }).subscribe({
       next: (updated) => {
         const merge = (l: Linea) => l.id === linea.id ? { ...l, ...updated } : l;
@@ -212,7 +205,7 @@ onMenuHover(): void {
     });
   }
 
-  // ── Modal detalle ─────────────────────────────────────────────────────────
+  // ── Modal ─────────────────────────────────────────────────────────────────
 
   abrirModal(linea: Linea): void {
     this.lineaModal.set(linea);
@@ -220,7 +213,6 @@ onMenuHover(): void {
     this.modalCredenciales.set(null);
     this.modalCargando.set(true);
     this.modalEditField.set(null);
-
     this.histSvc.get(linea.id).subscribe({
       next: h => { this.modalHistorial.set(h); this.modalCargando.set(false); },
       error: () => this.modalCargando.set(false),
@@ -233,8 +225,6 @@ onMenuHover(): void {
 
   cerrarModal(): void { this.lineaModal.set(null); this.modalEditField.set(null); }
 
-  // ── Edición inline modal ──────────────────────────────────────────────────
-
   openModalEdit(field: string, value: any): void {
     this.modalEditField.set(field);
     this.modalEditValue.set(value != null ? String(value) : '');
@@ -245,13 +235,11 @@ onMenuHover(): void {
     if (this.modalEditField() !== field) return;
     const raw = this.modalEditValue().trim();
     const payload: Record<string, any> = {};
-
     if (field === 'importe') {
       payload['importe'] = raw ? parseFloat(raw.replace(',', '.')) : null;
     } else {
       payload[field] = raw || null;
     }
-
     this.modalEditField.set(null);
     this.lineas$.update(lineaId, payload).subscribe({
       next: (updated) => {
@@ -263,17 +251,15 @@ onMenuHover(): void {
 
   cancelModalEdit(): void { this.modalEditField.set(null); }
 
-  // ── Historial helpers ─────────────────────────────────────────────────────
-
   etiquetaHistorial(h: EntradaHistorial): string {
     const map: Record<string, string> = {
       por_pedir: 'Pedir', pedido: 'Pedido', en_tienda: 'En tienda',
       por_reparar: 'Reparando', por_enviar_taller: 'Enviar a taller',
-      en_taller: 'En taller', reparado: 'Reparado',
-      entregado: 'Finalizado', cancelado: 'Cancelado', no_reparable: 'No reparable',
+      en_taller: 'En taller', reparado: 'Reparado - Avisado',
+      entregado: 'Finalizado', cancelado: 'Cancelado', no_reparable: 'No se puede reparar',
     };
     let label = map[h.fase] ?? h.fase;
-    if (h.avisado) label += ' · Avisado';
+    if (h.avisado && h.fase === 'no_reparable') label = 'No se puede reparar - Avisado';
     if (h.movil_en_tienda) label += ' · 📱';
     return label;
   }

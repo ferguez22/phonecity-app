@@ -39,6 +39,7 @@ export interface Linea {
   fecha_retorno_taller: string | null;
   cliente_id: number | null;
   linea_origen_id: number | null;
+  subtipo: 'venta' | 'compra' | null;
 
   // Campos que llegan del LEFT JOIN con cliente (NULL = TIENDA)
   cliente_nombre: string | null;
