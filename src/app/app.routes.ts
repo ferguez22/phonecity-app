@@ -26,6 +26,14 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/linea-form/linea-form.component').then((m) => m.LineaFormComponent),
   },
+
+  {
+    path: 'importar',
+    loadComponent: () =>
+      import('./features/import/import.component').then((m) => m.ImportComponent),
+    canActivate: [authGuard],
+  },
+  
   {
     path: 'linea/:id',
     canActivate: [authGuard],
@@ -33,6 +41,8 @@ export const routes: Routes = [
       import('./features/linea-detalle/linea-detalle.component').then(
         (m) => m.LineaDetalleComponent,
       ),
+    
+      
   },
   { path: '**', redirectTo: 'tablero' },
 ];

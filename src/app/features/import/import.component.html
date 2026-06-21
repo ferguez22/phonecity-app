@@ -1,0 +1,144 @@
+<div class="import-page">
+  <div class="import-header">
+    <h2>Importar CSV</h2>
+    <p class="subtitle">Sube el export del Google Sheet para actualizar la base de datos.</p>
+    <a routerLink="/tablero" class="btn btn-link">Volver a Inicio</a>
+  </div>
+
+  @if (error()) {
+    <div class="alert-box error">{{ error() }}</div>
+  }
+
+  @if (!result()) {
+    <div
+      class="dropzone"
+      [class.dragover]="dragOver()"
+      (dragover)="onDragOver($event)"
+      (dragleave)="onDragLeave($event)"
+      (drop)="onDrop($event)"
+    >
+      <input type="file" id="csvInput" accept=".csv" hidden (change)="onFileInput($event)" />
+      <label for="csvInput" class="dropzone-label">
+        <div class="dropzone-icon">⬆</div>
+        @if (file(); as f) {
+          <div class="file-name">{{ f.name }}</div>
+          <div class="file-size">{{ formatSize(f.size) }}</div>
+        } @else {
+          <div class="dropzone-text">Arrastra el CSV aquí o haz clic para seleccionar</div>
+          <div class="dropzone-hint">Solo archivos .csv · máx 5 MB</div>
+        }
+      </label>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" [disabled]="!file() || loading()" (click)="doPreview()">
+        @if (loading() && !preview()) {
+          <span class="spinner"></span> Analizando...
+        } @else {
+          Previsualizar
+        }
+      </button>
+      @if (file()) {
+        <button class="btn btn-link" [disabled]="loading()" (click)="reset()">Quitar archivo</button>
+      }
+    </div>
+  }
+
+  @if (preview(); as p) {
+    <div class="panel">
+      <h3>Previsualización <span class="muted">(no se ha modificado nada)</span></h3>
+
+      <div class="stat-grid">
+        <div class="stat-card ok">
+          <div class="stat-num">{{ p.stats.ok }}</div>
+          <div class="stat-label">Importables</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">{{ p.stats.separador }}</div>
+          <div class="stat-label">Separadores</div>
+        </div>
+        <div class="stat-card warn">
+          <div class="stat-num">{{ p.stats.fallback }}</div>
+          <div class="stat-label">Sin estado</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">{{ p.stats.vacia }}</div>
+          <div class="stat-label">Vacías</div>
+        </div>
+        <div class="stat-card" [class.err]="p.stats.err > 0">
+          <div class="stat-num">{{ p.stats.err }}</div>
+          <div class="stat-label">Errores</div>
+        </div>
+      </div>
+
+      @if (p.fallbackLog.length) {
+        <button class="btn btn-sm btn-outline" (click)="toggleFallbacks()">
+          {{ showFallbacks() ? 'Ocultar' : 'Ver' }} líneas sin estado ({{ p.fallbackLog.length }})
+        </button>
+        @if (showFallbacks()) {
+          <div class="fallback-list">
+            @for (line of p.fallbackLog; track line) {
+              <div>{{ line }}</div>
+            }
+          </div>
+        }
+      }
+
+      <div class="danger-box">
+        <div class="danger-title">⚠ Acción destructiva</div>
+        <p>
+          Importar <strong>reemplaza TODOS los datos</strong> de líneas, clientes, historial y
+          credenciales por los del CSV. Se crea una copia de seguridad automática
+          (<code>*_backup</code>) y la operación es atómica: si algo falla, no se pierde nada.
+        </p>
+        <label class="confirm-check">
+          <input type="checkbox" [checked]="confirm()" (change)="toggleConfirm()" />
+          Entiendo que se reemplazarán todos los datos por los del CSV.
+        </label>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-danger" [disabled]="!confirm() || loading()" (click)="doExecute()">
+          @if (loading()) {
+            <span class="spinner"></span> Importando...
+          } @else {
+            Importar (reemplazar todo)
+          }
+        </button>
+        <button class="btn btn-link" [disabled]="loading()" (click)="reset()">Cancelar</button>
+      </div>
+    </div>
+  }
+
+  @if (result(); as r) {
+    <div class="panel result">
+      <div class="result-icon">✓</div>
+      <h3>Importación completada</h3>
+
+      <div class="stat-grid">
+        <div class="stat-card ok">
+          <div class="stat-num">{{ r.stats.ok }}</div>
+          <div class="stat-label">Importadas</div>
+        </div>
+        <div class="stat-card warn">
+          <div class="stat-num">{{ r.stats.fallback }}</div>
+          <div class="stat-label">Sin estado</div>
+        </div>
+        <div class="stat-card" [class.err]="r.stats.err > 0">
+          <div class="stat-num">{{ r.stats.err }}</div>
+          <div class="stat-label">Errores</div>
+        </div>
+      </div>
+
+      <p class="result-meta">
+        Próximo ID: <strong>{{ r.nextAutoIncrement }}</strong> · Backup creado:
+        {{ r.backup ? 'sí' : 'no' }}
+      </p>
+
+      <div class="actions center">
+        <a class="btn btn-primary" routerLink="/tablero">Ver tablero</a>
+        <button class="btn btn-link" (click)="reset()">Importar otro</button>
+      </div>
+    </div>
+  }
+</div>
