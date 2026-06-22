@@ -13,7 +13,7 @@ export type Fase =
   | 'no_reparable';
 
 export type TipoCobro = 'normal' | 'garantia' | 'presupuesto_taller';
-export type Taller = 'PhoneStorm' | 'Infotec';
+export type Taller = 'Phonestorm' | 'Infotec';
 
 export interface Linea {
   id: number;

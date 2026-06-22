@@ -61,7 +61,7 @@ export class LineaFormComponent implements OnInit {
   fecha_pedido   = '';
   fecha_recogida_prevista = '';
   proveedor_id: number | null = null;
-  taller: 'PhoneStorm' | 'Infotec' | '' = '';
+  taller: 'Phonestorm' | 'Infotec' | '' = '';
   fecha_envio_taller   = '';
   fecha_retorno_taller = '';
 
@@ -159,7 +159,7 @@ export class LineaFormComponent implements OnInit {
         this.fecha_pedido  = l.fecha_pedido ?? '';
         this.fecha_recogida_prevista = l.fecha_recogida_prevista ?? '';
         this.proveedor_id  = l.proveedor_id;
-        this.taller    = (l.taller as 'PhoneStorm' | 'Infotec') ?? '';
+        this.taller    = (l.taller as 'Phonestorm' | 'Infotec') ?? '';
         this.fecha_envio_taller   = l.fecha_envio_taller ?? '';
         this.fecha_retorno_taller = l.fecha_retorno_taller ?? '';
 

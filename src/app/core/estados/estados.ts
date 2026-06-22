@@ -1,7 +1,7 @@
 import { Linea, Flujo, Fase } from '../models/linea.model';
 
 export type ProveedorAccesorio = 'Apokin' | 'Wephone';
-export type TallerEstado = 'PhoneStorm' | 'Infotec';
+export type TallerEstado = 'Phonestorm' | 'Infotec';
 
 export interface EstadoDef {
   id: string;
@@ -45,9 +45,9 @@ export const ESTADOS: EstadoDef[] = [
   { id: 'compra', label: 'Compra de Dispositivo', flujo: 'venta', fase: 'entregado', avisado: false, movil_en_tienda: false, subtipo: 'compra', color: COLOR_COMPRA },
   { id: 'venta', label: 'Venta de Dispositivo', flujo: 'venta', fase: 'entregado', avisado: false, movil_en_tienda: false, subtipo: 'venta', color: COLOR_VENTA },
 
-  { id: 'enviar_taller_phonestorm', label: 'Enviar a Taller - PhoneStorm', flujo: 'reparacion', fase: 'por_enviar_taller', avisado: false, movil_en_tienda: true, taller: 'PhoneStorm', color: '#E0DAF0' },
+  { id: 'enviar_taller_phonestorm', label: 'Enviar a Taller - Phonestorm', flujo: 'reparacion', fase: 'por_enviar_taller', avisado: false, movil_en_tienda: true, taller: 'Phonestorm', color: '#E0DAF0' },
   { id: 'enviar_taller_infotec', label: 'Enviar a Taller - Infotec', flujo: 'reparacion', fase: 'por_enviar_taller', avisado: false, movil_en_tienda: true, taller: 'Infotec', color: '#D9D2E9' },
-  { id: 'enviado_taller_phonestorm', label: 'Enviado a Taller - PhoneStorm', flujo: 'reparacion', fase: 'en_taller', avisado: false, movil_en_tienda: false, taller: 'PhoneStorm', color: '#C7BEE3' },
+  { id: 'enviado_taller_phonestorm', label: 'Enviado a Taller - Phonestorm', flujo: 'reparacion', fase: 'en_taller', avisado: false, movil_en_tienda: false, taller: 'Phonestorm', color: '#C7BEE3' },
   { id: 'enviado_taller_infotec', label: 'Enviado a Taller - Infotec', flujo: 'reparacion', fase: 'en_taller', avisado: false, movil_en_tienda: false, taller: 'Infotec', color: '#B4A7D6' },
 
   { id: 'finalizado', label: 'Finalizado', flujo: 'reparacion', fase: 'entregado', avisado: false, movil_en_tienda: false, color: COLOR_FINALIZADO, preservaFlujo: true },
