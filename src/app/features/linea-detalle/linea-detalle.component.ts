@@ -84,7 +84,6 @@ export class LineaDetalleComponent implements OnInit {
     };
     let label = map[entrada.fase] ?? entrada.fase;
     if (entrada.avisado)         label += ' · Avisado';
-    if (entrada.movil_en_tienda) label += ' · 📱 En tienda';
     return label;
   }
 

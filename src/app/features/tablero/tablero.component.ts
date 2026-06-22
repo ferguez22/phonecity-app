@@ -6,42 +6,10 @@ import { AuthService } from '../../core/services/auth.service';
 import { LineaService, LineaFiltros } from '../../core/services/linea.service';
 import { CredencialesService } from '../../core/services/credenciales.service';
 import { HistorialService, EntradaHistorial } from '../../core/services/historial.service';
-import { Linea, Flujo, Fase } from '../../core/models/linea.model';
+import { Linea } from '../../core/models/linea.model';
 import { Credenciales } from '../../core/models/credenciales.model';
-import { getColor, getEtiqueta } from './color.util';
-
-export interface EstadoOption {
-  label: string;
-  flujo: Flujo;
-  fase: Fase;
-  avisado: boolean;
-  movil_en_tienda: boolean;
-  subtipo?: 'venta' | 'compra' | null;
-}
-
-export const ESTADO_OPTIONS: EstadoOption[] = [
-  // Pieza
-  { label: 'Pedir Pieza - Móvil en tienda', flujo: 'pieza',      fase: 'por_pedir', avisado: false, movil_en_tienda: true  },
-  { label: 'Pieza pedida - Móvil en tienda',flujo: 'pieza',      fase: 'pedido',    avisado: false, movil_en_tienda: true  },
-  { label: 'Pedir pieza',                   flujo: 'pieza',      fase: 'por_pedir', avisado: false, movil_en_tienda: false },
-  { label: 'Pieza pedida',                  flujo: 'pieza',      fase: 'pedido',    avisado: false, movil_en_tienda: false },
-  { label: 'Pieza en tienda - Avisado',     flujo: 'pieza',      fase: 'en_tienda', avisado: true,  movil_en_tienda: false },
-  // Accesorio
-  { label: 'Pedir Accesorio',               flujo: 'accesorio',  fase: 'por_pedir', avisado: false, movil_en_tienda: false },
-  { label: 'Accesorio Pedido',              flujo: 'accesorio',  fase: 'pedido',    avisado: false, movil_en_tienda: false },
-  { label: 'Accesorio en tienda - Avisado', flujo: 'accesorio',  fase: 'en_tienda', avisado: true,  movil_en_tienda: false },
-  // Reparación
-  { label: 'Reparar',                       flujo: 'reparacion', fase: 'por_reparar',        avisado: false, movil_en_tienda: false },
-  { label: 'Reparado - Avisado',            flujo: 'reparacion', fase: 'reparado',           avisado: true,  movil_en_tienda: false },
-  { label: 'Enviar a taller',               flujo: 'reparacion', fase: 'por_enviar_taller',  avisado: false, movil_en_tienda: false },
-  { label: 'Enviado a taller',              flujo: 'reparacion', fase: 'en_taller',          avisado: false, movil_en_tienda: false },
-  { label: 'Cancelado', flujo: 'reparacion', fase: 'cancelado', avisado: false, movil_en_tienda: false },
-  { label: 'No se puede reparar', flujo: 'reparacion', fase: 'no_reparable', avisado: false, movil_en_tienda: false },
-  { label: 'No se puede reparar - Entregado', flujo: 'reparacion', fase: 'no_reparable', avisado: true, movil_en_tienda: false }, { label: 'Finalizado', flujo: 'reparacion', fase: 'entregado', avisado: false, movil_en_tienda: false },
-  // Venta / Compra
-  { label: 'Venta de Dispositivo',          flujo: 'venta',      fase: 'entregado',          avisado: false, movil_en_tienda: false, subtipo: 'venta'  },
-  { label: 'Compra de Dispositivo',         flujo: 'venta',      fase: 'entregado',          avisado: false, movil_en_tienda: false, subtipo: 'compra' },
-];
+import {ESTADO_OPTIONS, EstadoDef, esEstadoActual, getColor, getEtiqueta, etiquetaHistorialFase} from '../../core/estados/estados';
+import { ProveedorService, Proveedor } from '../../core/services/proveedor.service';
 
 interface Boton { label: string; filtros: LineaFiltros; }
 
@@ -60,7 +28,8 @@ export class TableroComponent implements OnInit, AfterViewInit {
   private readonly lineas$ = inject(LineaService);
   private readonly credSvc = inject(CredencialesService);
   private readonly histSvc = inject(HistorialService);
-  private readonly router  = inject(Router);
+  private readonly router = inject(Router);
+  private readonly proveedorSvc = inject(ProveedorService);
 
   readonly lineas       = signal<Linea[]>([]);
   readonly cargando     = signal(false);
@@ -68,7 +37,10 @@ export class TableroComponent implements OnInit, AfterViewInit {
   readonly busqueda     = signal('');
   readonly orderDir     = signal<'asc' | 'desc'>('asc');
   readonly orderBy      = signal<'fecha_entrada' | 'dias_reparacion' | 'id'>('id');
-  readonly botonActivo  = signal('Todo');
+  readonly botonActivo = signal('Todo');
+  readonly proveedores = signal<Proveedor[]>([]);
+
+
   private filtrosActivos: LineaFiltros = {};
 
   readonly editingId       = signal<number | null>(null);
@@ -85,16 +57,17 @@ export class TableroComponent implements OnInit, AfterViewInit {
   readonly modalEditValue    = signal<string>('');
 
   readonly botones: Boton[] = [
-    { label: 'Todo',                      filtros: {} },
-    { label: '📱 Móviles en tienda',      filtros: { vista: 'moviles_en_tienda' } },
-    { label: 'Reparar',                   filtros: { flujo: 'reparacion', fase: 'por_reparar' } },
-    { label: 'Reparado - Avisado',        filtros: { flujo: 'reparacion', fase: 'reparado', avisado: true } },
-    { label: 'Enviar a taller',           filtros: { fase: 'por_enviar_taller' } },
-    { label: 'Enviado a taller', filtros: { fase: 'en_taller' } },
-    { label: 'No se puede reparar', filtros: { fase: 'no_reparable', avisado: false } },
-    { label: 'No se puede reparar - Entregado', filtros: { fase: 'no_reparable', avisado: true } },
-    { label: 'Venta de Dispositivo', filtros: { flujo: 'venta', subtipo: 'venta' } },
-    { label: 'Compra de Dispositivo',     filtros: { flujo: 'venta', subtipo: 'compra' } },
+    { label: 'Todo',                            filtros: {} },
+    { label: 'Móviles en Tienda',               filtros: { vista: 'moviles_en_tienda' } },
+    { label: 'Reparar',                         filtros: { flujo: 'reparacion', fase: 'por_reparar' } },
+    { label: 'Reparado - Avisado',              filtros: { flujo: 'reparacion', fase: 'reparado', avisado: true } },
+    { label: 'Enviar a Taller',                 filtros: { fase: 'por_enviar_taller' } },
+    { label: 'Enviado a Taller',                filtros: { fase: 'en_taller' } },
+    { label: 'No se Puede Reparar - Avisado',   filtros: { fase: 'no_reparable', avisado: true, movil_en_tienda: true } },
+    { label: 'No se Puede Reparar - Entregado', filtros: { fase: 'no_reparable', avisado: true, movil_en_tienda: false } },
+    { label: 'Accesorios',                      filtros: { flujo: 'accesorio' } },
+    { label: 'Venta de Dispositivo',            filtros: { flujo: 'venta', subtipo: 'venta' } },
+    { label: 'Compra de Dispositivo',           filtros: { flujo: 'venta', subtipo: 'compra' } },
   ];
 
   readonly lineasFiltradas = computed(() => {
@@ -116,8 +89,10 @@ export class TableroComponent implements OnInit, AfterViewInit {
     return id !== null ? (this.lineas().find(l => l.id === id) ?? null) : null;
   });
 
-  ngOnInit(): void { this.cargar(); }
-
+  ngOnInit(): void {
+    this.cargar();
+    this.proveedorSvc.list().subscribe({ next: (p) => this.proveedores.set(p), error: () => {} });
+  }
   ngAfterViewInit(): void {
     setTimeout(() => {
       const h = this.controlsRef?.nativeElement?.offsetHeight ?? 148;
@@ -178,30 +153,29 @@ export class TableroComponent implements OnInit, AfterViewInit {
     if (this.hoverTimer) clearTimeout(this.hoverTimer);
   }
 
-  esOpcionActual(opt: EstadoOption, linea: Linea): boolean {
-    const subtipoMatch = opt.subtipo != null
-      ? opt.subtipo === (linea as any).subtipo
-      : true;
-    return opt.flujo === linea.flujo && opt.fase === linea.fase &&
-           opt.avisado === !!linea.avisado && opt.movil_en_tienda === !!linea.movil_en_tienda &&
-           subtipoMatch;
+  esOpcionActual(opt: EstadoDef, linea: Linea): boolean {
+    return esEstadoActual(opt, linea);
   }
 
-  seleccionarEstado(event: Event, opt: EstadoOption, linea: Linea): void {
+  seleccionarEstado(event: Event, opt: EstadoDef, linea: Linea): void {
     event.stopPropagation();
     this.editingId.set(null);
     if (this.esOpcionActual(opt, linea)) return;
 
-    if (opt.fase === 'entregado' && linea.fase !== 'entregado') {
-      if (!window.confirm('⚠️ Al marcar como Finalizado se eliminarán las credenciales (RGPD). ¿Continuar?')) return;
+    const payload: any = {
+      fase: opt.fase,
+      avisado: opt.avisado ? 1 : 0,
+      movil_en_tienda: opt.movil_en_tienda ? 1 : 0,
+    };
+    if (!opt.preservaFlujo) {
+      payload.flujo = opt.flujo;
+      payload.subtipo = opt.subtipo ?? null;
+      payload.taller = opt.taller ?? null;
+      payload.proveedor_id = opt.flujo === 'accesorio' ? this.proveedorIdPorNombre(opt.proveedor) : null;
     }
 
     this.guardandoInline.set(true);
-    this.lineas$.update(linea.id, {
-      flujo: opt.flujo, fase: opt.fase,
-      avisado: opt.avisado as any, movil_en_tienda: opt.movil_en_tienda as any,
-      subtipo: opt.subtipo ?? null,
-    }).subscribe({
+    this.lineas$.update(linea.id, payload).subscribe({
       next: (updated) => {
         const merge = (l: Linea) => l.id === linea.id ? { ...l, ...updated } : l;
         this.lineas.update(c => c.map(merge));
@@ -210,6 +184,13 @@ export class TableroComponent implements OnInit, AfterViewInit {
       },
       error: (err) => { this.guardandoInline.set(false); this.error.set(err?.error?.error?.message ?? 'Error'); },
     });
+  }
+
+  private proveedorIdPorNombre(nombre?: string | null): number | null {
+    if (!nombre) return null;
+    const norm = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    const p = this.proveedores().find(x => norm(x.nombre) === norm(nombre));
+    return p ? p.id : null;
   }
 
   // ── Modal ─────────────────────────────────────────────────────────────────
@@ -259,16 +240,7 @@ export class TableroComponent implements OnInit, AfterViewInit {
   cancelModalEdit(): void { this.modalEditField.set(null); }
 
   etiquetaHistorial(h: EntradaHistorial): string {
-    const map: Record<string, string> = {
-      por_pedir: 'Pedir', pedido: 'Pedido', en_tienda: 'En tienda',
-      por_reparar: 'Reparando', por_enviar_taller: 'Enviar a taller',
-      en_taller: 'En taller', reparado: 'Reparado - Avisado',
-      entregado: 'Finalizado', cancelado: 'Cancelado', no_reparable: 'No se puede reparar',
-    };
-    let label = map[h.fase] ?? h.fase;
-    if (h.avisado && h.fase === 'no_reparable') label = 'No se puede reparar - Entregado';
-    if (h.movil_en_tienda) label += ' · 📱';
-    return label;
+    return etiquetaHistorialFase(h.fase, h.avisado, h.movil_en_tienda);
   }
 
   getColor    = getColor;

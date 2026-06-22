@@ -13,7 +13,7 @@ export type Fase =
   | 'no_reparable';
 
 export type TipoCobro = 'normal' | 'garantia' | 'presupuesto_taller';
-export type Taller = 'Phonestorm' | 'Infotec';
+export type Taller = 'PhoneStorm' | 'Infotec';
 
 export interface Linea {
   id: number;
@@ -44,6 +44,7 @@ export interface Linea {
   // Campos que llegan del LEFT JOIN con cliente (NULL = TIENDA)
   cliente_nombre: string | null;
   cliente_telefono: string | null;
+  proveedor_nombre: string | null;
 
   // Flag de respuesta al pasar a 'entregado' (borrado RGPD de credenciales)
   credenciales_borradas?: boolean;
