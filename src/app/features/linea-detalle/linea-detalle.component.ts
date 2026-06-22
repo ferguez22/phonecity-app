@@ -3,10 +3,8 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
 import { LineaService } from '../../core/services/linea.service';
-import { CredencialesService } from '../../core/services/credenciales.service';
 import { HistorialService, EntradaHistorial } from '../../core/services/historial.service';
 import { Linea } from '../../core/models/linea.model';
-import { Credenciales } from '../../core/models/credenciales.model';
 import { getColor, getEtiqueta } from '../tablero/color.util';
 
 @Component({
@@ -20,11 +18,9 @@ export class LineaDetalleComponent implements OnInit {
   private readonly route     = inject(ActivatedRoute);
   private readonly router    = inject(Router);
   private readonly lineaSvc  = inject(LineaService);
-  private readonly credSvc   = inject(CredencialesService);
   private readonly histSvc   = inject(HistorialService);
 
   readonly linea       = signal<Linea | null>(null);
-  readonly credenciales = signal<Credenciales | null>(null);
   readonly historial   = signal<EntradaHistorial[]>([]);
   readonly cargando    = signal(true);
   readonly error       = signal<string | null>(null);
@@ -50,12 +46,6 @@ export class LineaDetalleComponent implements OnInit {
         this.error.set('No se pudo cargar la línea');
         this.cargando.set(false);
       },
-    });
-
-    // Cargar credenciales (puede no tener → ignorar 404)
-    this.credSvc.get(id).subscribe({
-      next: (c) => this.credenciales.set(c),
-      error: () => this.credenciales.set(null),
     });
 
     // Cargar historial

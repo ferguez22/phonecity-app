@@ -4,10 +4,8 @@ import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/services/auth.service';
 import { LineaService, LineaFiltros } from '../../core/services/linea.service';
-import { CredencialesService } from '../../core/services/credenciales.service';
 import { HistorialService, EntradaHistorial } from '../../core/services/historial.service';
 import { Linea } from '../../core/models/linea.model';
-import { Credenciales } from '../../core/models/credenciales.model';
 import {ESTADO_OPTIONS, EstadoDef, esEstadoActual, getColor, getEtiqueta, etiquetaHistorialFase} from '../../core/estados/estados';
 import { ProveedorService, Proveedor } from '../../core/services/proveedor.service';
 
@@ -26,7 +24,6 @@ export class TableroComponent implements OnInit, AfterViewInit {
 
   private readonly auth    = inject(AuthService);
   private readonly lineas$ = inject(LineaService);
-  private readonly credSvc = inject(CredencialesService);
   private readonly histSvc = inject(HistorialService);
   private readonly router = inject(Router);
   private readonly proveedorSvc = inject(ProveedorService);
@@ -51,7 +48,6 @@ export class TableroComponent implements OnInit, AfterViewInit {
 
   readonly lineaModal        = signal<Linea | null>(null);
   readonly modalHistorial    = signal<EntradaHistorial[]>([]);
-  readonly modalCredenciales = signal<Credenciales | null>(null);
   readonly modalCargando     = signal(false);
   readonly modalEditField    = signal<string | null>(null);
   readonly modalEditValue    = signal<string>('');
@@ -198,16 +194,11 @@ export class TableroComponent implements OnInit, AfterViewInit {
   abrirModal(linea: Linea): void {
     this.lineaModal.set(linea);
     this.modalHistorial.set([]);
-    this.modalCredenciales.set(null);
     this.modalCargando.set(true);
     this.modalEditField.set(null);
     this.histSvc.get(linea.id).subscribe({
       next: h => { this.modalHistorial.set(h); this.modalCargando.set(false); },
       error: () => this.modalCargando.set(false),
-    });
-    this.credSvc.get(linea.id).subscribe({
-      next: c => this.modalCredenciales.set(c),
-      error: () => this.modalCredenciales.set(null),
     });
   }
 
