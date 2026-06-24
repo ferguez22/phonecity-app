@@ -17,9 +17,10 @@ export interface EstadoDef {
   preservaFlujo?: boolean;
 }
 
-const COLOR_VENTA = '#e9e9e9';
-const COLOR_COMPRA = '#e1e1e1';
+const COLOR_VENTA = '#A2C4C9';
+const COLOR_COMPRA = '#76A5AF';
 const COLOR_FINALIZADO = '#6AA84F';
+const COLOR_TALLER = '#D9D2E9';
 
 export const ESTADOS: EstadoDef[] = [
   { id: 'reparar', label: 'Reparar', flujo: 'reparacion', fase: 'por_reparar', avisado: false, movil_en_tienda: true, color: '#B6D7A8' },
@@ -112,6 +113,10 @@ export function getColor(l: Linea): string {
   const def = matchEstado(l);
   if (def) return def.color;
   if (l.flujo === 'accesorio') return accesorioColor(l.fase);
+  if (l.flujo === 'reparacion' && (l.fase === 'por_enviar_taller' || l.fase === 'en_taller')) {
+    return COLOR_TALLER;
+  }
+  return '#FFFFFF';
   return '#FFFFFF';
 }
 
