@@ -128,25 +128,6 @@
     <!-- CREDENCIALES -->
     <div class="card mb-3">
       <div class="card-header fw-semibold">Credenciales del dispositivo</div>
-      <div class="card-body">
-        @if (credenciales(); as c) {
-          <dl class="row mb-0">
-            <dt class="col-5">PIN SIM</dt>
-            <dd class="col-7">{{ c.pin_sim ?? '—' }}</dd>
-
-            <dt class="col-5">Código desbloqueo</dt>
-            <dd class="col-7">{{ c.codigo_desbloqueo ?? '—' }}</dd>
-
-            <dt class="col-5">Correos Google</dt>
-            <dd class="col-7" style="white-space:pre-wrap">{{ c.correos_google ?? '—' }}</dd>
-
-            <dt class="col-5">Password recuperación</dt>
-            <dd class="col-7">{{ c.password_recuperacion ?? '—' }}</dd>
-          </dl>
-        } @else {
-          <span class="text-muted">Sin credenciales registradas.</span>
-        }
-      </div>
     </div>
 
     <!-- HISTORIAL -->

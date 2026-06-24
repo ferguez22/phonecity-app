@@ -1,4 +1,3 @@
-<!-- ── STICKY HEADER (fixed) ─────────────────────────────────────────────── -->
 <div class="sticky-controls" #controlsRef>
 
   <nav class="navbar navbar-dark bg-dark px-3 py-2">
@@ -42,7 +41,6 @@
 
 </div>
 
-<!-- ── TABLA ──────────────────────────────────────────────────────────────── -->
 <div class="table-area container-fluid">
 
   @if (cargando()) {
@@ -52,232 +50,172 @@
   } @else if (lineasFiltradas().length === 0) {
     <div class="text-center text-muted py-5">No hay líneas en este estado.</div>
   } @else {
-    <div>
-      <table class="table table-sm table-hover tabla-lineas">
-        <thead class="table-dark">
-          <tr>
-            <th>L-ID</th><th>Estado</th><th>Modelo</th><th>Cliente</th>
-            <th>Teléfono</th><th>€</th><th>Problema / Pieza</th>
-            <th>Fecha entrada</th><th>Días</th>
+    <table class="table table-sm tabla-lineas">
+      <thead class="table-dark">
+        <tr>
+          <th>L-ID</th><th>Estado</th><th>Modelo</th><th>Cliente</th>
+          <th>Teléfono</th><th>€</th><th>Problema / Pieza</th>
+          <th>Fecha entrada</th><th>Días</th><th class="th-expand"></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (linea of lineasFiltradas(); track linea.id) {
+          <tr class="fila-linea" [class.expandida]="expandedId() === linea.id" [style.--bs-table-bg]="getColor(linea)">
+            <td class="fw-bold">L-{{ linea.id }}</td>
+            <td><span class="badge-estado">{{ getEtiqueta(linea) }}</span></td>
+            <td>{{ linea.modelo ?? '—' }}</td>
+            <td>{{ linea.cliente_nombre ?? 'TIENDA' }}</td>
+            <td>{{ linea.cliente_telefono ?? '—' }}</td>
+            <td>{{ linea.importe != null ? (linea.importe | number:'1.0-0') + ' €' : '—' }}</td>
+            <td class="text-truncate col-pieza">{{ linea.problema_o_pieza ?? '—' }}</td>
+            <td>{{ linea.fecha_entrada ?? '—' }}</td>
+            <td>@if (linea.fecha_entrada) { {{ diasDesde(linea.fecha_entrada) }}d }</td>
+            <td class="td-expand">
+              <button class="btn-expand" [class.abierto]="expandedId() === linea.id" (click)="toggleExpand(linea)" type="button">
+                <span class="chev"></span>
+              </button>
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          @for (linea of lineasFiltradas(); track linea.id) {
-            <tr class="fila-linea" [style.--bs-table-bg]="getColor(linea)" (click)="abrirModal(linea)">
-              <td class="fw-bold">L-{{ linea.id }}</td>
 
-              <!-- ESTADO — hover dropdown a la derecha -->
-              <td class="td-estado" (click)="$event.stopPropagation()">
-                <div class="estado-wrapper" (mouseenter)="onEstadoHover($event, linea.id)" (mouseleave)="onEstadoLeave()">
-                  <span class="badge-estado">{{ getEtiqueta(linea) }}</span>
+          @if (expandedId() === linea.id) {
+            <tr class="detalle-row">
+              <td colspan="10" class="detalle-cell">
+                <div class="detalle-panel" @expand>
+
+                  <div class="panel-grid">
+
+                    <section class="panel-sec panel-estado">
+                      <div class="panel-sec-title">Estado</div>
+                      <div class="estado-grid">
+                        @for (opt of estadoOptions; track opt.id) {
+                          <button
+                            class="estado-chip"
+                            type="button"
+                            [class.activo]="esEstadoActual(opt, linea)"
+                            [style.--chip]="opt.color"
+                            [disabled]="guardando()"
+                            (click)="cambiarEstado(opt, linea)"
+                          >{{ opt.label }}</button>
+                        }
+                      </div>
+                    </section>
+
+                    <section class="panel-sec">
+                      <div class="panel-sec-title">Datos</div>
+                      <div class="campos-grid">
+                        <label class="campo">
+                          <span>Modelo</span>
+                          <input type="text" [(ngModel)]="edModelo" name="edModelo" />
+                        </label>
+                        <label class="campo">
+                          <span>Problema / Pieza</span>
+                          <input type="text" [(ngModel)]="edProblema" name="edProblema" />
+                        </label>
+                        <label class="campo">
+                          <span>Importe (€)</span>
+                          <input type="number" min="0" step="0.01" [(ngModel)]="edImporte" name="edImporte" />
+                        </label>
+                        <label class="campo">
+                          <span>Tipo de cobro</span>
+                          <select [(ngModel)]="edTipoCobro" name="edTipoCobro">
+                            <option value="normal">Normal</option>
+                            <option value="garantia">Garantía</option>
+                            <option value="presupuesto_taller">Presupuesto taller</option>
+                          </select>
+                        </label>
+                        <label class="campo">
+                          <span>Fecha entrada</span>
+                          <input type="date" [(ngModel)]="edFechaEntrada" name="edFechaEntrada" />
+                        </label>
+                        <label class="campo">
+                          <span>Recogida prevista</span>
+                          <input type="datetime-local" [(ngModel)]="edRecogida" name="edRecogida" />
+                        </label>
+                        <label class="campo">
+                          <span>Tel. alternativo</span>
+                          <input type="tel" [(ngModel)]="edTelAlt" name="edTelAlt" />
+                        </label>
+                        <label class="campo">
+                          <span>Código dispositivo</span>
+                          <input type="text" [(ngModel)]="edCodigo" name="edCodigo" />
+                        </label>
+                      </div>
+                      <label class="campo campo-full">
+                        <span>Notas</span>
+                        <textarea rows="2" [(ngModel)]="edNotas" name="edNotas"></textarea>
+                      </label>
+                    </section>
+
+                    <section class="panel-sec">
+                      <div class="panel-sec-title">Cliente</div>
+                      <div class="cliente-box">
+                        <input
+                          type="text"
+                          class="cliente-search"
+                          placeholder="Buscar nombre o teléfono..."
+                          [ngModel]="busqCliente()"
+                          (ngModelChange)="onBuscarCliente($event)"
+                          name="busqCliente"
+                        />
+                        @if (clienteSelec()) {
+                          <small class="cliente-ok">✓ {{ clienteSelec()!.nombre }} ({{ clienteSelec()!.telefono ?? 'sin tel.' }})</small>
+                        }
+                        @if (resultClientes().length > 0) {
+                          <ul class="cliente-result">
+                            @for (c of resultClientes(); track c.id) {
+                              <li (click)="seleccionarCliente(c)">{{ c.nombre }} — {{ c.telefono ?? 'sin tel.' }}</li>
+                            }
+                          </ul>
+                        }
+
+                        <button type="button" class="btn btn-sm btn-outline-primary mt-2" (click)="toggleNuevoCliente()">
+                          {{ mostrarNuevoCliente() ? 'Cancelar' : '+ Cliente nuevo' }}
+                        </button>
+
+                        @if (mostrarNuevoCliente()) {
+                          <div class="cliente-nuevo">
+                            <input type="text" placeholder="Nombre *" [ngModel]="nuevoNombre()" (ngModelChange)="nuevoNombre.set($event)" name="nuevoNombre" />
+                            <input type="tel" placeholder="Teléfono" [ngModel]="nuevoTel()" (ngModelChange)="nuevoTel.set($event)" name="nuevoTel" />
+                            <button type="button" class="btn btn-sm btn-success" (click)="crearCliente()">Crear y seleccionar</button>
+                          </div>
+                        }
+                      </div>
+                    </section>
+
+                    <section class="panel-sec">
+                      <div class="panel-sec-title">Historial</div>
+                      @if (panelCargando()) {
+                        <span class="text-muted small">Cargando...</span>
+                      } @else if (panelHistorial().length === 0) {
+                        <span class="text-muted small">Sin historial.</span>
+                      } @else {
+                        <div class="historial-list">
+                          @for (h of panelHistorial(); track h.id) {
+                            <div class="historial-item">
+                              <span class="hist-fecha">{{ h.fecha | date:'dd/MM/yy HH:mm' }}</span>
+                              <span>{{ etiquetaHistorial(h) }}</span>
+                            </div>
+                          }
+                        </div>
+                      }
+                    </section>
+
+                  </div>
+
+                  <div class="panel-acciones">
+                    <button type="button" class="btn btn-primary btn-sm" [disabled]="guardando()" (click)="guardarDatos(linea)">
+                      {{ guardando() ? 'Guardando...' : 'Guardar datos' }}
+                    </button>
+                    <button type="button" class="btn btn-link btn-sm" (click)="toggleExpand(linea)">Cerrar</button>
+                  </div>
+
                 </div>
               </td>
-
-              <td>{{ linea.modelo ?? '—' }}</td>
-              <td>{{ linea.cliente_nombre ?? 'TIENDA' }}</td>
-              <td>{{ linea.cliente_telefono ?? '—' }}</td>
-              <td>{{ linea.importe != null ? (linea.importe | number:'1.0-0') + ' €' : '—' }}</td>
-              <td class="text-truncate col-pieza">{{ linea.problema_o_pieza ?? '—' }}</td>
-              <td>{{ linea.fecha_entrada ?? '—' }}</td>
-              <td>@if (linea.fecha_entrada) { {{ diasDesde(linea.fecha_entrada) }}d }</td>
             </tr>
           }
-        </tbody>
-      </table>
-    </div>
-  }
-
-</div>
-
-@if (activeLinea()) {
-<div class="estado-menu" [style.top]="menuStyle().top" [style.left]="menuStyle().left"
-  [style.max-height]="menuStyle().maxHeight" (mouseenter)="onMenuHover()" (mouseleave)="onEstadoLeave()">
-  @for (opt of estadoOptions; track opt.label) {
-  <div class="estado-opt" [class.activo]="esOpcionActual(opt, activeLinea()!)"
-    (click)="seleccionarEstado($event, opt, activeLinea()!)">
-    {{ opt.label }}
-  </div>
-  }
-</div>
-}
-
-<!-- ── MODAL DETALLE ─────────────────────────────────────────────────────── -->
-@if (lineaModal()) {
-  <div class="modal-overlay" (click)="cerrarModal()">
-    <div class="modal-card" (click)="$event.stopPropagation()">
-
-      @let l = lineaModal()!;
-
-      <!-- Cabecera -->
-      <div class="modal-card-header" [style.border-left-color]="getColor(l)">
-        <div>
-          <!-- Modelo editable -->
-          @if (modalEditField() === 'modelo') {
-            <input class="edit-input fw-bold"
-                   [value]="modalEditValue()"
-                   (input)="modalEditValue.set($any($event.target).value)"
-                   (keydown.enter)="saveModalField('modelo', l.id)"
-                   (keydown.escape)="cancelModalEdit()"
-                   (blur)="saveModalField('modelo', l.id)" />
-          } @else {
-            <div class="fw-bold editable-field" (click)="openModalEdit('modelo', l.modelo)">
-              L-{{ l.id }} — {{ l.modelo ?? 'Sin modelo' }}
-            </div>
-          }
-          <span class="badge-estado px-2 py-1 rounded mt-1 d-inline-block"
-                [style.background-color]="getColor(l)">
-            {{ getEtiqueta(l) }}
-          </span>
-        </div>
-        <div class="d-flex gap-2 align-items-start">
-          @if (l.fecha_entrada) {
-            <span class="text-muted small">{{ diasDesde(l.fecha_entrada) }}d</span>
-          }
-          <button class="btn-close-modal" (click)="cerrarModal()">✕</button>
-        </div>
-      </div>
-
-      <!-- Cuerpo -->
-      <div class="modal-card-body">
-
-        <!-- Cliente -->
-        <div class="modal-section">
-          <div class="modal-section-title">Cliente</div>
-          <dl class="row mb-0 small">
-            <dt class="col-5">Nombre</dt>
-            <dd class="col-7">{{ l.cliente_nombre ?? 'TIENDA' }}</dd>
-            <dt class="col-5">Teléfono</dt>
-            <dd class="col-7">{{ l.cliente_telefono ?? '—' }}</dd>
-            @if (l.telefono_alternativo) {
-              <dt class="col-5">Tel. alternativo</dt>
-              <dd class="col-7">{{ l.telefono_alternativo }}</dd>
-            }
-            @if (l.codigo_dispositivo) {
-              <dt class="col-5">Código</dt>
-              <dd class="col-7">{{ l.codigo_dispositivo }}</dd>
-            }
-          </dl>
-        </div>
-
-        <!-- Reparación -->
-        <div class="modal-section">
-          <div class="modal-section-title">Reparación</div>
-          <dl class="row mb-0 small">
-
-            <dt class="col-5">Problema / Pieza</dt>
-            <dd class="col-7">
-              @if (modalEditField() === 'problema_o_pieza') {
-                <input class="edit-input"
-                       [value]="modalEditValue()"
-                       (input)="modalEditValue.set($any($event.target).value)"
-                       (keydown.enter)="saveModalField('problema_o_pieza', l.id)"
-                       (keydown.escape)="cancelModalEdit()"
-                       (blur)="saveModalField('problema_o_pieza', l.id)" />
-              } @else {
-                <span class="editable-field" (click)="openModalEdit('problema_o_pieza', l.problema_o_pieza)">
-                  {{ l.problema_o_pieza ?? '—' }}
-                </span>
-              }
-            </dd>
-
-            <dt class="col-5">Fecha entrada</dt>
-            <dd class="col-7">
-              @if (modalEditField() === 'fecha_entrada') {
-                <input type="date" class="edit-input"
-                       [value]="modalEditValue()"
-                       (input)="modalEditValue.set($any($event.target).value)"
-                       (keydown.enter)="saveModalField('fecha_entrada', l.id)"
-                       (keydown.escape)="cancelModalEdit()"
-                       (blur)="saveModalField('fecha_entrada', l.id)" />
-              } @else {
-                <span class="editable-field" (click)="openModalEdit('fecha_entrada', l.fecha_entrada)">
-                  {{ l.fecha_entrada ?? '—' }}
-                </span>
-              }
-            </dd>
-
-            <dt class="col-5">Importe</dt>
-            <dd class="col-7">
-              @if (modalEditField() === 'importe') {
-                <input type="number" class="edit-input"
-                       [value]="modalEditValue()"
-                       (input)="modalEditValue.set($any($event.target).value)"
-                       (keydown.enter)="saveModalField('importe', l.id)"
-                       (keydown.escape)="cancelModalEdit()"
-                       (blur)="saveModalField('importe', l.id)" />
-              } @else {
-                <span class="editable-field" (click)="openModalEdit('importe', l.importe)">
-                  {{ l.importe != null ? (l.importe | number:'1.0-2') + ' €' : '—' }}
-                </span>
-              }
-            </dd>
-
-            <dt class="col-5">Tipo cobro</dt>
-            <dd class="col-7">{{ l.tipo_cobro }}</dd>
-          </dl>
-        </div>
-
-        <!-- Notas -->
-        <div class="modal-section">
-          <div class="modal-section-title">Notas</div>
-          @if (modalEditField() === 'notas') {
-            <textarea class="edit-input edit-textarea"
-                      [value]="modalEditValue()"
-                      (input)="modalEditValue.set($any($event.target).value)"
-                      (keydown.escape)="cancelModalEdit()"
-                      (blur)="saveModalField('notas', l.id)"
-                      rows="3"></textarea>
-          } @else {
-            <span class="editable-field d-block" style="white-space:pre-wrap; min-height:24px"
-                  (click)="openModalEdit('notas', l.notas)">
-              {{ l.notas ?? '—' }}
-            </span>
-          }
-        </div>
-
-        <!-- Credenciales -->
-        @if (modalCredenciales()) {
-          @let c = modalCredenciales()!;
-          <div class="modal-section">
-            <div class="modal-section-title">Credenciales</div>
-            <dl class="row mb-0 small">
-              @if (c.pin_sim) {
-                <dt class="col-5">PIN SIM</dt><dd class="col-7">{{ c.pin_sim }}</dd>
-              }
-              @if (c.codigo_desbloqueo) {
-                <dt class="col-5">Desbloqueo</dt><dd class="col-7">{{ c.codigo_desbloqueo }}</dd>
-              }
-              @if (c.correos_google) {
-                <dt class="col-5">Google</dt>
-                <dd class="col-7" style="white-space:pre-wrap">{{ c.correos_google }}</dd>
-              }
-              @if (c.password_recuperacion) {
-                <dt class="col-5">Password recup.</dt><dd class="col-7">{{ c.password_recuperacion }}</dd>
-              }
-            </dl>
-          </div>
         }
+      </tbody>
+    </table>
+  }
 
-        <!-- Historial -->
-        <div class="modal-section">
-          <div class="modal-section-title">Historial</div>
-          @if (modalCargando()) {
-            <span class="text-muted small">Cargando...</span>
-          } @else if (modalHistorial().length === 0) {
-            <span class="text-muted small">Sin historial.</span>
-          } @else {
-            <div class="historial-list">
-              @for (h of modalHistorial(); track h.id) {
-                <div class="historial-item small">
-                  <span class="text-muted me-2">{{ h.fecha | date:'dd/MM/yy HH:mm' }}</span>
-                  <span>{{ etiquetaHistorial(h) }}</span>
-                </div>
-              }
-            </div>
-          }
-        </div>
-
-      </div><!-- /modal-card-body -->
-    </div><!-- /modal-card -->
-  </div><!-- /modal-overlay -->
-}
+</div>
