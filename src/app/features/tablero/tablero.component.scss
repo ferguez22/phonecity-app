@@ -343,3 +343,34 @@
   padding-top: 0.75rem;
   border-top: 1px solid #e3e7ec;
 }
+
+.tabla-lineas {
+
+  .th-id,
+  .td-id {
+    min-width: 72px;
+    white-space: nowrap;
+  }
+
+  .col-notas {
+    max-width: 200px;
+  }
+
+  .ver-todos {
+    text-decoration: none;
+    font-size: 0.78rem;
+    color: #6c757d;
+  }
+}
+
+.divisor-row {
+  .divisor-cell {
+    background: #ffffff;
+    color: #000;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-align: center;
+    padding: 5px 12px;
+    font-size: 0.8rem;
+  }
+}

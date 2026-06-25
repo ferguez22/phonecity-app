@@ -1,6 +1,4 @@
-import {
-  Component, OnInit, AfterViewInit, ViewChild, ElementRef, inject, signal, computed,
-} from '@angular/core';
+import {Component, OnInit, AfterViewInit, ViewChild, ElementRef, inject, signal, computed, HostListener} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -14,12 +12,12 @@ import { ClienteService } from '../../core/services/cliente.service';
 import { ProveedorService, Proveedor } from '../../core/services/proveedor.service';
 import { Linea, TipoCobro } from '../../core/models/linea.model';
 import { Cliente } from '../../core/models/cliente.model';
-import {
-  ESTADO_OPTIONS, EstadoDef, esEstadoActual,
-  getColor, getEtiqueta, etiquetaHistorialFase,
-} from '../../core/estados/estados';
+import { ESTADO_OPTIONS, EstadoDef, esEstadoActual, getColor, getEtiqueta, etiquetaHistorialFase, estadoActualDef, siguientesDe} from '../../core/estados/estados';
 
 interface Boton { label: string; filtros: LineaFiltros; }
+type FilaTablero =
+  | { tipo: 'divisor'; fecha: string; key: string }
+  | { tipo: 'linea'; linea: Linea };
 
 @Component({
   selector: 'app-tablero',
@@ -39,8 +37,11 @@ interface Boton { label: string; filtros: LineaFiltros; }
     ]),
   ],
 })
+  
 export class TableroComponent implements OnInit, AfterViewInit {
   @ViewChild('controlsRef') controlsRef!: ElementRef<HTMLElement>;
+  @ViewChild('busquedaInput') busquedaInput!: ElementRef<HTMLInputElement>;
+  
 
   private readonly auth = inject(AuthService);
   private readonly lineas$ = inject(LineaService);
@@ -53,8 +54,7 @@ export class TableroComponent implements OnInit, AfterViewInit {
   readonly cargando = signal(false);
   readonly error = signal<string | null>(null);
   readonly busqueda = signal('');
-  readonly orderDir = signal<'asc' | 'desc'>('asc');
-  readonly orderBy = signal<'fecha_entrada' | 'dias_reparacion' | 'id'>('id');
+
   readonly botonActivo = signal('Todo');
   private filtrosActivos: LineaFiltros = {};
 
@@ -63,6 +63,7 @@ export class TableroComponent implements OnInit, AfterViewInit {
   readonly guardando = signal(false);
 
   readonly expandedId = signal<number | null>(null);
+  readonly verTodos = signal(false);
   readonly panelHistorial = signal<EntradaHistorial[]>([]);
   readonly panelCargando = signal(false);
 
@@ -112,6 +113,20 @@ export class TableroComponent implements OnInit, AfterViewInit {
 
   readonly total = computed(() => this.lineasFiltradas().length);
 
+    readonly filas = computed<FilaTablero[]>(() => {
+      const ls = this.lineasFiltradas();
+      const out: FilaTablero[] = [];
+      let ultimaFecha: string | null = null;
+      for (const l of ls) {
+        const f = l.fecha_entrada;
+        if (f && f !== ultimaFecha) {
+          out.push({ tipo: 'divisor', fecha: f, key: `div-${f}-${l.id}` });
+          ultimaFecha = f;
+        }
+        out.push({ tipo: 'linea', linea: l });
+      }
+      return out;
+    });
   getColor = getColor;
   getEtiqueta = getEtiqueta;
 
@@ -138,18 +153,11 @@ export class TableroComponent implements OnInit, AfterViewInit {
     this.cargar();
   }
 
-  toggleOrder(): void { this.orderDir.update((d) => d === 'desc' ? 'asc' : 'desc'); this.cargar(); }
-
-  toggleOrderBy(): void {
-    this.orderBy.update((o) => o === 'id' ? 'fecha_entrada' : o === 'fecha_entrada' ? 'dias_reparacion' : 'id');
-    this.cargar();
-  }
-
   cargar(): void {
     this.cargando.set(true);
     this.error.set(null);
     this.expandedId.set(null);
-    this.lineas$.list({ ...this.filtrosActivos, orderBy: this.orderBy(), order: this.orderDir() }).subscribe({
+    this.lineas$.list({ ...this.filtrosActivos}).subscribe({
       next: (data) => {
         this.lineas.set(data);
         this.cargando.set(false);
@@ -169,6 +177,8 @@ export class TableroComponent implements OnInit, AfterViewInit {
       return;
     }
     this.expandedId.set(linea.id);
+    this.verTodos.set(false);
+
 
     this.edModelo = linea.modelo ?? '';
     this.edProblema = linea.problema_o_pieza ?? '';
@@ -288,6 +298,45 @@ export class TableroComponent implements OnInit, AfterViewInit {
 
   diasDesde(fecha: string): number {
     return Math.floor((Date.now() - new Date(fecha).getTime()) / 86_400_000);
+  }
+
+  chipsParaLinea(linea: Linea): EstadoDef[] {
+    if (this.verTodos()) return this.estadoOptions;
+    const actual = estadoActualDef(linea);
+    const sig = siguientesDe(linea);
+    return actual ? [actual, ...sig] : sig;
+  }
+
+  toggleVerTodos(): void {
+    this.verTodos.update((v) => !v);
+  }
+
+  formatoDivisor(fecha: string): string {
+    let d: Date;
+    if (/^\d{4}-\d{2}-\d{2}/.test(fecha)) d = new Date(fecha);
+    else if (/^\d{2}\/\d{2}\/\d{4}/.test(fecha)) {
+      const [dd, mm, yyyy] = fecha.split('/').map(Number);
+      d = new Date(yyyy, mm - 1, dd);
+    } else d = new Date(fecha);
+    if (isNaN(d.getTime())) return fecha;
+    const meses = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
+    return `${d.getDate()} DE ${meses[d.getMonth()]} DE ${d.getFullYear()}`;
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  onKeydown(e: KeyboardEvent): void {
+    const enInput = (() => {
+      const t = e.target as HTMLElement;
+      return !!t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT');
+    })();
+    if (((e.ctrlKey || e.metaKey) && e.key === 'f') || (e.key === '/' && !enInput)) {
+      e.preventDefault();
+      this.busquedaInput?.nativeElement?.focus();
+    }
+    if (e.key === 'Escape') {
+      if (this.expandedId() !== null) this.expandedId.set(null);
+      else if (this.busqueda()) this.busqueda.set('');
+    }
   }
 
   logout(): void { this.auth.logout(); this.router.navigate(['/login']); }

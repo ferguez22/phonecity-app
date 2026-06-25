@@ -11,31 +11,15 @@
   </nav>
 
   <div class="controles-bar px-3 py-2 d-flex flex-wrap gap-2 align-items-center">
-    <input
-      type="text"
-      class="form-control form-control-sm busqueda"
-      placeholder="Buscar L-id, modelo, cliente, teléfono..."
-      [ngModel]="busqueda()"
-      (ngModelChange)="busqueda.set($event)"
-    />
-    <button class="btn btn-sm btn-outline-secondary" (click)="toggleOrderBy()">
-      Orden:
-      @if (orderBy() === 'id') { Nº línea }
-      @else if (orderBy() === 'fecha_entrada') { Fecha entrada }
-      @else { Días en espera }
-    </button>
-    <button class="btn btn-sm btn-outline-secondary" (click)="toggleOrder()">
-      {{ orderDir() === 'asc' ? '↑ Más antiguo' : '↓ Más reciente' }}
-    </button>
+    <input #busquedaInput type="text" class="form-control form-control-sm busqueda"
+      placeholder="Buscar L-id, modelo, cliente, teléfono...   ( / )" [ngModel]="busqueda()"
+      (ngModelChange)="busqueda.set($event)" />
   </div>
 
   <div class="botones-bar px-3 pb-2 d-flex gap-2">
     @for (boton of botones; track boton.label) {
-      <button
-        class="btn btn-sm boton-estado"
-        [class.activo]="botonActivo() === boton.label"
-        (click)="seleccionarBoton(boton)"
-      >{{ boton.label }}</button>
+    <button class="btn btn-sm boton-estado" [class.activo]="botonActivo() === boton.label"
+      (click)="seleccionarBoton(boton)">{{ boton.label }}</button>
     }
   </div>
 
@@ -44,178 +28,190 @@
 <div class="table-area container-fluid">
 
   @if (cargando()) {
-    <div class="text-center text-muted py-5">Cargando...</div>
+  <div class="text-center text-muted py-5">Cargando...</div>
   } @else if (error()) {
-    <div class="alert alert-danger">{{ error() }}</div>
+  <div class="alert alert-danger">{{ error() }}</div>
   } @else if (lineasFiltradas().length === 0) {
-    <div class="text-center text-muted py-5">No hay líneas en este estado.</div>
+  <div class="text-center text-muted py-5">No hay líneas en este estado.</div>
   } @else {
-    <table class="table table-sm tabla-lineas">
-      <thead class="table-dark">
-        <tr>
-          <th>L-ID</th><th>Estado</th><th>Modelo</th><th>Cliente</th>
-          <th>Teléfono</th><th>€</th><th>Problema / Pieza</th>
-          <th>Fecha entrada</th><th>Días</th><th class="th-expand"></th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (linea of lineasFiltradas(); track linea.id) {
-          <tr class="fila-linea" [class.expandida]="expandedId() === linea.id" [style.--bs-table-bg]="getColor(linea)">
-            <td class="fw-bold">L-{{ linea.id }}</td>
-            <td><span class="badge-estado">{{ getEtiqueta(linea) }}</span></td>
-            <td>{{ linea.modelo ?? '—' }}</td>
-            <td>{{ linea.cliente_nombre ?? 'TIENDA' }}</td>
-            <td>{{ linea.cliente_telefono ?? '—' }}</td>
-            <td>{{ linea.importe != null ? (linea.importe | number:'1.0-0') + ' €' : '—' }}</td>
-            <td class="text-truncate col-pieza">{{ linea.problema_o_pieza ?? '—' }}</td>
-            <td>{{ linea.fecha_entrada ?? '—' }}</td>
-            <td>@if (linea.fecha_entrada) { {{ diasDesde(linea.fecha_entrada) }}d }</td>
-            <td class="td-expand">
-              <button class="btn-expand" [class.abierto]="expandedId() === linea.id" (click)="toggleExpand(linea)" type="button">
-                <span class="chev"></span>
-              </button>
-            </td>
-          </tr>
+  <table class="table table-sm tabla-lineas">
+    <thead class="table-dark">
+      <tr>
+        <th class="th-id">L-ID</th>
+        <th>Estado</th>
+        <th>Fecha</th>
+        <th>Modelo</th>
+        <th>Cliente</th>
+        <th>Teléfono</th>
+        <th>€</th>
+        <th>Problema / Pieza</th>
+        <th>Notas</th>
+        <th>Días</th>
+        <th class="th-expand"></th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (fila of filas(); track fila.tipo === 'divisor' ? fila.key : fila.linea.id) {
+      @if (fila.tipo === 'divisor') {
+      <tr class="divisor-row">
+        <td colspan="11" class="divisor-cell">{{ formatoDivisor(fila.fecha) }}</td>
+      </tr>
+      } @else {
+      @let linea = fila.linea;
+      <tr class="fila-linea" [class.expandida]="expandedId() === linea.id" [style.--bs-table-bg]="getColor(linea)">
+        <td class="fw-bold td-id">L-{{ linea.id }}</td>
+        <td><span class="badge-estado">{{ getEtiqueta(linea) }}</span></td>
+        <td>{{ linea.fecha_entrada ?? '—' }}</td>
+        <td>{{ linea.modelo ?? '—' }}</td>
+        <td>{{ linea.cliente_nombre ?? 'TIENDA' }}</td>
+        <td>{{ linea.cliente_telefono ?? '—' }}</td>
+        <td>{{ linea.importe != null ? (linea.importe | number:'1.0-0') + ' €' : '—' }}</td>
+        <td class="text-truncate col-pieza">{{ linea.problema_o_pieza ?? '—' }}</td>
+        <td class="text-truncate col-notas">{{ linea.notas ?? '—' }}</td>
+        <td>@if (linea.fecha_entrada) { {{ diasDesde(linea.fecha_entrada) }}d }</td>
+        <td class="td-expand">
+          <button class="btn-expand" [class.abierto]="expandedId() === linea.id" (click)="toggleExpand(linea)"
+            type="button">
+            <span class="chev"></span>
+          </button>
+        </td>
+      </tr>
 
-          @if (expandedId() === linea.id) {
-            <tr class="detalle-row">
-              <td colspan="10" class="detalle-cell">
-                <div class="detalle-panel" @expand>
+      @if (expandedId() === linea.id) {
+      <tr class="detalle-row">
+        <td colspan="11" class="detalle-cell">
+          <div class="detalle-panel" @expand>
 
-                  <div class="panel-grid">
+            <div class="panel-grid">
 
-                    <section class="panel-sec panel-estado">
-                      <div class="panel-sec-title">Estado</div>
-                      <div class="estado-grid">
-                        @for (opt of estadoOptions; track opt.id) {
-                          <button
-                            class="estado-chip"
-                            type="button"
-                            [class.activo]="esEstadoActual(opt, linea)"
-                            [style.--chip]="opt.color"
-                            [disabled]="guardando()"
-                            (click)="cambiarEstado(opt, linea)"
-                          >{{ opt.label }}</button>
-                        }
-                      </div>
-                    </section>
-
-                    <section class="panel-sec">
-                      <div class="panel-sec-title">Datos</div>
-                      <div class="campos-grid">
-                        <label class="campo">
-                          <span>Modelo</span>
-                          <input type="text" [(ngModel)]="edModelo" name="edModelo" />
-                        </label>
-                        <label class="campo">
-                          <span>Problema / Pieza</span>
-                          <input type="text" [(ngModel)]="edProblema" name="edProblema" />
-                        </label>
-                        <label class="campo">
-                          <span>Importe (€)</span>
-                          <input type="number" min="0" step="0.01" [(ngModel)]="edImporte" name="edImporte" />
-                        </label>
-                        <label class="campo">
-                          <span>Tipo de cobro</span>
-                          <select [(ngModel)]="edTipoCobro" name="edTipoCobro">
-                            <option value="normal">Normal</option>
-                            <option value="garantia">Garantía</option>
-                            <option value="presupuesto_taller">Presupuesto taller</option>
-                          </select>
-                        </label>
-                        <label class="campo">
-                          <span>Fecha entrada</span>
-                          <input type="date" [(ngModel)]="edFechaEntrada" name="edFechaEntrada" />
-                        </label>
-                        <label class="campo">
-                          <span>Recogida prevista</span>
-                          <input type="datetime-local" [(ngModel)]="edRecogida" name="edRecogida" />
-                        </label>
-                        <label class="campo">
-                          <span>Tel. alternativo</span>
-                          <input type="tel" [(ngModel)]="edTelAlt" name="edTelAlt" />
-                        </label>
-                        <label class="campo">
-                          <span>Código dispositivo</span>
-                          <input type="text" [(ngModel)]="edCodigo" name="edCodigo" />
-                        </label>
-                      </div>
-                      <label class="campo campo-full">
-                        <span>Notas</span>
-                        <textarea rows="2" [(ngModel)]="edNotas" name="edNotas"></textarea>
-                      </label>
-                    </section>
-
-                    <section class="panel-sec">
-                      <div class="panel-sec-title">Cliente</div>
-                      <div class="cliente-box">
-                        <input
-                          type="text"
-                          class="cliente-search"
-                          placeholder="Buscar nombre o teléfono..."
-                          [ngModel]="busqCliente()"
-                          (ngModelChange)="onBuscarCliente($event)"
-                          name="busqCliente"
-                        />
-                        @if (clienteSelec()) {
-                          <small class="cliente-ok">✓ {{ clienteSelec()!.nombre }} ({{ clienteSelec()!.telefono ?? 'sin tel.' }})</small>
-                        }
-                        @if (resultClientes().length > 0) {
-                          <ul class="cliente-result">
-                            @for (c of resultClientes(); track c.id) {
-                              <li (click)="seleccionarCliente(c)">{{ c.nombre }} — {{ c.telefono ?? 'sin tel.' }}</li>
-                            }
-                          </ul>
-                        }
-
-                        <button type="button" class="btn btn-sm btn-outline-primary mt-2" (click)="toggleNuevoCliente()">
-                          {{ mostrarNuevoCliente() ? 'Cancelar' : '+ Cliente nuevo' }}
-                        </button>
-
-                        @if (mostrarNuevoCliente()) {
-                          <div class="cliente-nuevo">
-                            <input type="text" placeholder="Nombre *" [ngModel]="nuevoNombre()" (ngModelChange)="nuevoNombre.set($event)" name="nuevoNombre" />
-                            <input type="tel" placeholder="Teléfono" [ngModel]="nuevoTel()" (ngModelChange)="nuevoTel.set($event)" name="nuevoTel" />
-                            <button type="button" class="btn btn-sm btn-success" (click)="crearCliente()">Crear y seleccionar</button>
-                          </div>
-                        }
-                      </div>
-                    </section>
-
-                    <section class="panel-sec">
-                      <div class="panel-sec-title">Historial</div>
-                      @if (panelCargando()) {
-                        <span class="text-muted small">Cargando...</span>
-                      } @else if (panelHistorial().length === 0) {
-                        <span class="text-muted small">Sin historial.</span>
-                      } @else {
-                        <div class="historial-list">
-                          @for (h of panelHistorial(); track h.id) {
-                            <div class="historial-item">
-                              <span class="hist-fecha">{{ h.fecha | date:'dd/MM/yy HH:mm' }}</span>
-                              <span>{{ etiquetaHistorial(h) }}</span>
-                            </div>
-                          }
-                        </div>
-                      }
-                    </section>
-
-                  </div>
-
-                  <div class="panel-acciones">
-                    <button type="button" class="btn btn-primary btn-sm" [disabled]="guardando()" (click)="guardarDatos(linea)">
-                      {{ guardando() ? 'Guardando...' : 'Guardar datos' }}
-                    </button>
-                    <button type="button" class="btn btn-link btn-sm" (click)="toggleExpand(linea)">Cerrar</button>
-                  </div>
-
+              <section class="panel-sec panel-estado">
+                <div class="panel-sec-title">Estado</div>
+                <div class="estado-grid">
+                  @for (opt of chipsParaLinea(linea); track opt.id) {
+                  <button class="estado-chip" type="button" [class.activo]="esEstadoActual(opt, linea)"
+                    [style.--chip]="opt.color" [disabled]="guardando()" (click)="cambiarEstado(opt, linea)">{{ opt.label
+                    }}</button>
+                  }
                 </div>
-              </td>
-            </tr>
-          }
-        }
-      </tbody>
-    </table>
+                <button type="button" class="btn btn-sm btn-link p-0 mt-1 ver-todos" (click)="toggleVerTodos()">
+                    {{ verTodos() ? '▲ Ver menos' : '▼ Ver todos los estados' }}
+                </button>
+              </section>
+
+              <section class="panel-sec">
+                <div class="panel-sec-title">Datos</div>
+                <div class="campos-grid">
+                  <label class="campo">
+                    <span>Modelo</span>
+                    <input type="text" [(ngModel)]="edModelo" name="edModelo" />
+                  </label>
+                  <label class="campo">
+                    <span>Problema / Pieza</span>
+                    <input type="text" [(ngModel)]="edProblema" name="edProblema" />
+                  </label>
+                  <label class="campo">
+                    <span>Importe (€)</span>
+                    <input type="number" min="0" step="0.01" [(ngModel)]="edImporte" name="edImporte" />
+                  </label>
+                  <label class="campo">
+                    <span>Tipo de cobro</span>
+                    <select [(ngModel)]="edTipoCobro" name="edTipoCobro">
+                      <option value="normal">Normal</option>
+                      <option value="garantia">Garantía</option>
+                      <option value="presupuesto_taller">Presupuesto taller</option>
+                    </select>
+                  </label>
+                  <label class="campo">
+                    <span>Fecha entrada</span>
+                    <input type="date" [(ngModel)]="edFechaEntrada" name="edFechaEntrada" />
+                  </label>
+                  <label class="campo">
+                    <span>Recogida prevista</span>
+                    <input type="datetime-local" [(ngModel)]="edRecogida" name="edRecogida" />
+                  </label>
+                  <label class="campo">
+                    <span>Tel. alternativo</span>
+                    <input type="tel" [(ngModel)]="edTelAlt" name="edTelAlt" />
+                  </label>
+                  <label class="campo">
+                    <span>Código dispositivo</span>
+                    <input type="text" [(ngModel)]="edCodigo" name="edCodigo" />
+                  </label>
+                </div>
+                <label class="campo campo-full">
+                  <span>Notas</span>
+                  <textarea rows="2" [(ngModel)]="edNotas" name="edNotas"></textarea>
+                </label>
+              </section>
+
+              <section class="panel-sec">
+                <div class="panel-sec-title">Cliente</div>
+                <div class="cliente-box">
+                  <input type="text" class="cliente-search" placeholder="Buscar nombre o teléfono..."
+                    [ngModel]="busqCliente()" (ngModelChange)="onBuscarCliente($event)" name="busqCliente" />
+                  @if (clienteSelec()) {
+                  <small class="cliente-ok">✓ {{ clienteSelec()!.nombre }} ({{ clienteSelec()!.telefono ?? 'sin tel.'
+                    }})</small>
+                  }
+                  @if (resultClientes().length > 0) {
+                  <ul class="cliente-result">
+                    @for (c of resultClientes(); track c.id) {
+                    <li (click)="seleccionarCliente(c)">{{ c.nombre }} — {{ c.telefono ?? 'sin tel.' }}</li>
+                    }
+                  </ul>
+                  }
+
+                  <button type="button" class="btn btn-sm btn-outline-primary mt-2" (click)="toggleNuevoCliente()">
+                    {{ mostrarNuevoCliente() ? 'Cancelar' : '+ Cliente nuevo' }}
+                  </button>
+
+                  @if (mostrarNuevoCliente()) {
+                  <div class="cliente-nuevo">
+                    <input type="text" placeholder="Nombre *" [ngModel]="nuevoNombre()"
+                      (ngModelChange)="nuevoNombre.set($event)" name="nuevoNombre" />
+                    <input type="tel" placeholder="Teléfono" [ngModel]="nuevoTel()"
+                      (ngModelChange)="nuevoTel.set($event)" name="nuevoTel" />
+                    <button type="button" class="btn btn-sm btn-success" (click)="crearCliente()">Crear y
+                      seleccionar</button>
+                  </div>
+                  }
+                </div>
+              </section>
+
+              <section class="panel-sec">
+                <div class="panel-sec-title">Historial</div>
+                @if (panelCargando()) {
+                <span class="text-muted small">Cargando...</span>
+                } @else if (panelHistorial().length === 0) {
+                <span class="text-muted small">Sin historial.</span>
+                } @else {
+                <div class="historial-list">
+                  @for (h of panelHistorial(); track h.id) {
+                  <div class="historial-item">
+                    <span class="hist-fecha">{{ h.fecha | date:'dd/MM/yy HH:mm' }}</span>
+                    <span>{{ etiquetaHistorial(h) }}</span>
+                  </div>
+                  }
+                </div>
+                }
+              </section>
+
+            </div>
+
+            <div class="panel-acciones">
+              <button type="button" class="btn btn-primary btn-sm" [disabled]="guardando()"
+                (click)="guardarDatos(linea)">{{ guardando() ? 'Guardando...' : 'Guardar datos' }}</button>
+              <button type="button" class="btn btn-link btn-sm" (click)="toggleExpand(linea)">Cerrar</button>
+            </div>
+
+          </div>
+        </td>
+      </tr>
+      }
+      }
+      }
+    </tbody>
+  </table>
   }
 
 </div>
