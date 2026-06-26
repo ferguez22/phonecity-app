@@ -20,34 +20,34 @@ export interface EstadoDef {
   siguientes: string[];
 }
 
-const COLOR_VENTA = '#A2C4C9';
-const COLOR_COMPRA = '#76A5AF';
-const COLOR_FINALIZADO = '#6AA84F';
-const COLOR_TALLER = '#D9D2E9'; 
+const COLOR_VENTA = '#F4F3F0';
+const COLOR_COMPRA = '#ECEBE6';
+const COLOR_FINALIZADO = '#9FE1A2';
+const COLOR_TALLER = '#DCE2F6';
 
 export const ESTADOS: EstadoDef[] = [
-  { id: 'reparar', label: 'Reparar', flujo: 'reparacion', fase: 'por_reparar', avisado: false, movil_en_tienda: true, color: '#B6D7A8',esEntrada: true, ordenEntrada: 1,siguientes: ['pedir_pieza_movil','enviar_taller_infotec', 'enviar_taller_phonestorm', 'reparado_avisado', 'no_reparable_avisado', 'no_reparable_entregado', 'cancelado', 'finalizado'] },
-  { id: 'reparado_avisado', label: 'Reparado - Avisado', flujo: 'reparacion', fase: 'reparado', avisado: true, movil_en_tienda: true, color: '#93C47D',siguientes: ['finalizado', 'cancelado'] },
-  { id: 'pedir_pieza_movil', label: 'Pedir Pieza Movil en tienda', flujo: 'pieza', fase: 'por_pedir', avisado: false, movil_en_tienda: true, color: '#FFF2CC', esEntrada: true, ordenEntrada: 2, siguientes: ['pieza_pedida_movil', 'cancelado', 'finalizado'] },
-  { id: 'pedir_pieza', label: 'Pedir Pieza', flujo: 'pieza', fase: 'por_pedir', avisado: false, movil_en_tienda: false, color: '#FFF2CC', esEntrada: true, ordenEntrada: 3, siguientes: ['pieza_pedida', 'cancelado', 'finalizado'] },
-  { id: 'pieza_pedida_movil', label: 'Pieza pedida - Movil en tienda', flujo: 'pieza', fase: 'pedido', avisado: false, movil_en_tienda: true, color: '#FFD966', siguientes: ['pieza_en_tienda', 'cancelado', 'finalizado'] },
-  { id: 'pieza_pedida', label: 'Pieza pedida', flujo: 'pieza', fase: 'pedido', avisado: false, movil_en_tienda: false, color: '#FFD966', siguientes: ['pieza_en_tienda', 'cancelado', 'finalizado'] },
-  { id: 'pieza_en_tienda', label: 'Pieza en tienda - avisado', flujo: 'pieza', fase: 'en_tienda', avisado: true, movil_en_tienda: false, color: '#F6B26B', siguientes: ['reparar', 'cancelado', 'finalizado'] },
-  { id: 'pedir_acc_apokin', label: 'Pedir accesorio APOKIN', flujo: 'accesorio', fase: 'por_pedir', avisado: false, movil_en_tienda: false, proveedor: 'Apokin', color: '#BBD7F0', esEntrada: true, ordenEntrada: 5, siguientes: ['acc_pedido_apokin', 'cancelado', 'finalizado'] },
-  { id: 'pedir_acc_wephone', label: 'Pedir accesorio WEPHONE', flujo: 'accesorio', fase: 'por_pedir', avisado: false, movil_en_tienda: false, proveedor: 'Wephone', color: '#9FC5E8', esEntrada: true, ordenEntrada: 4, siguientes: ['acc_pedido_wephone', 'cancelado', 'finalizado'] },
-  { id: 'acc_pedido_apokin', label: 'Accesorio Pedido APOKIN', flujo: 'accesorio', fase: 'pedido', avisado: false, movil_en_tienda: false, proveedor: 'Apokin', color: '#9FC5E8', siguientes: ['acc_en_tienda_apokin', 'cancelado', 'finalizado'] },
-  { id: 'acc_pedido_wephone', label: 'Accesorio Pedido WEPHONE', flujo: 'accesorio', fase: 'pedido', avisado: false, movil_en_tienda: false, proveedor: 'Wephone', color: '#6FA8DC', siguientes: ['acc_en_tienda_wephone', 'cancelado', 'finalizado'] },
-  { id: 'acc_en_tienda_apokin', label: 'Accesorio en tienda Avisado APOKIN', flujo: 'accesorio', fase: 'en_tienda', avisado: true, movil_en_tienda: false, proveedor: 'Apokin', color: '#6FA8DC', siguientes: ['finalizado', 'cancelado'] },
-  { id: 'acc_en_tienda_wephone', label: 'Accesorio en tienda Avisado WEPHONE', flujo: 'accesorio', fase: 'en_tienda', avisado: true, movil_en_tienda: false, proveedor: 'Wephone', color: '#4A86C8', siguientes: ['finalizado', 'cancelado'] },
-  { id: 'no_reparable_avisado', label: 'No se puede reparar - avisado', flujo: 'reparacion', fase: 'no_reparable', avisado: true, movil_en_tienda: true, color: '#E06666', siguientes: ['no_reparable_entregado', 'finalizado', 'cancelado'] },
-  { id: 'no_reparable_entregado', label: 'No se puede Reparar - Entregado', flujo: 'reparacion', fase: 'no_reparable', avisado: true, movil_en_tienda: false, color: '#F4AAAA', siguientes: ['finalizado', 'cancelado'] },
-  { id: 'cancelado', label: 'Cancelado', flujo: 'reparacion', fase: 'cancelado', avisado: false, movil_en_tienda: false, color: '#EA9999', siguientes: [] },
+  { id: 'reparar', label: 'Reparar', flujo: 'reparacion', fase: 'por_reparar', avisado: false, movil_en_tienda: true, color: '#CFE8AE',esEntrada: true, ordenEntrada: 1,siguientes: ['pedir_pieza_movil','enviar_taller_infotec', 'enviar_taller_phonestorm', 'reparado_avisado', 'no_reparable_avisado', 'no_reparable_entregado', 'cancelado', 'finalizado'] },
+  { id: 'reparado_avisado', label: 'Reparado - Avisado', flujo: 'reparacion', fase: 'reparado', avisado: true, movil_en_tienda: true, color: '#A7D479',siguientes: ['finalizado', 'cancelado'] },
+  { id: 'pedir_pieza_movil', label: 'Pedir Pieza Movil en tienda', flujo: 'pieza', fase: 'por_pedir', avisado: false, movil_en_tienda: true, color: '#F7E08F', esEntrada: true, ordenEntrada: 2, siguientes: ['pieza_pedida_movil', 'cancelado', 'finalizado'] },
+  { id: 'pedir_pieza', label: 'Pedir Pieza', flujo: 'pieza', fase: 'por_pedir', avisado: false, movil_en_tienda: false, color: '#FBEFA8', esEntrada: true, ordenEntrada: 3, siguientes: ['pieza_pedida', 'cancelado', 'finalizado'] },
+  { id: 'pieza_pedida_movil', label: 'Pieza pedida - Movil en tienda', flujo: 'pieza', fase: 'pedido', avisado: false, movil_en_tienda: true, color: '#F3CB63', siguientes: ['pieza_en_tienda', 'cancelado', 'finalizado'] },
+  { id: 'pieza_pedida', label: 'Pieza pedida', flujo: 'pieza', fase: 'pedido', avisado: false, movil_en_tienda: false, color: '#F7D98A', siguientes: ['pieza_en_tienda', 'cancelado', 'finalizado'] },
+  { id: 'pieza_en_tienda', label: 'Pieza en tienda - avisado', flujo: 'pieza', fase: 'en_tienda', avisado: true, movil_en_tienda: false, color: '#EFB44D', siguientes: ['reparar', 'cancelado', 'finalizado'] },
+  { id: 'pedir_acc_apokin', label: 'Pedir accesorio APOKIN', flujo: 'accesorio', fase: 'por_pedir', avisado: false, movil_en_tienda: false, proveedor: 'Apokin', color: '#B6E3D9', esEntrada: true, ordenEntrada: 5, siguientes: ['acc_pedido_apokin', 'cancelado', 'finalizado'] },
+  { id: 'pedir_acc_wephone', label: 'Pedir accesorio WEPHONE', flujo: 'accesorio', fase: 'por_pedir', avisado: false, movil_en_tienda: false, proveedor: 'Wephone', color: '#C7E0F8', esEntrada: true, ordenEntrada: 4, siguientes: ['acc_pedido_wephone', 'cancelado', 'finalizado'] },
+  { id: 'acc_pedido_apokin', label: 'Accesorio Pedido APOKIN', flujo: 'accesorio', fase: 'pedido', avisado: false, movil_en_tienda: false, proveedor: 'Apokin', color: '#82CBBE', siguientes: ['acc_en_tienda_apokin', 'cancelado', 'finalizado'] },
+  { id: 'acc_pedido_wephone', label: 'Accesorio Pedido WEPHONE', flujo: 'accesorio', fase: 'pedido', avisado: false, movil_en_tienda: false, proveedor: 'Wephone', color: '#93C0EE', siguientes: ['acc_en_tienda_wephone', 'cancelado', 'finalizado'] },
+  { id: 'acc_en_tienda_apokin', label: 'Accesorio en tienda Avisado APOKIN', flujo: 'accesorio', fase: 'en_tienda', avisado: true, movil_en_tienda: false, proveedor: 'Apokin', color: '#52B0A0', siguientes: ['finalizado', 'cancelado'] },
+  { id: 'acc_en_tienda_wephone', label: 'Accesorio en tienda Avisado WEPHONE', flujo: 'accesorio', fase: 'en_tienda', avisado: true, movil_en_tienda: false, proveedor: 'Wephone', color: '#5FA0E0', siguientes: ['finalizado', 'cancelado'] },
+  { id: 'no_reparable_avisado', label: 'No se puede reparar - avisado', flujo: 'reparacion', fase: 'no_reparable', avisado: true, movil_en_tienda: true, color: '#F3B6A4', siguientes: ['no_reparable_entregado', 'finalizado', 'cancelado'] },
+  { id: 'no_reparable_entregado', label: 'No se puede Reparar - Entregado', flujo: 'reparacion', fase: 'no_reparable', avisado: true, movil_en_tienda: false, color: '#DD8770', siguientes: ['finalizado', 'cancelado'] },
+  { id: 'cancelado', label: 'Cancelado', flujo: 'reparacion', fase: 'cancelado', avisado: false, movil_en_tienda: false, color: '#D2CEC4', siguientes: [] },
   { id: 'compra', label: 'Compra de Dispositivo', flujo: 'venta', fase: 'entregado', avisado: false, movil_en_tienda: false, subtipo: 'compra', color: COLOR_COMPRA, esEntrada: true, ordenEntrada: 7, siguientes: ['cancelado'] },
   { id: 'venta', label: 'Venta de Dispositivo', flujo: 'venta', fase: 'entregado', avisado: false, movil_en_tienda: false, subtipo: 'venta', color: COLOR_VENTA, esEntrada: true, ordenEntrada: 6, siguientes: ['cancelado'] },
-  { id: 'enviar_taller_phonestorm', label: 'Enviar a Taller - Phonestorm', flujo: 'reparacion', fase: 'por_enviar_taller', avisado: false, movil_en_tienda: true, taller: 'Phonestorm', color: '#E0DAF0', siguientes: ['enviado_taller_phonestorm', 'cancelado', 'finalizado'] },
-  { id: 'enviar_taller_infotec', label: 'Enviar a Taller - Infotec', flujo: 'reparacion', fase: 'por_enviar_taller', avisado: false, movil_en_tienda: true, taller: 'Infotec', color: '#D9D2E9', siguientes: ['enviado_taller_infotec', 'cancelado', 'finalizado'] },
-  { id: 'enviado_taller_phonestorm', label: 'Enviado a Taller - Phonestorm', flujo: 'reparacion', fase: 'en_taller', avisado: false, movil_en_tienda: false, taller: 'Phonestorm', color: '#C7BEE3', siguientes: ['reparado_avisado', 'no_reparable_avisado', 'cancelado', 'finalizado'] },
-  { id: 'enviado_taller_infotec', label: 'Enviado a Taller - Infotec', flujo: 'reparacion', fase: 'en_taller', avisado: false, movil_en_tienda: false, taller: 'Infotec', color: '#B4A7D6', siguientes: ['reparado_avisado', 'no_reparable_avisado', 'cancelado', 'finalizado'] },
+  { id: 'enviar_taller_phonestorm', label: 'Enviar a Taller - Phonestorm', flujo: 'reparacion', fase: 'por_enviar_taller', avisado: false, movil_en_tienda: true, taller: 'Phonestorm', color: '#D6D0F5', siguientes: ['enviado_taller_phonestorm', 'cancelado', 'finalizado'] },
+  { id: 'enviar_taller_infotec', label: 'Enviar a Taller - Infotec', flujo: 'reparacion', fase: 'por_enviar_taller', avisado: false, movil_en_tienda: true, taller: 'Infotec', color: '#C2CEF2', siguientes: ['enviado_taller_infotec', 'cancelado', 'finalizado'] },
+  { id: 'enviado_taller_phonestorm', label: 'Enviado a Taller - Phonestorm', flujo: 'reparacion', fase: 'en_taller', avisado: false, movil_en_tienda: false, taller: 'Phonestorm', color: '#B3A9EC', siguientes: ['reparado_avisado', 'no_reparable_avisado', 'cancelado', 'finalizado'] },
+  { id: 'enviado_taller_infotec', label: 'Enviado a Taller - Infotec', flujo: 'reparacion', fase: 'en_taller', avisado: false, movil_en_tienda: false, taller: 'Infotec', color: '#94A8E5', siguientes: ['reparado_avisado', 'no_reparable_avisado', 'cancelado', 'finalizado'] },
   { id: 'finalizado', label: 'Finalizado', flujo: 'reparacion', fase: 'entregado', avisado: false, movil_en_tienda: false, color: COLOR_FINALIZADO, preservaFlujo: true, siguientes: [] },
 ];
 
