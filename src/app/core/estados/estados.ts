@@ -22,7 +22,7 @@ export interface EstadoDef {
 
 const COLOR_VENTA = '#F4F3F0';
 const COLOR_COMPRA = '#ECEBE6';
-const COLOR_FINALIZADO = '#9FE1A2';
+const COLOR_FINALIZADO = '#5fe366';
 const COLOR_TALLER = '#DCE2F6';
 
 export const ESTADOS: EstadoDef[] = [
