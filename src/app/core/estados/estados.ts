@@ -173,3 +173,29 @@ export function siguientesDe(l: Linea): EstadoDef[] {
     .map((id) => ESTADOS.find((e) => e.id === id))
     .filter((e): e is EstadoDef => !!e);
 }
+
+const PLANTILLAS_WA: Record<string, (l: Linea) => string> = {
+  reparado: (l) =>`Hola ${l.cliente_nombre || ''}! Soy Fernando de PhoneCity. Ya hemos reparado tu ${l.modelo || 'dispositivo'}, puedes pasarte por la tienda a recogerlo cuando quieras!`,
+  no_reparable: (l) =>`Hola ${l.cliente_nombre || ''}! Soy Fernando de PhoneCity. Lamentablemente no hemos podido reparar tu ${l.modelo || 'dispositivo'} con problema ${l.problema_o_pieza || ''}, puedes pasarte por la tienda a recogerlo cuando quieras! Esperamos poder ayudarte en otra ocasión!`,
+  pieza_en_tienda: (l) =>`Hola ${l.cliente_nombre || ''}! Soy Fernando de PhoneCity. Ya tenemos la ${l.problema_o_pieza || 'pieza'} de tu ${l.modelo || 'dispositivo'}, puedes pasarte por la tienda cuando quieras.`,
+  acc_en_tienda: (l) =>`Hola ${l.cliente_nombre || ''}! Soy Fernando de PhoneCity. Ya tenemos el ${l.problema_o_pieza || 'accesorio'} de tu ${l.modelo || 'dispositivo'} en tienda, puedes pasarte por la tienda a recogerlo cuando quieras!`,
+};
+
+// Devuelve la clave de plantilla específica si el estado actual la tiene
+function claveMensaje(l: Linea): string | null {
+  if (l.flujo === 'reparacion' && l.fase === 'reparado') return 'reparado';
+  if (l.flujo === 'reparacion' && l.fase === 'no_reparable' && !!l.avisado) return 'no_reparable';
+  if (l.flujo === 'pieza' && l.fase === 'en_tienda') return 'pieza_en_tienda';
+  if (l.flujo === 'accesorio' && l.fase === 'en_tienda') return 'acc_en_tienda';
+  return null;
+}
+
+export function tieneMensajeEspecifico(l: Linea): boolean {
+  return claveMensaje(l) !== null;
+}
+
+export function mensajeWhatsapp(l: Linea): string {
+  const clave = claveMensaje(l);
+  if (clave) return PLANTILLAS_WA[clave](l);
+  return `Hola ${l.cliente_nombre || ''}! Soy Fernando de PhoneCity.`;
+}

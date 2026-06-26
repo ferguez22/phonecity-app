@@ -13,7 +13,7 @@ import { ProveedorService, Proveedor } from '../../core/services/proveedor.servi
 import { Linea, TipoCobro } from '../../core/models/linea.model';
 import { PedidoModalComponent } from '../pedido-modal/pedido-modal.component';
 import { Cliente } from '../../core/models/cliente.model';
-import { ESTADO_OPTIONS, EstadoDef, esEstadoActual, getColor, getEtiqueta, etiquetaHistorialFase, estadoActualDef, siguientesDe} from '../../core/estados/estados';
+import { ESTADO_OPTIONS, EstadoDef, esEstadoActual, getColor, getEtiqueta, etiquetaHistorialFase, estadoActualDef, siguientesDe, mensajeWhatsapp, tieneMensajeEspecifico} from '../../core/estados/estados';
 
 interface Boton { label: string; filtros: LineaFiltros; }
 type FilaTablero =
@@ -43,34 +43,6 @@ export class TableroComponent implements OnInit, AfterViewInit {
   @ViewChild('controlsRef') controlsRef!: ElementRef<HTMLElement>;
   @ViewChild('busquedaInput') busquedaInput!: ElementRef<HTMLInputElement>;
   
-
-  private readonly auth = inject(AuthService);
-  private readonly lineas$ = inject(LineaService);
-  private readonly histSvc = inject(HistorialService);
-  private readonly clienteSvc = inject(ClienteService);
-  private readonly proveedorSvc = inject(ProveedorService);
-  private readonly router = inject(Router);
-
-  readonly lineas = signal<Linea[]>([]);
-  readonly cargando = signal(false);
-  readonly error = signal<string | null>(null);
-  readonly busqueda = signal('');
-
-  readonly botonActivo = signal('Todo');
-  private filtrosActivos: LineaFiltros = {};
-
-  readonly proveedores = signal<Proveedor[]>([]);
-  readonly estadoOptions = ESTADO_OPTIONS;
-  readonly guardando = signal(false);
-  readonly expandedId = signal<number | null>(null);
-  readonly verTodos = signal(false);
-  readonly ajustesAbierto = signal(false);
-  readonly pedidoAbierto = signal(false);
-  readonly divisorModo = signal<'todos' | 'solo_todo' | 'off'>(this.leerDivisorModo());
-  readonly panelHistorial = signal<EntradaHistorial[]>([]);
-  readonly panelCargando = signal(false);
-  readonly filasVacias = [0, 1, 2, 3, 4];
-
   edModelo = '';
   edProblema = '';
   edImporte: number | null = null;
@@ -81,13 +53,39 @@ export class TableroComponent implements OnInit, AfterViewInit {
   edCodigo = '';
   edNotas = '';
 
+  private readonly auth = inject(AuthService);
+  private readonly lineas$ = inject(LineaService);
+  private readonly histSvc = inject(HistorialService);
+  private readonly clienteSvc = inject(ClienteService);
+  private readonly proveedorSvc = inject(ProveedorService);
+  private readonly router = inject(Router);
+  private filtrosActivos: LineaFiltros = {};
+  private toastTimer: ReturnType<typeof setTimeout> | null = null;
+  private readonly busq$ = new Subject<string>();
+
+  readonly lineas = signal<Linea[]>([]);
+  readonly cargando = signal(false);
+  readonly error = signal<string | null>(null);
+  readonly busqueda = signal('');
+  readonly botonActivo = signal('Todo');
+  readonly proveedores = signal<Proveedor[]>([]);
+  readonly estadoOptions = ESTADO_OPTIONS;
+  readonly guardando = signal(false);
+  readonly expandedId = signal<number | null>(null);
+  readonly verTodos = signal(false);
+  readonly ajustesAbierto = signal(false);
+  readonly pedidoAbierto = signal(false);
+  readonly toastWa = signal<Linea | null>(null);
+  readonly divisorModo = signal<'todos' | 'solo_todo' | 'off'>(this.leerDivisorModo());
+  readonly panelHistorial = signal<EntradaHistorial[]>([]);
+  readonly panelCargando = signal(false);
+  readonly filasVacias = [0, 1, 2, 3, 4];
   readonly busqCliente = signal('');
   readonly resultClientes = signal<Cliente[]>([]);
   readonly clienteSelec = signal<Cliente | null>(null);
   readonly mostrarNuevoCliente = signal(false);
   readonly nuevoNombre = signal('');
   readonly nuevoTel = signal('');
-  private readonly busq$ = new Subject<string>();
 
   readonly botones: Boton[] = [
     { label: 'Todo', filtros: {} },
@@ -240,8 +238,12 @@ export class TableroComponent implements OnInit, AfterViewInit {
     this.guardando.set(true);
     this.lineas$.update(linea.id, payload).subscribe({
       next: (updated) => {
-        this.lineas.update((c) => c.map((x) => x.id === linea.id ? { ...x, ...updated } : x));
+        const merged = { ...linea, ...updated } as Linea;
+        this.lineas.update((c) => c.map((x) => x.id === linea.id ? merged : x));
         this.guardando.set(false);
+        if (tieneMensajeEspecifico(merged) && merged.cliente_telefono) {
+          this.mostrarToastWa(merged);
+        }
       },
       error: (err) => { this.guardando.set(false); this.error.set(err?.error?.error?.message ?? 'Error'); },
     });
@@ -329,6 +331,43 @@ export class TableroComponent implements OnInit, AfterViewInit {
 
   abrirPedido(): void {
     this.pedidoAbierto.set(true);
+  }
+
+  enviarWhatsapp(linea: Linea): void {
+    const tel = this.limpiarTelefono(linea.cliente_telefono);
+    if (!tel) {
+      this.error.set('Esta línea no tiene número de teléfono');
+      return;
+    }
+    const texto = mensajeWhatsapp(linea);
+    const url = `https://wa.me/${tel}?text=${encodeURIComponent(texto)}`;
+    window.open(url, '_blank');
+  }
+
+  mostrarToastWa(linea: Linea): void {
+    this.toastWa.set(linea);
+    if (this.toastTimer) clearTimeout(this.toastTimer);
+    this.toastTimer = setTimeout(() => this.toastWa.set(null), 6000);
+  }
+
+  enviarDesdeToast(): void {
+    const l = this.toastWa();
+    if (l) this.enviarWhatsapp(l);
+    this.cerrarToast();
+  }
+
+  cerrarToast(): void {
+    this.toastWa.set(null);
+    if (this.toastTimer) { clearTimeout(this.toastTimer); this.toastTimer = null; }
+  }
+
+  private limpiarTelefono(tel: string | null): string | null {
+    if (!tel) return null;
+    let s = tel.replace(/\D/g, '');
+    if (!s || s.length < 6) return null;
+    if (s.length === 9) s = '34' + s;        // móvil español sin prefijo
+    // si ya viene con 34 (11-12 díg) se deja tal cual
+    return s;
   }
 
   cerrarPedido(recargar: boolean): void {
