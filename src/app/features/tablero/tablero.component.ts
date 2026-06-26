@@ -61,9 +61,10 @@ export class TableroComponent implements OnInit, AfterViewInit {
   readonly proveedores = signal<Proveedor[]>([]);
   readonly estadoOptions = ESTADO_OPTIONS;
   readonly guardando = signal(false);
-
   readonly expandedId = signal<number | null>(null);
   readonly verTodos = signal(false);
+  readonly ajustesAbierto = signal(false);
+  readonly divisorModo = signal<'todos' | 'solo_todo' | 'off'>(this.leerDivisorModo());
   readonly panelHistorial = signal<EntradaHistorial[]>([]);
   readonly panelCargando = signal(false);
 
@@ -113,20 +114,28 @@ export class TableroComponent implements OnInit, AfterViewInit {
 
   readonly total = computed(() => this.lineasFiltradas().length);
 
-    readonly filas = computed<FilaTablero[]>(() => {
-      const ls = this.lineasFiltradas();
-      const out: FilaTablero[] = [];
-      let ultimaFecha: string | null = null;
-      for (const l of ls) {
-        const f = l.fecha_entrada;
-        if (f && f !== ultimaFecha) {
-          out.push({ tipo: 'divisor', fecha: f, key: `div-${f}-${l.id}` });
-          ultimaFecha = f;
-        }
-        out.push({ tipo: 'linea', linea: l });
+  readonly mostrarDivisor = computed(() => {
+    const modo = this.divisorModo();
+    if (modo === 'off') return false;
+    if (modo === 'todos') return true;
+    return this.botonActivo() === 'Todo';
+  });
+
+  readonly filas = computed<FilaTablero[]>(() => {
+    const ls = this.lineasFiltradas();
+    const conDivisor = this.mostrarDivisor();
+    const out: FilaTablero[] = [];
+    let ultimaFecha: string | null = null;
+    for (const l of ls) {
+      const f = l.fecha_entrada;
+      if (conDivisor && f && f !== ultimaFecha) {
+        out.push({ tipo: 'divisor', fecha: f, key: `div-${f}-${l.id}` });
+        ultimaFecha = f;
       }
-      return out;
-    });
+      out.push({ tipo: 'linea', linea: l });
+    }
+    return out;
+  });
   getColor = getColor;
   getEtiqueta = getEtiqueta;
 
@@ -311,6 +320,23 @@ export class TableroComponent implements OnInit, AfterViewInit {
     this.verTodos.update((v) => !v);
   }
 
+  toggleAjustes(): void {
+    this.ajustesAbierto.update((v) => !v);
+  }
+
+  setDivisorModo(modo: 'todos' | 'solo_todo' | 'off'): void {
+    this.divisorModo.set(modo);
+    try { localStorage.setItem('phonecity_divisor_modo', modo); } catch {}
+  }
+
+  private leerDivisorModo(): 'todos' | 'solo_todo' | 'off' {
+    try {
+      const v = localStorage.getItem('phonecity_divisor_modo');
+      if (v === 'todos' || v === 'solo_todo' || v === 'off') return v;
+    } catch {}
+    return 'solo_todo';
+  }
+
   formatoDivisor(fecha: string): string {
     let d: Date;
     if (/^\d{4}-\d{2}-\d{2}/.test(fecha)) d = new Date(fecha);
@@ -334,9 +360,17 @@ export class TableroComponent implements OnInit, AfterViewInit {
       this.busquedaInput?.nativeElement?.focus();
     }
     if (e.key === 'Escape') {
-      if (this.expandedId() !== null) this.expandedId.set(null);
+      if (this.ajustesAbierto()) this.ajustesAbierto.set(false);
+      else if (this.expandedId() !== null) this.expandedId.set(null);
       else if (this.busqueda()) this.busqueda.set('');
     }
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocClick(e: MouseEvent): void {
+    if (!this.ajustesAbierto()) return;
+    const t = e.target as HTMLElement;
+    if (t && !t.closest('.ajustes-wrap')) this.ajustesAbierto.set(false);
   }
 
   logout(): void { this.auth.logout(); this.router.navigate(['/login']); }

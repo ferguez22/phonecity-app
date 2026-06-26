@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 import { debounceTime, distinctUntilChanged, Subject, switchMap } from 'rxjs';
 
 import { LineaService, LineaPayload } from '../../core/services/linea.service';
-import { ClienteService } from '../../core/services/cliente.service';
+import { ESTADOS_ENTRADA } from '../../core/estados/estados';import { ClienteService } from '../../core/services/cliente.service';
 import { ProveedorService, Proveedor } from '../../core/services/proveedor.service';
 import { Linea, Flujo, Fase, TipoCobro } from '../../core/models/linea.model';
 import { Cliente } from '../../core/models/cliente.model';
@@ -65,6 +65,10 @@ export class LineaFormComponent implements OnInit {
   fecha_envio_taller   = '';
   fecha_retorno_taller = '';
 
+  readonly estadosEntrada = ESTADOS_ENTRADA;
+  estadoEntradaId = ESTADOS_ENTRADA[0]?.id ?? 'reparar';
+  subtipo: 'venta' | 'compra' | null = null;
+
   // Opciones de selects
   readonly flujos: { val: Flujo; label: string }[] = [
     { val: 'reparacion', label: 'Reparación' },
@@ -116,6 +120,8 @@ export class LineaFormComponent implements OnInit {
       this.modoEdicion.set(true);
       this.lineaId = Number(id);
       this.cargarLinea(this.lineaId);
+    } else {
+      this.aplicarEstadoEntrada();
     }
   }
 
@@ -215,6 +221,24 @@ export class LineaFormComponent implements OnInit {
     this.fase = this.fases[0].val;
   }
 
+  aplicarEstadoEntrada(): void {
+    const def = this.estadosEntrada.find((e) => e.id === this.estadoEntradaId);
+    if (!def) return;
+    this.flujo = def.flujo;
+    this.fase = def.fase;
+    this.avisado = def.avisado;
+    this.movil_en_tienda = def.movil_en_tienda;
+    this.subtipo = def.subtipo ?? null;
+    this.taller = def.taller ?? '';
+    this.proveedor_id = def.proveedor ? this.proveedorIdPorNombre(def.proveedor) : null;
+  }
+
+  private proveedorIdPorNombre(nombre: string): number | null {
+    const norm = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    const p = this.proveedores().find((x) => norm(x.nombre) === norm(nombre));
+    return p ? p.id : null;
+  }
+
   toggleNuevoCliente(): void {
     this.mostrarNuevoCliente.update((v) => !v);
   }
@@ -241,6 +265,7 @@ export class LineaFormComponent implements OnInit {
       taller: this.taller || null,
       fecha_envio_taller:   this.fecha_envio_taller || null,
       fecha_retorno_taller: this.fecha_retorno_taller || null,
+      subtipo: this.subtipo,
       cliente_id: this.clienteSelec()?.id ?? null,
     };
 

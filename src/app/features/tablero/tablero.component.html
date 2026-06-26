@@ -4,9 +4,40 @@
     <span class="navbar-brand fw-bold">PhoneCity</span>
     <div class="d-flex align-items-center gap-3">
       <span class="text-white-50 small">{{ total() }} líneas</span>
-      <a routerLink="/importar" class="btn btn-sm btn-outline-info">Importar</a>
       <a routerLink="/linea/nueva" class="btn btn-sm btn-success">+ Nueva línea</a>
-      <button class="btn btn-sm btn-outline-light" (click)="logout()">Salir</button>
+    
+      <div class="ajustes-wrap position-relative">
+        <button class="btn btn-sm btn-outline-light ajustes-btn" type="button" (click)="toggleAjustes()" title="Ajustes">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path
+              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z">
+            </path>
+          </svg>
+        </button>
+    
+        @if (ajustesAbierto()) {
+        <div class="ajustes-panel">
+          <div class="ap-sec-title">Ajustes</div>
+          <div class="ap-group">
+            <span class="ap-label">Divisor de fecha</span>
+            <label class="ap-opt"><input type="radio" name="divmodo" [checked]="divisorModo() === 'todos'"
+                (change)="setDivisorModo('todos')" /> En todos los filtros</label>
+            <label class="ap-opt"><input type="radio" name="divmodo" [checked]="divisorModo() === 'solo_todo'"
+                (change)="setDivisorModo('solo_todo')" /> Solo en "Todo"</label>
+            <label class="ap-opt"><input type="radio" name="divmodo" [checked]="divisorModo() === 'off'"
+                (change)="setDivisorModo('off')" /> Desactivado</label>
+          </div>
+    
+          <div class="ap-sec-title">Acciones</div>
+          <div class="ap-group">
+            <a routerLink="/importar" class="ap-action">Importar CSV</a>
+            <button type="button" class="ap-action ap-danger" (click)="logout()">Cerrar sesión</button>
+          </div>
+        </div>
+        }
+      </div>
     </div>
   </nav>
 
@@ -212,6 +243,8 @@
       }
     </tbody>
   </table>
+      <div class="espacio-final" aria-hidden="true"></div>
+
   }
 
 </div>
