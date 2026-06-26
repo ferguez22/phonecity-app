@@ -455,6 +455,13 @@
   }
 }
 
-.espacio-final {
-  height: 160px;
+.fila-vacia {
+  td {
+    height: 33px;
+    background: #fff;
+  }
+
+  &:hover td {
+    background: #fff;
+  }
 }

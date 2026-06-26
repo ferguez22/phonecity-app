@@ -1,0 +1,58 @@
+<div class="pm-overlay" (click)="cerrar(false)">
+    <div class="pm-modal" (click)="$event.stopPropagation()">
+
+        <div class="pm-header">
+            <h5>Generar pedido</h5>
+            <button type="button" class="pm-close" (click)="cerrar(false)">✕</button>
+        </div>
+
+        @if (cargando()) {
+        <div class="pm-body text-center text-muted py-4">Cargando pendientes...</div>
+        } @else {
+        <div class="pm-body">
+
+            @if (error()) { <div class="alert alert-danger py-2">{{ error() }}</div> }
+
+            <div class="pm-bloque">
+                <div class="pm-bloque-head">
+                    <span>Wephone Infotec</span>
+                    <button type="button" class="btn btn-sm btn-outline-primary"
+                        (click)="copiar(txtWephone, 'wephone')">
+                        {{ copiado() === 'wephone' ? '✓ Copiado' : 'Copiar' }}
+                    </button>
+                </div>
+                <textarea [(ngModel)]="txtWephone" rows="5"></textarea>
+            </div>
+
+            <div class="pm-bloque">
+                <div class="pm-bloque-head">
+                    <span>Apokin</span>
+                    <button type="button" class="btn btn-sm btn-outline-primary" (click)="copiar(txtApokin, 'apokin')">
+                        {{ copiado() === 'apokin' ? '✓ Copiado' : 'Copiar' }}
+                    </button>
+                </div>
+                <textarea [(ngModel)]="txtApokin" rows="5"></textarea>
+            </div>
+
+            <div class="pm-bloque">
+                <div class="pm-bloque-head">
+                    <span>Piezas</span>
+                    <button type="button" class="btn btn-sm btn-outline-primary" (click)="copiar(txtPiezas, 'piezas')">
+                        {{ copiado() === 'piezas' ? '✓ Copiado' : 'Copiar' }}
+                    </button>
+                </div>
+                <textarea [(ngModel)]="txtPiezas" rows="6"></textarea>
+            </div>
+
+        </div>
+
+        <div class="pm-footer">
+            <button type="button" class="btn btn-outline-secondary" (click)="cerrar(false)">Cancelar</button>
+            <button type="button" class="btn btn-success" [disabled]="guardando()" (click)="marcarPedido()">
+                {{ guardando() ? 'Marcando...' : '✓ Marcar piezas y accesorios como pedidos' }}
+            </button>
+        </div>
+        }
+
+    </div>
+</div>

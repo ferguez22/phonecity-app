@@ -11,6 +11,7 @@ import { HistorialService, EntradaHistorial } from '../../core/services/historia
 import { ClienteService } from '../../core/services/cliente.service';
 import { ProveedorService, Proveedor } from '../../core/services/proveedor.service';
 import { Linea, TipoCobro } from '../../core/models/linea.model';
+import { PedidoModalComponent } from '../pedido-modal/pedido-modal.component';
 import { Cliente } from '../../core/models/cliente.model';
 import { ESTADO_OPTIONS, EstadoDef, esEstadoActual, getColor, getEtiqueta, etiquetaHistorialFase, estadoActualDef, siguientesDe} from '../../core/estados/estados';
 
@@ -22,7 +23,7 @@ type FilaTablero =
 @Component({
   selector: 'app-tablero',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, PedidoModalComponent],
   templateUrl: './tablero.component.html',
   styleUrl: './tablero.component.scss',
   animations: [
@@ -64,9 +65,11 @@ export class TableroComponent implements OnInit, AfterViewInit {
   readonly expandedId = signal<number | null>(null);
   readonly verTodos = signal(false);
   readonly ajustesAbierto = signal(false);
+  readonly pedidoAbierto = signal(false);
   readonly divisorModo = signal<'todos' | 'solo_todo' | 'off'>(this.leerDivisorModo());
   readonly panelHistorial = signal<EntradaHistorial[]>([]);
   readonly panelCargando = signal(false);
+  readonly filasVacias = [0, 1, 2, 3, 4];
 
   edModelo = '';
   edProblema = '';
@@ -322,6 +325,15 @@ export class TableroComponent implements OnInit, AfterViewInit {
 
   toggleAjustes(): void {
     this.ajustesAbierto.update((v) => !v);
+  }
+
+  abrirPedido(): void {
+    this.pedidoAbierto.set(true);
+  }
+
+  cerrarPedido(recargar: boolean): void {
+    this.pedidoAbierto.set(false);
+    if (recargar) this.cargar();
   }
 
   setDivisorModo(modo: 'todos' | 'solo_todo' | 'off'): void {

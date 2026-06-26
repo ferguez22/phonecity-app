@@ -4,6 +4,7 @@
     <span class="navbar-brand fw-bold">PhoneCity</span>
     <div class="d-flex align-items-center gap-3">
       <span class="text-white-50 small">{{ total() }} líneas</span>
+      <button class="btn btn-sm btn-warning" type="button" (click)="abrirPedido()">Generar pedido</button>
       <a routerLink="/linea/nueva" class="btn btn-sm btn-success">+ Nueva línea</a>
     
       <div class="ajustes-wrap position-relative">
@@ -242,9 +243,30 @@
       }
       }
     </tbody>
+          <tbody>
+            @for (n of filasVacias; track n) {
+            <tr class="fila-vacia" aria-hidden="true">
+              <td class="td-id">&nbsp;</td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td class="td-expand"></td>
+            </tr>
+            }
+          </tbody>
   </table>
       <div class="espacio-final" aria-hidden="true"></div>
 
   }
 
 </div>
+
+@if (pedidoAbierto()) {
+<app-pedido-modal (cerrado)="cerrarPedido($event)"></app-pedido-modal>
+}
