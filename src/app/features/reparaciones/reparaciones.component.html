@@ -1,0 +1,161 @@
+<nav class="navbar navbar-dark bg-dark px-3 py-2">
+    <div class="d-flex align-items-center gap-3">
+        <a routerLink="/tablero" class="btn btn-sm btn-outline-light">← Tablero</a>
+        <span class="navbar-brand fw-bold mb-0">Temporizadores de reparación</span>
+    </div>
+    <div class="d-flex align-items-center gap-3">
+        <span class="text-white-50 small">{{ cards().length }} activos</span>
+        <button class="btn btn-sm btn-outline-light" type="button" (click)="cargar()">↻ Refrescar</button>
+    </div>
+</nav>
+
+<div class="container-fluid py-3">
+    <div class="layout-2col">
+
+        <div class="col-izq">
+
+            <section class="iniciar-box mb-4">
+                <div class="iniciar-titulo">Iniciar reparación</div>
+
+                <div class="iniciar-fila">
+                    <label class="campo-linea">
+                        <span>Nº de línea (L-id)</span>
+                        <input type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off"
+                            [ngModel]="nuevoLineaId" (ngModelChange)="onLineaIdInput($event)" name="nuevoLineaId"
+                            placeholder="1431" />
+                    </label>
+
+                    <div class="tiempos">
+                        <span class="tiempos-label">Tiempo:</span>
+                        <button type="button" class="btn btn-sm btn-tiempo" [disabled]="guardando()"
+                            (click)="seleccionarTiempo(30)">30 min</button>
+                        <button type="button" class="btn btn-sm btn-tiempo" [disabled]="guardando()"
+                            (click)="seleccionarTiempo(60)">1 h</button>
+                        <button type="button" class="btn btn-sm btn-tiempo" [disabled]="guardando()"
+                            (click)="seleccionarTiempo(90)">1 h 30</button>
+                        <button type="button" class="btn btn-sm btn-tiempo" [disabled]="guardando()"
+                            (click)="seleccionarTiempo(120)">2 h</button>
+                        <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="guardando()"
+                            (click)="toggleFechaManual()">
+                            {{ mostrarFechaManual() ? 'Cancelar fecha' : 'Fecha prevista' }}
+                        </button>
+                    </div>
+                </div>
+
+                @if (mostrarFechaManual()) {
+                <div class="fecha-manual">
+                    <input type="datetime-local" [(ngModel)]="fechaManual" name="fechaManual" />
+                    <button type="button" class="btn btn-sm btn-primary" [disabled]="guardando()"
+                        (click)="seleccionarFechaManual()">Usar fecha</button>
+                </div>
+                }
+
+                @if (error()) {
+                <div class="alert alert-danger py-1 px-2 mt-2 mb-0">{{ error() }}</div>
+                }
+            </section>
+
+            @if (cargando()) {
+            <div class="text-center text-muted py-5">Cargando...</div>
+            } @else if (cards().length === 0) {
+            <div class="text-center text-muted py-5">No hay reparaciones con temporizador activo.</div>
+            } @else {
+            <div class="cards-grid">
+                @for (card of cards(); track card.linea.id) {
+                <div class="timer-card" [class.vencido]="card.vencido" [style.background-color]="card.color">
+                    <div class="tc-id">L-{{ card.linea.id }}</div>
+                    <div class="tc-cliente">{{ card.linea.cliente_nombre ?? 'TIENDA' }}</div>
+                    <div class="tc-modelo">{{ card.linea.modelo ?? '—' }}</div>
+                    <div class="tc-problema">{{ card.linea.problema_o_pieza ?? '—' }}</div>
+
+                    <div class="tc-countdown">
+                        @if (card.vencido) {
+                        <span class="tc-vencido-tag">VENCIDO</span>
+                        }
+                        <span class="tc-tiempo">{{ card.texto }}</span>
+                    </div>
+
+                    <button type="button" class="btn btn-sm tc-quitar" [disabled]="guardando()"
+                        (click)="quitarTimer(card.linea)">
+                        Quitar temporizador
+                    </button>
+                </div>
+                }
+            </div>
+            }
+
+        </div>
+
+        <aside class="col-der">
+            <div class="panel-reparar">
+                <div class="pr-titulo">En «Reparar» ({{ lineas().length }})</div>
+                @if (cargando()) {
+                <div class="pr-vacio">Cargando...</div>
+                } @else if (lineas().length === 0) {
+                <div class="pr-vacio">Sin líneas en Reparar.</div>
+                } @else {
+                <div class="pr-scroll">
+                    <table class="pr-tabla">
+                        <thead>
+                            <tr>
+                                <th>L-ID</th>
+                                <th>Estado</th>
+                                <th>Modelo</th>
+                                <th>Cliente</th>
+                                <th>Problema</th>
+                                <th>Notas</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (l of lineas(); track l.id) {
+                            <tr class="pr-fila" [class.con-timer]="l.fecha_recogida_prevista"
+                                [class.sel]="esSeleccionada(l.id)" (click)="seleccionarLineaPanel(l)"
+                                title="Click para usar este L-ID">
+                                <td class="pr-id">
+                                    @if (l.fecha_recogida_prevista) {<span class="pr-ico"
+                                        title="Temporizador activo">⏱</span>}L-{{ l.id }}
+                                </td>
+                                <td>{{ getEtiqueta(l) }}</td>
+                                <td class="pr-trunc" [title]="l.modelo ?? ''">{{ l.modelo ?? '—' }}</td>
+                                <td class="pr-trunc" [title]="l.cliente_nombre ?? 'TIENDA'">{{ l.cliente_nombre ??
+                                    'TIENDA' }}</td>
+                                <td class="pr-trunc" [title]="l.problema_o_pieza ?? ''">{{ l.problema_o_pieza ?? '—' }}
+                                </td>
+                                <td class="pr-trunc" [title]="l.notas ?? ''">{{ l.notas ?? '—' }}</td>
+                            </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                }
+            </div>
+        </aside>
+
+    </div>
+</div>
+
+@if (confirmacion(); as c) {
+<div class="conf-overlay" (click)="cancelarInicio()">
+    <div class="conf-modal" (click)="$event.stopPropagation()">
+        <div class="conf-titulo">{{ c.yaEnReparar ? 'Actualizar temporizador' : 'Iniciar temporizador' }}</div>
+        <p class="conf-texto">
+            @if (c.yaEnReparar) {
+            La línea <strong>L-{{ c.linea.id }}</strong> ya está en <strong>REPARAR</strong>.<br>
+            Se {{ c.linea.fecha_recogida_prevista ? 'actualizará' : 'iniciará' }} el temporizador hasta <strong>{{
+                c.objetivoLabel }}</strong>.
+            } @else {
+            Estado actual de la línea <strong>L-{{ c.linea.id }}</strong>: <strong>{{ c.estadoLabel }}</strong>.<br>
+            Se cambiará a <strong>REPARAR</strong> y se iniciará el temporizador hasta <strong>{{ c.objetivoLabel
+                }}</strong>.
+            }
+        </p>
+        <div class="conf-acciones">
+            <button type="button" class="btn btn-secondary btn-sm" [disabled]="guardando()"
+                (click)="cancelarInicio()">Cancelar</button>
+            <button type="button" class="btn btn-primary btn-sm" [disabled]="guardando()" (click)="confirmarInicio()">
+                {{ guardando() ? 'Guardando...' : 'Confirmar' }}
+            </button>
+        </div>
+    </div>
+</div>
+}

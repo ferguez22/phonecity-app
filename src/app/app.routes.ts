@@ -15,6 +15,12 @@ export const routes: Routes = [
       import('./features/tablero/tablero.component').then((m) => m.TableroComponent),
   },
   {
+    path: 'reparaciones',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/reparaciones/reparaciones.component').then((m) => m.ReparacionesComponent),
+  },
+  {
     path: 'linea/nueva',
     canActivate: [authGuard],
     loadComponent: () =>
