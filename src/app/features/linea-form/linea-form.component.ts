@@ -53,8 +53,6 @@ export class LineaFormComponent implements OnInit {
   modelo       = '';
   problema_o_pieza = '';
   notas        = '';
-  telefono_alternativo = '';
-  codigo_dispositivo   = '';
   importe: number | null = null;
   tipo_cobro: TipoCobro = 'normal';
   fecha_entrada  = this.hoy();
@@ -157,8 +155,6 @@ export class LineaFormComponent implements OnInit {
         this.modelo    = l.modelo ?? '';
         this.problema_o_pieza = l.problema_o_pieza ?? '';
         this.notas     = l.notas ?? '';
-        this.telefono_alternativo = l.telefono_alternativo ?? '';
-        this.codigo_dispositivo   = l.codigo_dispositivo ?? '';
         this.importe   = l.importe;
         this.tipo_cobro = l.tipo_cobro;
         this.fecha_entrada = l.fecha_entrada ?? this.hoy();
@@ -254,8 +250,6 @@ export class LineaFormComponent implements OnInit {
       modelo:    this.modelo || null,
       problema_o_pieza: this.problema_o_pieza || null,
       notas:     this.notas || null,
-      telefono_alternativo: this.telefono_alternativo || null,
-      codigo_dispositivo:   this.codigo_dispositivo || null,
       importe:   this.importe,
       tipo_cobro: this.tipo_cobro,
       fecha_entrada: this.fecha_entrada || null,

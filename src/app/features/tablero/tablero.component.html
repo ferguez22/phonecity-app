@@ -162,14 +162,6 @@
                     <span>Recogida prevista</span>
                     <input type="datetime-local" [(ngModel)]="edRecogida" name="edRecogida" />
                   </label>
-                  <label class="campo">
-                    <span>Tel. alternativo</span>
-                    <input type="tel" [(ngModel)]="edTelAlt" name="edTelAlt" />
-                  </label>
-                  <label class="campo">
-                    <span>Código dispositivo</span>
-                    <input type="text" [(ngModel)]="edCodigo" name="edCodigo" />
-                  </label>
                 </div>
                 <label class="campo campo-full">
                   <span>Notas</span>
@@ -236,6 +228,10 @@
                 (click)="guardarDatos(linea)">
                 {{ guardando() ? 'Guardando...' : 'Guardar datos' }}
               </button>
+              <button type="button" class="btn btn-outline-dark btn-sm btn-ticket" (click)="imprimirTicket(linea)">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                      Imprimir ticket
+                    </button>
               <button type="button" class="btn btn-success btn-sm btn-wa" (click)="enviarWhatsapp(linea)">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
                   <path
@@ -287,6 +283,7 @@
   <div class="toast-wa-actions">
     <button type="button" class="btn btn-sm btn-success" (click)="enviarDesdeToast()">Enviar</button>
     <button type="button" class="btn btn-sm btn-link text-muted" (click)="cerrarToast()">✕</button>
+    
   </div>
 </div>
 }

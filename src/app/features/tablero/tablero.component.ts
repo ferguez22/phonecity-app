@@ -50,7 +50,6 @@ export class TableroComponent implements OnInit, AfterViewInit {
   edFechaEntrada = '';
   edRecogida = '';
   edTelAlt = '';
-  edCodigo = '';
   edNotas = '';
 
   private readonly auth = inject(AuthService);
@@ -196,8 +195,6 @@ export class TableroComponent implements OnInit, AfterViewInit {
     this.edTipoCobro = linea.tipo_cobro;
     this.edFechaEntrada = linea.fecha_entrada ?? '';
     this.edRecogida = linea.fecha_recogida_prevista ?? '';
-    this.edTelAlt = linea.telefono_alternativo ?? '';
-    this.edCodigo = linea.codigo_dispositivo ?? '';
     this.edNotas = linea.notas ?? '';
 
     if (linea.cliente_nombre) {
@@ -257,8 +254,6 @@ export class TableroComponent implements OnInit, AfterViewInit {
       tipo_cobro: this.edTipoCobro,
       fecha_entrada: this.edFechaEntrada || null,
       fecha_recogida_prevista: this.edRecogida || null,
-      telefono_alternativo: this.edTelAlt || null,
-      codigo_dispositivo: this.edCodigo || null,
       notas: this.edNotas || null,
       cliente_id: this.clienteSelec()?.id ?? null,
     };
@@ -342,6 +337,102 @@ export class TableroComponent implements OnInit, AfterViewInit {
     const texto = mensajeWhatsapp(linea);
     const url = `https://wa.me/${tel}?text=${encodeURIComponent(texto)}`;
     window.open(url, '_blank');
+  }
+
+  imprimirTicket(linea: Linea): void {
+    const esc = (s: string | null | undefined) =>
+      (s ?? '-').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+    const cliente = esc(linea.cliente_nombre);
+    const telefono = esc(linea.cliente_telefono);
+    const modelo = esc(linea.modelo);
+    const problema = esc(linea.problema_o_pieza);
+    const precio = linea.importe != null ? `${linea.importe}€` : '-';
+    const fecha = linea.fecha_entrada
+      ? new Date(linea.fecha_entrada).toLocaleDateString('es-ES')
+      : '-';
+    const nPedido = linea.id;
+
+    const legal = [
+      'En caso de pérdida de este resguardo, el terminal sólo podrá ser retirado por su titular acreditando identidad con DNI/NIE o número de teléfono.',
+      'No se devolverá el importe de liberaciones o reparaciones si el terminal resulta bloqueado por la operadora.',
+      'Los plazos de entrega son orientativos y pueden retrasarse. Una vez solicitadas, las reparaciones no se pueden anular.',
+      'El cliente declara ser el propietario legítimo del terminal y autoriza su manipulación, desbloqueo o liberación.',
+      'La empresa no se responsabiliza de la pérdida de datos del dispositivo; se recomienda realizar una copia de seguridad. Tampoco se responden por tarjetas SIM, SD o accesorios que no hayan sido retirados.',
+      'El dispositivo debe recogerse en un plazo máximo de tres meses desde la fecha del presente documento. Pasado dicho plazo podrá ser desmontado o reciclado para cubrir gastos.',
+    ].map((p) => `<p class="legal">${p}</p>`).join('');
+
+    const html = `<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Ticket-${nPedido}</title>
+<style>
+  @page { size: 80mm 200mm; margin: 3mm; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: Arial, sans-serif; font-size: 11px; line-height: 1.35; color: #000; width: 74mm; }
+  .center { text-align: center; }
+  .bold { font-weight: bold; }
+  .sep { border-top: 2px solid #000; margin: 6px 0; }
+  .tienda { font-size: 15px; font-weight: bold; text-align: center; margin: 2px 0; }
+  .dato { margin: 1px 0; }
+  .gap { height: 8px; }
+  .pedido { font-size: 16px; font-weight: bold; text-align: center; margin: 6px 0; }
+  .gracias { font-size: 15px; font-weight: bold; text-align: center; margin: 6px 0; }
+  .cond-titulo { font-size: 9px; font-weight: bold; text-align: center; margin: 6px 0 4px; }
+  .legal { font-size: 8px; margin: 3px 0; text-align: left; }
+  .corte { border-top: 1px dashed #000; margin: 10px 0; position: relative; }
+  .corte::before { content: "✂"; position: absolute; top: -8px; left: 0; font-size: 11px; background: #fff; padding-right: 4px; }
+  .rg-pedido { font-size: 13px; font-weight: bold; margin: 4px 0 2px; }
+  .rg-dato { font-size: 11px; margin: 1px 0; }
+  .rg-precio { font-size: 11px; font-weight: bold; margin: 1px 0; }
+  .conforme { border: 1px solid #000; padding: 6px 8px; margin: 10px 0; font-size: 9px; }
+  .firma { font-size: 11px; font-weight: bold; margin-top: 14px; }
+  .firma-linea { border-top: 1px solid #000; margin-top: 38px; }
+</style></head>
+<body>
+  <div class="sep"></div>
+  <div class="tienda">📱 Phone City 📱</div>
+  <div class="sep"></div>
+
+  <p class="dato bold">Cliente: ${cliente}</p>
+  <p class="dato bold">Teléfono: ${telefono}</p>
+  <div class="gap"></div>
+  <p class="dato bold">Terminal: ${modelo}</p>
+  <p class="dato bold">Problema o Pieza: ${problema}</p>
+  <div class="gap"></div>
+  <p class="dato bold">Fecha entrada: ${fecha}</p>
+
+  <div class="pedido">Nº Pedido: ${nPedido}</div>
+
+  <div class="sep"></div>
+  <div class="gracias">¡Gracias por confiar en nosotros!</div>
+  <div class="sep"></div>
+
+  <div class="cond-titulo">CONDICIONES DE REPARACIÓN</div>
+  ${legal}
+
+  <div class="corte"></div>
+
+  <p class="rg-pedido">Nº Pedido: ${nPedido}</p>
+  <p class="rg-dato">Cliente: ${cliente}</p>
+  <p class="rg-dato">Teléfono: ${telefono}</p>
+  <p class="rg-dato">Terminal: ${modelo}</p>
+  <p class="rg-dato">Problema/Pieza: ${problema}</p>
+  <p class="rg-precio">Precio: ${precio}</p>
+
+  <div class="conforme">☐&nbsp;&nbsp;&nbsp;Estoy de acuerdo con las condiciones de reparación</div>
+
+  <p class="firma">Firma del cliente:</p>
+  <div class="firma-linea"></div>
+</body></html>`;
+
+    const win = window.open('', '_blank', 'width=400,height=700');
+    if (!win) {
+      this.error.set('Bloqueado por el navegador. Permite las ventanas emergentes.');
+      return;
+    }
+    win.document.write(html);
+    win.document.close();
+    win.focus();
+    setTimeout(() => { win.print(); }, 300);
   }
 
   mostrarToastWa(linea: Linea): void {

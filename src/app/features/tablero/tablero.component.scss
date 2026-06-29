@@ -511,3 +511,9 @@
     transform: translateX(0);
   }
 }
+
+.btn-ticket {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}

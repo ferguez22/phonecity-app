@@ -26,8 +26,6 @@ export interface Linea {
   modelo: string | null;
   problema_o_pieza: string | null;
   notas: string | null;
-  telefono_alternativo: string | null;
-  codigo_dispositivo: string | null;
   importe: number | null;
   tipo_cobro: TipoCobro;
   fecha_entrada: string | null;
