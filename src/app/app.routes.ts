@@ -8,6 +8,7 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/auth/login/login.component').then((m) => m.LoginComponent),
   },
+  // fix :)
   {
     path: 'tablero',
     canActivate: [authGuard],
