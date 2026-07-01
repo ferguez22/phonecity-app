@@ -8,6 +8,12 @@
       📋 Consulta de taller
     </button>
     }
+        @if (mostrarBotonAvisar()) {
+        <button class="btn btn-sm btn-success btn-consulta-taller" type="button" (click)="abrirAvisar()"
+          style="position:absolute; left:50%; transform:translateX(-50%);">
+          💬 Avisar clientes
+        </button>
+        }
     <div class="d-flex align-items-center gap-3">
       <span class="text-white-50 small">{{ total() }} líneas</span>
       <button class="btn btn-sm btn-warning" type="button" (click)="abrirPedido()">Generar pedido</button>
@@ -297,4 +303,8 @@
 
 @if (tallerAbierto()) {
 <app-consulta-taller-modal (cerrado)="cerrarTaller()"></app-consulta-taller-modal>
+}
+
+@if (avisarAbierto()) {
+<app-avisar-modal [filtros]="filtrosAvisar()" (cerrado)="cerrarAvisar($event)"></app-avisar-modal>
 }

@@ -31,6 +31,7 @@ export interface Linea {
   fecha_entrada: string | null;
   fecha_pedido: string | null;
   fecha_recogida_prevista: string | null;
+  fecha_ultimo_aviso: string | null;
   proveedor_id: number | null;
   taller: Taller | null;
   fecha_envio_taller: string | null;

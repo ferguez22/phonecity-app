@@ -13,6 +13,7 @@ import { ProveedorService, Proveedor } from '../../core/services/proveedor.servi
 import { Linea, TipoCobro } from '../../core/models/linea.model';
 import { PedidoModalComponent } from '../pedido-modal/pedido-modal.component';
 import { ConsultaTallerModalComponent } from '../consulta-taller-modal/consulta-taller-modal.component';
+import { AvisarModalComponent } from '../avisar-modal/avisar-modal.component';
 
 import { Cliente } from '../../core/models/cliente.model';
 import { ESTADO_OPTIONS, EstadoDef, esEstadoActual, getColor, getEtiqueta, etiquetaHistorialCompleta, estadoActualDef, siguientesDe, mensajeWhatsapp, tieneMensajeEspecifico} from '../../core/estados/estados';
@@ -25,7 +26,7 @@ type FilaTablero =
 @Component({
   selector: 'app-tablero',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, PedidoModalComponent, ConsultaTallerModalComponent],
+  imports: [CommonModule, FormsModule, RouterLink, PedidoModalComponent, ConsultaTallerModalComponent, AvisarModalComponent],
   templateUrl: './tablero.component.html',
   styleUrl: './tablero.component.scss',
   animations: [
@@ -76,7 +77,10 @@ export class TableroComponent implements OnInit, AfterViewInit {
   readonly verTodos = signal(false);
   readonly ajustesAbierto = signal(false);
   readonly pedidoAbierto = signal(false);
-  readonly tallerAbierto = signal(false);  readonly toastWa = signal<Linea | null>(null);
+  readonly tallerAbierto = signal(false);
+  readonly avisarAbierto = signal(false);
+  readonly filtrosAvisar = signal<LineaFiltros>({});
+  readonly toastWa = signal<Linea | null>(null);
   readonly divisorModo = signal<'todos' | 'solo_todo' | 'off'>(this.leerDivisorModo());
   readonly panelHistorial = signal<EntradaHistorial[]>([]);
   readonly panelCargando = signal(false);
@@ -105,6 +109,11 @@ export class TableroComponent implements OnInit, AfterViewInit {
   readonly mostrarBotonTaller = computed(() =>
     this.botonActivo() === 'Enviar a taller' || this.botonActivo() === 'Enviado a taller',
   );
+
+  readonly mostrarBotonAvisar = computed(() =>
+    this.botonActivo() === 'Reparado - Avisado' || this.botonActivo() === 'No se puede reparar - Avisado',
+  );
+  
 
   readonly lineasFiltradas = computed(() => {
     const q = this.busqueda().toLowerCase().trim();
@@ -475,6 +484,17 @@ export class TableroComponent implements OnInit, AfterViewInit {
   abrirTaller(): void { this.tallerAbierto.set(true); }
 
   cerrarTaller(): void { this.tallerAbierto.set(false); }
+
+  abrirAvisar(): void {
+    const b = this.botones.find((x) => x.label === this.botonActivo());
+    this.filtrosAvisar.set(b ? { ...b.filtros } : {});
+    this.avisarAbierto.set(true);
+  }
+
+  cerrarAvisar(recargar: boolean): void {
+    this.avisarAbierto.set(false);
+    if (recargar) this.cargar();
+  }
 
   setDivisorModo(modo: 'todos' | 'solo_todo' | 'off'): void {
     this.divisorModo.set(modo);
