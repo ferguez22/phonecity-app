@@ -14,7 +14,10 @@
     background: #fff;
     border-radius: 10px;
     width: 100%;
-    max-width: 560px;
+    max-width: min(95vw, 1200px);
+    height: 80vh;
+    display: flex;
+    flex-direction: column;
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
 }
 
@@ -41,8 +44,23 @@
 
 .pm-body {
     padding: 14px 18px;
-    max-height: 65vh;
+    flex: 1;
+    min-height: 0;
     overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    align-items: start;
+}
+
+.pm-body .alert {
+    grid-column: 1 / -1;
+}
+
+@media (max-width: 900px) {
+    .pm-body {
+        grid-template-columns: 1fr;
+    }
 }
 
 .pm-bloque {
@@ -59,14 +77,15 @@
     }
 
     textarea {
-        width: 100%;
-        border: 1px solid #ced4da;
-        border-radius: 6px;
-        padding: 8px 10px;
-        font-family: ui-monospace, monospace;
-        font-size: 0.82rem;
-        resize: vertical;
-    }
+width: 100%;
+height: 60vh;
+border: 1px solid #ced4da;
+border-radius: 6px;
+padding: 8px 10px;
+font-family: ui-monospace, monospace;
+font-size: 0.82rem;
+resize: vertical;
+}
 }
 
 .pm-footer {

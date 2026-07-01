@@ -78,7 +78,7 @@ export class ConsultaTallerModalComponent implements OnInit {
     const dias = l.dias != null ? `${l.dias}d` : null;
     const tail = [envio, dias].filter(Boolean).join(' - ');
     const middle = [...desc, tail].join(' - ');
-    return `* L-${l.id} ${middle}`;
+    return `L-${l.id} ${middle}`;
   }
 
   private fechaHoy(): string {

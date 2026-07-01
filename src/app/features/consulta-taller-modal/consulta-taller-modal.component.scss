@@ -9,17 +9,6 @@
     padding: 16px;
 }
 
-.modal-box {
-    background: #fff;
-    border-radius: 14px;
-    width: 100%;
-    max-width: 560px;
-    max-height: 85vh;
-    display: flex;
-    flex-direction: column; 
-    box-shadow: 0 10px 40px rgba(0, 0, 0, .3);
-}
-
 .modal-header {
     display: flex;
     align-items: center;
@@ -112,6 +101,18 @@
     color: #1a7f37;
 }
 
+.modal-box {
+    background: #fff;
+    border-radius: 14px;
+    width: max-content;
+    max-width: min(95vw, 1100px);
+    min-width: 420px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, .3);
+}
+
 .bloque-texto {
     margin: 0;
     padding: 12px;
@@ -119,6 +120,5 @@
     font-size: .82rem;
     line-height: 1.5;
     color: #2a313a;
-    white-space: pre-wrap;
-    word-break: break-word;
+    white-space: pre;
 }
