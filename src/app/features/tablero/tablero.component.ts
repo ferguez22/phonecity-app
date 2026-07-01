@@ -13,7 +13,7 @@ import { ProveedorService, Proveedor } from '../../core/services/proveedor.servi
 import { Linea, TipoCobro } from '../../core/models/linea.model';
 import { PedidoModalComponent } from '../pedido-modal/pedido-modal.component';
 import { Cliente } from '../../core/models/cliente.model';
-import { ESTADO_OPTIONS, EstadoDef, esEstadoActual, getColor, getEtiqueta, etiquetaHistorialFase, estadoActualDef, siguientesDe, mensajeWhatsapp, tieneMensajeEspecifico} from '../../core/estados/estados';
+import { ESTADO_OPTIONS, EstadoDef, esEstadoActual, getColor, getEtiqueta, etiquetaHistorialCompleta, estadoActualDef, siguientesDe, mensajeWhatsapp, tieneMensajeEspecifico} from '../../core/estados/estados';
 
 interface Boton { label: string; filtros: LineaFiltros; }
 type FilaTablero =
@@ -302,9 +302,9 @@ export class TableroComponent implements OnInit, AfterViewInit {
   }
 
   etiquetaHistorial(h: EntradaHistorial): string {
-    return etiquetaHistorialFase(h.fase, h.avisado, h.movil_en_tienda);
+    return etiquetaHistorialCompleta(h);
   }
-
+  
   diasDesde(fecha: string): number {
     return Math.floor((Date.now() - new Date(fecha).getTime()) / 86_400_000);
   }

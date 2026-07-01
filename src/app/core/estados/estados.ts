@@ -153,6 +153,30 @@ export function etiquetaHistorialFase(fase: string, avisado: number, movil: numb
   return label;
 }
 
+export function etiquetaHistorialCompleta(h: {
+  flujo: string | null;
+  fase: string;
+  avisado: number;
+  movil_en_tienda: number;
+  subtipo: string | null;
+  taller: string | null;
+  proveedor_nombre: string | null;
+}): string {
+  if (h.flujo == null) {
+    return etiquetaHistorialFase(h.fase, h.avisado, h.movil_en_tienda);
+  }
+  const fake = {
+    flujo: h.flujo,
+    fase: h.fase,
+    avisado: h.avisado,
+    movil_en_tienda: h.movil_en_tienda,
+    subtipo: h.subtipo,
+    taller: h.taller,
+    proveedor_nombre: h.proveedor_nombre,
+  } as unknown as Linea;
+  return getEtiqueta(fake);
+}
+
 export const ESTADOS_ENTRADA: EstadoDef[] = ESTADOS
   .filter((e) => e.esEntrada)
   .sort((a, b) => (a.ordenEntrada ?? 99) - (b.ordenEntrada ?? 99));

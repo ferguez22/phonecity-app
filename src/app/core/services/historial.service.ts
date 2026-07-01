@@ -10,6 +10,10 @@ export interface EntradaHistorial {
   fase: string;
   avisado: number;
   movil_en_tienda: number;
+  flujo: string | null;
+  subtipo: string | null;
+  taller: string | null;
+  proveedor_nombre: string | null;
   fecha: string;
 }
 
