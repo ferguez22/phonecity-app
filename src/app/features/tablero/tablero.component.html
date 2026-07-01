@@ -1,7 +1,13 @@
 <div class="sticky-controls" #controlsRef>
 
-  <nav class="navbar navbar-dark bg-dark px-3 py-2">
+  <nav class="navbar navbar-dark bg-dark px-3 py-2 position-relative">
     <span class="navbar-brand fw-bold">PhoneCity</span>
+    @if (mostrarBotonTaller()) {
+    <button class="btn btn-sm btn-primary btn-consulta-taller" type="button" (click)="abrirTaller()"
+      style="position:absolute; left:50%; transform:translateX(-50%);">
+      📋 Consulta de taller
+    </button>
+    }
     <div class="d-flex align-items-center gap-3">
       <span class="text-white-50 small">{{ total() }} líneas</span>
       <button class="btn btn-sm btn-warning" type="button" (click)="abrirPedido()">Generar pedido</button>
@@ -287,4 +293,8 @@
     
   </div>
 </div>
+}
+
+@if (tallerAbierto()) {
+<app-consulta-taller-modal (cerrado)="cerrarTaller()"></app-consulta-taller-modal>
 }

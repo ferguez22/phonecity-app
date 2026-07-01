@@ -1,0 +1,124 @@
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1060;
+    padding: 16px;
+}
+
+.modal-box {
+    background: #fff;
+    border-radius: 14px;
+    width: 100%;
+    max-width: 560px;
+    max-height: 85vh;
+    display: flex;
+    flex-direction: column; 
+    box-shadow: 0 10px 40px rgba(0, 0, 0, .3);
+}
+
+.modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 18px;
+    border-bottom: 1px solid #e6e8eb;
+}
+
+.modal-title {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #1f2733;
+}
+
+.btn-close-x {
+    background: none;
+    border: none;
+    font-size: 1.1rem;
+    color: #8a929c;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.btn-close-x:hover {
+    color: #333;
+}
+
+.modal-estado {
+    padding: 28px 18px;
+    text-align: center;
+    color: #6b7280;
+}
+
+.modal-error {
+    color: #b00020;
+}
+
+.bloques {
+    padding: 14px 18px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.bloque {
+    border: 1px solid #e3e6ea;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.bloque-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: #f1f3f5;
+    border-bottom: 1px solid #e3e6ea;
+}
+
+.bloque-taller {
+    font-weight: 700;
+    color: #1f2733;
+}
+
+.bloque-count {
+    font-size: .8rem;
+    color: #6b7280;
+}
+
+.btn-copiar {
+    margin-left: auto;
+    padding: 5px 14px;
+    border: 1px solid #1d4ed8;
+    background: #e9f2ff;
+    color: #1d4ed8;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: .82rem;
+    cursor: pointer;
+}
+
+.btn-copiar:hover {
+    background: #d7e8ff;
+}
+
+.btn-copiar.ok {
+    border-color: #1a7f37;
+    background: #e6f4ea;
+    color: #1a7f37;
+}
+
+.bloque-texto {
+    margin: 0;
+    padding: 12px;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .82rem;
+    line-height: 1.5;
+    color: #2a313a;
+    white-space: pre-wrap;
+    word-break: break-word;
+}

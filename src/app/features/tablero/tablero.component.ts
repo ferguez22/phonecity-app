@@ -12,6 +12,8 @@ import { ClienteService } from '../../core/services/cliente.service';
 import { ProveedorService, Proveedor } from '../../core/services/proveedor.service';
 import { Linea, TipoCobro } from '../../core/models/linea.model';
 import { PedidoModalComponent } from '../pedido-modal/pedido-modal.component';
+import { ConsultaTallerModalComponent } from '../consulta-taller-modal/consulta-taller-modal.component';
+
 import { Cliente } from '../../core/models/cliente.model';
 import { ESTADO_OPTIONS, EstadoDef, esEstadoActual, getColor, getEtiqueta, etiquetaHistorialCompleta, estadoActualDef, siguientesDe, mensajeWhatsapp, tieneMensajeEspecifico} from '../../core/estados/estados';
 
@@ -23,7 +25,7 @@ type FilaTablero =
 @Component({
   selector: 'app-tablero',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, PedidoModalComponent],
+  imports: [CommonModule, FormsModule, RouterLink, PedidoModalComponent, ConsultaTallerModalComponent],
   templateUrl: './tablero.component.html',
   styleUrl: './tablero.component.scss',
   animations: [
@@ -74,7 +76,7 @@ export class TableroComponent implements OnInit, AfterViewInit {
   readonly verTodos = signal(false);
   readonly ajustesAbierto = signal(false);
   readonly pedidoAbierto = signal(false);
-  readonly toastWa = signal<Linea | null>(null);
+  readonly tallerAbierto = signal(false);  readonly toastWa = signal<Linea | null>(null);
   readonly divisorModo = signal<'todos' | 'solo_todo' | 'off'>(this.leerDivisorModo());
   readonly panelHistorial = signal<EntradaHistorial[]>([]);
   readonly panelCargando = signal(false);
@@ -99,6 +101,10 @@ export class TableroComponent implements OnInit, AfterViewInit {
     { label: 'Venta de Dispositivo', filtros: { flujo: 'venta', subtipo: 'venta' } },
     { label: 'Compra de Dispositivo', filtros: { flujo: 'venta', subtipo: 'compra' } },
   ];
+
+  readonly mostrarBotonTaller = computed(() =>
+    this.botonActivo() === 'Enviar a taller' || this.botonActivo() === 'Enviado a taller',
+  );
 
   readonly lineasFiltradas = computed(() => {
     const q = this.busqueda().toLowerCase().trim();
@@ -434,7 +440,7 @@ export class TableroComponent implements OnInit, AfterViewInit {
     win.focus();
     setTimeout(() => { win.print(); }, 300);
   }
-
+  
   mostrarToastWa(linea: Linea): void {
     this.toastWa.set(linea);
     if (this.toastTimer) clearTimeout(this.toastTimer);
@@ -465,6 +471,10 @@ export class TableroComponent implements OnInit, AfterViewInit {
     this.pedidoAbierto.set(false);
     if (recargar) this.cargar();
   }
+
+  abrirTaller(): void { this.tallerAbierto.set(true); }
+
+  cerrarTaller(): void { this.tallerAbierto.set(false); }
 
   setDivisorModo(modo: 'todos' | 'solo_todo' | 'off'): void {
     this.divisorModo.set(modo);
