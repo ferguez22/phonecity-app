@@ -1,5 +1,6 @@
 import {Component, OnInit, AfterViewInit, ViewChild, ElementRef, inject, signal, computed, HostListener} from '@angular/core';
 import { CommonModule } from '@angular/common';
+import JsBarcode from 'jsbarcode';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { trigger, transition, style, animate } from '@angular/animations';
@@ -362,14 +363,32 @@ export class TableroComponent implements OnInit, AfterViewInit {
     const telefono = esc(linea.cliente_telefono);
     const modelo = esc(linea.modelo);
     const problema = esc(linea.problema_o_pieza);
-    const precio = linea.importe != null ? `${linea.importe}€` : '-';
-    const fecha = linea.fecha_entrada
-      ? new Date(linea.fecha_entrada).toLocaleDateString('es-ES')
-      : '-';
     const nPedido = linea.id;
 
+    const importeNum = linea.importe != null ? Number(linea.importe) : null;
+    const precio = importeNum != null && !Number.isNaN(importeNum)
+      ? (Number.isInteger(importeNum) ? `${importeNum}€` : `${importeNum.toFixed(2)}€`)
+      : '-';
+
+    const fecha = linea.fecha_entrada
+      ? new Date(linea.fecha_entrada.replace(' ', 'T')).toLocaleDateString('es-ES', {
+          day: '2-digit', month: '2-digit', year: 'numeric',
+        })
+      : '-';
+
+    let barcodeImg = '';
+    try {
+      const canvas = document.createElement('canvas');
+      JsBarcode(canvas, String(nPedido), {
+        format: 'CODE128', width: 2, height: 60, displayValue: false, margin: 0,
+      });
+      barcodeImg = `<div class="barcode-wrap"><img class="barcode" src="${canvas.toDataURL('image/png')}" alt="No ${nPedido}"></div>`;
+    } catch {
+      barcodeImg = '';
+    }
+
     const legal = [
-      'En caso de pérdida de este resguardo, el terminal sólo podrá ser retirado por su titular acreditando identidad con DNI/NIE o número de teléfono.',
+      'La recogida del dispositivo se realiza presentando este resguardo. En su defecto, será necesario acreditar identidad y titularidad, pudiendo demorarse la entrega.',
       'No se devolverá el importe de liberaciones o reparaciones si el terminal resulta bloqueado por la operadora.',
       'Los plazos de entrega son orientativos y pueden retrasarse. Una vez solicitadas, las reparaciones no se pueden anular.',
       'El cliente declara ser el propietario legítimo del terminal y autoriza su manipulación, desbloqueo o liberación.',
@@ -380,56 +399,77 @@ export class TableroComponent implements OnInit, AfterViewInit {
     const html = `<!DOCTYPE html>
 <html><head><meta charset="utf-8"><title>Ticket-${nPedido}</title>
 <style>
-  @page { size: 80mm 200mm; margin: 3mm; }
+  @page { size: 80mm 297mm; margin: 3mm; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { font-family: Arial, sans-serif; font-size: 11px; line-height: 1.35; color: #000; width: 74mm; }
-  .center { text-align: center; }
-  .bold { font-weight: bold; }
+  body { font-family: Arial, sans-serif; font-size: 12px; line-height: 1.4; color: #000; width: 74mm; }
+  .titulo-doc { font-size: 11px; font-weight: bold; text-align: center; letter-spacing: 2px; }
+  .tienda { font-size: 18px; font-weight: bold; text-align: center; margin: 3px 0; }
+  .copia-label { font-size: 9px; font-weight: bold; text-align: center; letter-spacing: 1px; margin-bottom: 2px; }
   .sep { border-top: 2px solid #000; margin: 6px 0; }
-  .tienda { font-size: 15px; font-weight: bold; text-align: center; margin: 2px 0; }
-  .dato { margin: 1px 0; }
-  .gap { height: 8px; }
-  .pedido { font-size: 16px; font-weight: bold; text-align: center; margin: 6px 0; }
-  .gracias { font-size: 15px; font-weight: bold; text-align: center; margin: 6px 0; }
-  .cond-titulo { font-size: 9px; font-weight: bold; text-align: center; margin: 6px 0 4px; }
-  .legal { font-size: 8px; margin: 3px 0; text-align: left; }
-  .corte { border-top: 1px dashed #000; margin: 10px 0; position: relative; }
-  .corte::before { content: "✂"; position: absolute; top: -8px; left: 0; font-size: 11px; background: #fff; padding-right: 4px; }
-  .rg-pedido { font-size: 13px; font-weight: bold; margin: 4px 0 2px; }
-  .rg-dato { font-size: 11px; margin: 1px 0; }
-  .rg-precio { font-size: 11px; font-weight: bold; margin: 1px 0; }
-  .conforme { border: 1px solid #000; padding: 6px 8px; margin: 10px 0; font-size: 9px; }
-  .firma { font-size: 11px; font-weight: bold; margin-top: 14px; }
-  .firma-linea { border-top: 1px solid #000; margin-top: 38px; }
+  .barcode-wrap { text-align: center; margin: 8px 0 2px; }
+  .barcode { max-width: 60mm; height: auto; }
+  .pedido { font-size: 17px; font-weight: bold; text-align: center; margin: 2px 0 8px; }
+  .aviso { border: 2px solid #000; padding: 8px 6px; margin: 8px 0; text-align: center; }
+  .aviso-titulo { font-size: 13px; font-weight: bold; }
+  .aviso-texto { font-size: 11px; margin-top: 4px; line-height: 1.35; }
+  .sec-titulo { font-size: 10px; font-weight: bold; letter-spacing: 1px; margin: 10px 0 4px; padding-bottom: 2px; border-bottom: 1px solid #000; }
+  .dato { font-size: 13px; font-weight: bold; margin: 3px 0; }
+  .gracias { font-size: 15px; font-weight: bold; text-align: center; margin: 12px 0; }
+  .cond-titulo { font-size: 10px; font-weight: bold; text-align: center; letter-spacing: 1px; margin: 8px 0 4px; }
+  .legal { font-size: 9px; text-align: justify; line-height: 1.4; margin: 4px 0; }
+  .contacto { font-size: 11px; text-align: center; line-height: 1.6; margin: 2px 0; }
+  .corte { border-top: 2px dashed #000; margin: 14px 0 6px; text-align: center; }
+  .corte-label { font-size: 10px; font-weight: bold; letter-spacing: 2px; background: #fff; padding: 0 6px; position: relative; top: -8px; }
+  .rg-pedido { font-size: 15px; font-weight: bold; margin: 4px 0; }
+  .rg-dato { font-size: 12px; font-weight: bold; margin: 2px 0; }
+  .rg-precio { font-size: 14px; font-weight: bold; margin: 4px 0; }
+  .conforme { border: 1px solid #000; padding: 8px; margin: 10px 0; font-size: 11px; font-weight: bold; }
+  .firma { font-size: 12px; font-weight: bold; margin-top: 16px; }
+  .firma-linea { border-top: 1px solid #000; margin-top: 40px; }
 </style></head>
 <body>
-  <div class="sep"></div>
-  <div class="tienda">📱 Phone City 📱</div>
+  <div class="titulo-doc">RESGUARDO DE RECOGIDA</div>
+  <div class="tienda">📱 PHONE CITY 📱</div>
+  <div class="copia-label">— COPIA CLIENTE —</div>
   <div class="sep"></div>
 
-  <p class="dato bold">Cliente: ${cliente}</p>
-  <p class="dato bold">Teléfono: ${telefono}</p>
-  <div class="gap"></div>
-  <p class="dato bold">Terminal: ${modelo}</p>
-  <p class="dato bold">Problema o Pieza: ${problema}</p>
-  <div class="gap"></div>
-  <p class="dato bold">Fecha entrada: ${fecha}</p>
-
+  ${barcodeImg}
   <div class="pedido">Nº Pedido: ${nPedido}</div>
 
-  <div class="sep"></div>
+  <div class="aviso">
+    <div class="aviso-titulo">⚠ CONSERVE ESTE RESGUARDO</div>
+    <div class="aviso-texto">En su ausencia, acreditar identidad y titularidad con DNI. Puede demorar la entrega del dispositivo.</div>
+  </div>
+
+  <div class="sec-titulo">DATOS DEL CLIENTE</div>
+  <p class="dato">Cliente: ${cliente}</p>
+  <p class="dato">Teléfono: ${telefono}</p>
+
+  <div class="sec-titulo">DISPOSITIVO</div>
+  <p class="dato">Dispositivo: ${modelo}</p>
+  <p class="dato">Problema: ${problema}</p>
+  <p class="dato">Precio: ${precio}</p>
+  <p class="dato">Fecha entrada: ${fecha}</p>
+
   <div class="gracias">¡Gracias por confiar en nosotros!</div>
-  <div class="sep"></div>
 
   <div class="cond-titulo">CONDICIONES DE REPARACIÓN</div>
   ${legal}
 
-  <div class="corte"></div>
+  <div class="sec-titulo">CONTACTO</div>
+  <div class="contacto">
+    Phone City · Avenida España 11<br>
+    Tel: 603 378 555<br>
+    L-V 10:00-14:00 y 17:00-20:30<br>
+    Sábados 10:00-14:00
+  </div>
+
+  <div class="corte"><span class="corte-label">✂ COPIA TIENDA</span></div>
 
   <p class="rg-pedido">Nº Pedido: ${nPedido}</p>
   <p class="rg-dato">Cliente: ${cliente}</p>
   <p class="rg-dato">Teléfono: ${telefono}</p>
-  <p class="rg-dato">Terminal: ${modelo}</p>
+  <p class="rg-dato">Dispositivo: ${modelo}</p>
   <p class="rg-dato">Problema/Pieza: ${problema}</p>
   <p class="rg-precio">Precio: ${precio}</p>
 
@@ -439,7 +479,7 @@ export class TableroComponent implements OnInit, AfterViewInit {
   <div class="firma-linea"></div>
 </body></html>`;
 
-    const win = window.open('', '_blank', 'width=400,height=700');
+    const win = window.open('', '_blank', 'width=600,height=800');
     if (!win) {
       this.error.set('Bloqueado por el navegador. Permite las ventanas emergentes.');
       return;
@@ -447,9 +487,13 @@ export class TableroComponent implements OnInit, AfterViewInit {
     win.document.write(html);
     win.document.close();
     win.focus();
-    setTimeout(() => { win.print(); }, 300);
+    setTimeout(() => {
+      win.print();
+      win.onafterprint = () => win.close();
+      setTimeout(() => { try { win.close(); } catch {} }, 500);
+    }, 300);
   }
-  
+
   mostrarToastWa(linea: Linea): void {
     this.toastWa.set(linea);
     if (this.toastTimer) clearTimeout(this.toastTimer);
