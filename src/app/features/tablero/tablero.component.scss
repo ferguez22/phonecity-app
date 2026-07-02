@@ -517,3 +517,17 @@
   align-items: center;
   gap: 5px;
 }
+
+@media (max-width: 768px) {
+  .TU-WRAPPER-TABLA {
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .btn-consulta-taller {
+    position: static !important;
+    left: auto !important;
+    transform: none !important;
+  }
+}
