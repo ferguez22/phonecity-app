@@ -7,7 +7,7 @@ import { PedidosService } from '../../core/services/pedidos.service';
   selector: 'app-pedido-modal',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './pedido-modal-component.html',
+  templateUrl: './pedido-modal.component.html',
   styleUrl: './pedido-modal.component.scss',
 })
 export class PedidoModalComponent implements OnInit {

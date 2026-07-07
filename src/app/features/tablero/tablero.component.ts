@@ -1,4 +1,4 @@
-import {Component, OnInit, AfterViewInit, ViewChild, ElementRef, inject, signal, computed, HostListener} from '@angular/core';
+import {Component, OnInit, AfterViewInit, OnDestroy, ViewChild, ElementRef, inject, signal, computed, HostListener} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import JsBarcode from 'jsbarcode';
 import { Router, RouterLink } from '@angular/router';
@@ -19,8 +19,7 @@ import { AvisarModalComponent } from '../avisar-modal/avisar-modal.component';
 import { Cliente } from '../../core/models/cliente.model';
 import { ESTADO_OPTIONS, EstadoDef, esEstadoActual, getColor, getEtiqueta, etiquetaHistorialCompleta, estadoActualDef, siguientesDe, mensajeWhatsapp, tieneMensajeEspecifico} from '../../core/estados/estados';
 
-interface Boton { label: string; filtros: LineaFiltros; }
-type FilaTablero =
+interface Boton { label: string; filtros: LineaFiltros; filtroClient?: (l: Linea) => boolean; }type FilaTablero =
   | { tipo: 'divisor'; fecha: string; key: string }
   | { tipo: 'linea'; linea: Linea };
 
@@ -43,7 +42,7 @@ type FilaTablero =
   ],
 })
   
-export class TableroComponent implements OnInit, AfterViewInit {
+export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('controlsRef') controlsRef!: ElementRef<HTMLElement>;
   @ViewChild('busquedaInput') busquedaInput!: ElementRef<HTMLInputElement>;
   
@@ -64,6 +63,7 @@ export class TableroComponent implements OnInit, AfterViewInit {
   private readonly router = inject(Router);
   private filtrosActivos: LineaFiltros = {};
   private toastTimer: ReturnType<typeof setTimeout> | null = null;
+  private resizeObs: ResizeObserver | null = null;
   private readonly busq$ = new Subject<string>();
 
   readonly lineas = signal<Linea[]>([]);
@@ -76,7 +76,8 @@ export class TableroComponent implements OnInit, AfterViewInit {
   readonly guardando = signal(false);
   readonly expandedId = signal<number | null>(null);
   readonly verTodos = signal(false);
-  readonly ajustesAbierto = signal(false);
+  readonly estadoActivo = signal<EstadoDef | null>(null);
+  readonly filtrosExpandidos = signal(false);  readonly ajustesAbierto = signal(false);
   readonly pedidoAbierto = signal(false);
   readonly tallerAbierto = signal(false);
   readonly avisarAbierto = signal(false);
@@ -96,36 +97,54 @@ export class TableroComponent implements OnInit, AfterViewInit {
   readonly botones: Boton[] = [
     { label: 'Todo', filtros: {} },
     { label: 'Móviles en tienda', filtros: { vista: 'moviles_en_tienda' } },
-    { label: 'Reparar', filtros: { flujo: 'reparacion', fase: 'por_reparar' } },
-    { label: 'Reparado - Avisado', filtros: { flujo: 'reparacion', fase: 'reparado', avisado: true } },
-    { label: 'Enviar a taller', filtros: { fase: 'por_enviar_taller' } },
-    { label: 'Enviado a taller', filtros: { fase: 'en_taller' } },
-    { label: 'No se puede reparar - Avisado', filtros: { fase: 'no_reparable', avisado: true, movil_en_tienda: true } },
-    { label: 'No se puede reparar - Entregado', filtros: { fase: 'no_reparable', avisado: true, movil_en_tienda: false } },
+    {
+      label: 'Reparar + Avisado',
+      filtros: { flujo: 'reparacion' },
+      filtroClient: (l) => l.fase === 'por_reparar' || (l.fase === 'reparado' && !!l.avisado),
+    },
+    { label: 'Piezas', filtros: { flujo: 'pieza' } },
     { label: 'Accesorios', filtros: { flujo: 'accesorio' } },
-    { label: 'Venta de Dispositivo', filtros: { flujo: 'venta', subtipo: 'venta' } },
-    { label: 'Compra de Dispositivo', filtros: { flujo: 'venta', subtipo: 'compra' } },
+    { label: 'No reparable', filtros: { flujo: 'reparacion', fase: 'no_reparable' } },
+    {
+      label: 'Taller',
+      filtros: { flujo: 'reparacion' },
+      filtroClient: (l) => l.fase === 'por_enviar_taller' || l.fase === 'en_taller',
+    },
+    { label: 'Venta/Compra', filtros: { flujo: 'venta' } },
   ];
 
-  readonly mostrarBotonTaller = computed(() =>
-    this.botonActivo() === 'Enviar a taller' || this.botonActivo() === 'Enviado a taller',
-  );
+  readonly mostrarBotonTaller = computed(() => {
+    if (this.botonActivo() === 'Taller') return true;
+    const est = this.estadoActivo();
+    return est?.fase === 'por_enviar_taller' || est?.fase === 'en_taller';
+  });
 
-  readonly mostrarBotonAvisar = computed(() =>
-    this.botonActivo() === 'Reparado - Avisado' || this.botonActivo() === 'No se puede reparar - Avisado',
-  );
+  readonly mostrarBotonAvisar = computed(() => {
+    const est = this.estadoActivo();
+    return est?.id === 'reparado_avisado' || est?.id === 'no_reparable_avisado';
+  });
   
 
   readonly lineasFiltradas = computed(() => {
+    let base = this.lineas();
+
+    const bt = this.botones.find((b) => b.label === this.botonActivo());
+    if (bt?.filtroClient) base = base.filter(bt.filtroClient);
+
+    const est = this.estadoActivo();
+    if (est) base = base.filter((l) => esEstadoActual(est, l));
+
     const q = this.busqueda().toLowerCase().trim();
-    if (!q) return this.lineas();
-    return this.lineas().filter((l) =>
-      String(l.id).includes(q) ||
-      l.modelo?.toLowerCase().includes(q) ||
-      l.cliente_nombre?.toLowerCase().includes(q) ||
-      l.cliente_telefono?.includes(q) ||
-      l.problema_o_pieza?.toLowerCase().includes(q),
-    );
+    if (q) {
+      base = base.filter((l) =>
+        String(l.id).includes(q) ||
+        l.modelo?.toLowerCase().includes(q) ||
+        l.cliente_nombre?.toLowerCase().includes(q) ||
+        l.cliente_telefono?.includes(q) ||
+        l.problema_o_pieza?.toLowerCase().includes(q),
+      );
+    }
+    return base;
   });
 
   readonly total = computed(() => this.lineasFiltradas().length);
@@ -164,18 +183,43 @@ export class TableroComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    setTimeout(() => {
-      const h = this.controlsRef?.nativeElement?.offsetHeight ?? 148;
-      document.documentElement.style.setProperty('--controls-h', `${h}px`);
-    }, 100);
+    const el = this.controlsRef?.nativeElement;
+    if (!el) return;
+    this.resizeObs = new ResizeObserver(() => {
+      document.documentElement.style.setProperty('--controls-h', `${el.offsetHeight}px`);
+    });
+    this.resizeObs.observe(el);
+  }
+
+  ngOnDestroy(): void {
+    this.resizeObs?.disconnect();
+    this.resizeObs = null;
   }
 
   seleccionarBoton(boton: Boton): void {
     this.filtrosActivos = boton.filtros;
     this.botonActivo.set(boton.label);
+    this.estadoActivo.set(null);
     this.busqueda.set('');
     this.expandedId.set(null);
     this.cargar();
+  }
+
+  seleccionarEstado(est: EstadoDef): void {
+    this.filtrosActivos = {};
+    this.botonActivo.set('');
+    this.estadoActivo.set(est);
+    this.busqueda.set('');
+    this.expandedId.set(null);
+    this.cargar();
+  }
+
+  resetEstado(): void {
+    this.seleccionarBoton(this.botones[0]);
+  }
+
+  toggleFiltrosExpandidos(): void {
+    this.filtrosExpandidos.update((v) => !v);
   }
 
   cargar(): void {
@@ -530,8 +574,20 @@ export class TableroComponent implements OnInit, AfterViewInit {
   cerrarTaller(): void { this.tallerAbierto.set(false); }
 
   abrirAvisar(): void {
-    const b = this.botones.find((x) => x.label === this.botonActivo());
-    this.filtrosAvisar.set(b ? { ...b.filtros } : {});
+    const est = this.estadoActivo();
+    if (est) {
+      this.filtrosAvisar.set({
+        flujo: est.flujo,
+        fase: est.fase,
+        avisado: est.avisado,
+        movil_en_tienda: est.movil_en_tienda,
+      });
+    } else if (this.botonActivo() === 'Reparar + Avisado') {
+      this.filtrosAvisar.set({ flujo: 'reparacion', fase: 'reparado', avisado: true });
+    } else {
+      const b = this.botones.find((x) => x.label === this.botonActivo());
+      this.filtrosAvisar.set(b ? { ...b.filtros } : {});
+    }
     this.avisarAbierto.set(true);
   }
 

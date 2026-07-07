@@ -519,7 +519,7 @@
 }
 
 @media (max-width: 768px) {
-  .TU-WRAPPER-TABLA {
+  .table-area {
     overflow-x: auto;
   }
 }
@@ -529,5 +529,64 @@
     position: static !important;
     left: auto !important;
     transform: none !important;
+  }
+}
+
+.filtros-estado-bar {
+  background: #f1f3f5;
+  border-top: 1px solid #e9ecef;
+  padding: 0.5rem 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  max-height: 30vh;
+  overflow-y: auto;
+  animation: fadeIn 0.15s ease;
+}
+
+.estado-chip-filtro {
+  font-size: 0.72rem;
+  padding: 4px 9px;
+  border-radius: 5px;
+  border: 1px solid #ccd2d9;
+  background: #fff;
+  cursor: pointer;
+  white-space: nowrap;
+  border-left: 4px solid var(--chip, #ccc);
+  transition: background 0.12s, box-shadow 0.12s;
+
+  &:hover {
+    background: #eef2f7;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  }
+
+  &.activo {
+    background: var(--chip, #212529);
+    color: #000;
+    border-color: var(--chip, #212529);
+    font-weight: 600;
+  }
+}
+
+.chip-reset {
+  border-left-color: #adb5bd !important;
+}
+
+.btn-expandir-filtros {
+  border: 1px solid #ccc;
+  background: #fff;
+  color: #333;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  &:hover {
+    background: #e9ecef;
+  }
+
+  &.activo {
+    background: #495057;
+    color: #fff;
+    border-color: #495057;
   }
 }

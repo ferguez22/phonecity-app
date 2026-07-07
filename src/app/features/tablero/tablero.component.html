@@ -62,12 +62,27 @@
       (ngModelChange)="busqueda.set($event)" />
   </div>
 
-  <div class="botones-bar px-3 pb-2 d-flex gap-2">
+  <div class="botones-bar px-3 pb-2 d-flex gap-2 align-items-center">
     @for (boton of botones; track boton.label) {
     <button class="btn btn-sm boton-estado" [class.activo]="botonActivo() === boton.label"
       (click)="seleccionarBoton(boton)">{{ boton.label }}</button>
     }
+    <button class="btn btn-sm btn-expandir-filtros" [class.activo]="filtrosExpandidos()"
+      (click)="toggleFiltrosExpandidos()" type="button">
+      {{ filtrosExpandidos() ? '▲ Ocultar estados' : '▼ Ver todos los estados' }}
+    </button>
   </div>
+  
+  @if (filtrosExpandidos()) {
+  <div class="filtros-estado-bar">
+    <button class="estado-chip-filtro chip-reset" [class.activo]="estadoActivo() === null && botonActivo() === 'Todo'"
+      (click)="resetEstado()" type="button">Todos</button>
+    @for (est of estadoOptions; track est.id) {
+    <button class="estado-chip-filtro" [class.activo]="estadoActivo()?.id === est.id" [style.--chip]="est.color"
+      (click)="seleccionarEstado(est)" type="button">{{ est.label }}</button>
+    }
+  </div>
+  }
 
 </div>
 
