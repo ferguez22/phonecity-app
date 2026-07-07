@@ -14,6 +14,8 @@ export interface LineaFiltros {
   order?: 'asc' | 'desc';
   vista?: string;      // ← añadir
   subtipo?: string;    // ← añadir
+  incluir_historial?: boolean;
+  fases_historial?: string;
 }
 export type LineaPayload = Partial<Omit<Linea,
   'id' | 'cliente_nombre' | 'cliente_telefono' | 'credenciales_borradas'

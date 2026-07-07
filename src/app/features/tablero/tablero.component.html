@@ -67,10 +67,16 @@
     <button class="btn btn-sm boton-estado" [class.activo]="botonActivo() === boton.label"
       (click)="seleccionarBoton(boton)">{{ boton.label }}</button>
     }
-    <button class="btn btn-sm btn-expandir-filtros" [class.activo]="filtrosExpandidos()"
-      (click)="toggleFiltrosExpandidos()" type="button">
+    <button class="btn btn-sm btn-expandir-filtros" [class.activo]="filtrosExpandidos()" (click)="toggleFiltrosExpandidos()"
+      type="button">
       {{ filtrosExpandidos() ? '▲ Ocultar estados' : '▼ Ver todos los estados' }}
     </button>
+    @if (mostrarToggleHistorial()) {
+    <button class="btn btn-sm btn-toggle-historial" [class.activo]="incluirHistorial()" (click)="toggleIncluirHistorial()"
+      type="button">
+      🕘 Incluir histórico
+    </button>
+    }
   </div>
   
   @if (filtrosExpandidos()) {
@@ -120,7 +126,7 @@
       } @else {
       @let linea = fila.linea;
       <tr class="fila-linea" [class.expandida]="expandedId() === linea.id" [style.--bs-table-bg]="getColor(linea)">
-        <td class="fw-bold td-id">L-{{ linea.id }}</td>
+        <td class="fw-bold td-id">L-{{ linea.id }}@if (linea.es_historico) {<span class="badge-historico">Histórico</span>}</td>
         <td><span class="badge-estado">{{ getEtiqueta(linea) }}</span></td>
         <td>{{ linea.fecha_entrada ?? '—' }}</td>
         <td>{{ linea.modelo ?? '—' }}</td>

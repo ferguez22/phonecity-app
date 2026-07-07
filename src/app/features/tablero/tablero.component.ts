@@ -19,7 +19,9 @@ import { AvisarModalComponent } from '../avisar-modal/avisar-modal.component';
 import { Cliente } from '../../core/models/cliente.model';
 import { ESTADO_OPTIONS, EstadoDef, esEstadoActual, getColor, getEtiqueta, etiquetaHistorialCompleta, estadoActualDef, siguientesDe, mensajeWhatsapp, tieneMensajeEspecifico} from '../../core/estados/estados';
 
-interface Boton { label: string; filtros: LineaFiltros; filtroClient?: (l: Linea) => boolean; }type FilaTablero =
+interface Boton { label: string; filtros: LineaFiltros; filtroClient?: (l: Linea) => boolean; aplicaHistorial?: boolean; fasesHistorial?: string[];}
+
+type FilaTablero =
   | { tipo: 'divisor'; fecha: string; key: string }
   | { tipo: 'linea'; linea: Linea };
 
@@ -77,7 +79,8 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly expandedId = signal<number | null>(null);
   readonly verTodos = signal(false);
   readonly estadoActivo = signal<EstadoDef | null>(null);
-  readonly filtrosExpandidos = signal(false);  readonly ajustesAbierto = signal(false);
+  readonly filtrosExpandidos = signal(false); readonly ajustesAbierto = signal(false);
+  readonly incluirHistorial = signal(false);
   readonly pedidoAbierto = signal(false);
   readonly tallerAbierto = signal(false);
   readonly avisarAbierto = signal(false);
@@ -102,23 +105,40 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
       filtros: { flujo: 'reparacion' },
       filtroClient: (l) => l.fase === 'por_reparar' || (l.fase === 'reparado' && !!l.avisado),
     },
-    { label: 'Piezas', filtros: { flujo: 'pieza' } },
-    { label: 'Accesorios', filtros: { flujo: 'accesorio' } },
-    { label: 'No reparable', filtros: { flujo: 'reparacion', fase: 'no_reparable' } },
+    {
+      label: 'Piezas',
+      filtros: { flujo: 'pieza' },
+      filtroClient: (l) => !!l.es_historico || (l.fase !== 'entregado' && l.fase !== 'cancelado'),
+      aplicaHistorial: true,
+    },
+    {
+      label: 'Accesorios',
+      filtros: { flujo: 'accesorio' },
+      filtroClient: (l) => !!l.es_historico || (l.fase !== 'entregado' && l.fase !== 'cancelado'),
+      aplicaHistorial: true,
+    },
+    { label: 'No reparable', filtros: { flujo: 'reparacion', fase: 'no_reparable' }, aplicaHistorial: true, fasesHistorial: ['no_reparable'] },
     {
       label: 'Taller',
       filtros: { flujo: 'reparacion' },
-      filtroClient: (l) => l.fase === 'por_enviar_taller' || l.fase === 'en_taller',
+      filtroClient: (l) => !!l.es_historico || l.fase === 'por_enviar_taller' || l.fase === 'en_taller',
+      aplicaHistorial: true,
+      fasesHistorial: ['por_enviar_taller', 'en_taller'],
     },
     { label: 'Venta/Compra', filtros: { flujo: 'venta' } },
   ];
+
+  readonly mostrarToggleHistorial = computed(() => {
+    const bt = this.botones.find((b) => b.label === this.botonActivo());
+    return !!bt?.aplicaHistorial;
+  });
 
   readonly mostrarBotonTaller = computed(() => {
     if (this.botonActivo() === 'Taller') return true;
     const est = this.estadoActivo();
     return est?.fase === 'por_enviar_taller' || est?.fase === 'en_taller';
   });
-
+  
   readonly mostrarBotonAvisar = computed(() => {
     const est = this.estadoActivo();
     return est?.id === 'reparado_avisado' || est?.id === 'no_reparable_avisado';
@@ -222,12 +242,22 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
     this.filtrosExpandidos.update((v) => !v);
   }
 
+  toggleIncluirHistorial(): void {
+    this.incluirHistorial.update((v) => !v);
+    this.cargar();
+  }
+
   cargar(): void {
     this.cargando.set(true);
     this.error.set(null);
     this.expandedId.set(null);
-    this.lineas$.list({ ...this.filtrosActivos}).subscribe({
-      next: (data) => {
+    const filtros: LineaFiltros = { ...this.filtrosActivos };
+    const bt = this.botones.find((b) => b.label === this.botonActivo());
+    if (this.incluirHistorial() && bt?.aplicaHistorial) {
+      filtros.incluir_historial = true;
+      if (bt.fasesHistorial?.length) filtros.fases_historial = bt.fasesHistorial.join(',');
+    }
+    this.lineas$.list(filtros).subscribe({      next: (data) => {
         this.lineas.set(data);
         this.cargando.set(false);
         setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'instant' }), 80);

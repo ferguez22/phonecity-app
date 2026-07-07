@@ -39,6 +39,9 @@ export interface Linea {
   cliente_id: number | null;
   linea_origen_id: number | null;
   subtipo: 'venta' | 'compra' | null;
+  
+  // Flag solo presente con incluir_historial=true (0/1 desde MariaDB)
+  es_historico?: number;
 
   // Campos que llegan del LEFT JOIN con cliente (NULL = TIENDA)
   cliente_nombre: string | null;

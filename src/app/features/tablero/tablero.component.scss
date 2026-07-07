@@ -590,3 +590,35 @@
     border-color: #495057;
   }
 }
+
+.btn-toggle-historial {
+  border: 1px solid #ccc;
+  background: #fff;
+  color: #333;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+
+  &:hover {
+    background: #e9ecef;
+  }
+
+  &.activo {
+    background: #6c757d;
+    color: #fff;
+    border-color: #6c757d;
+  }
+}
+
+.badge-historico {
+  font-size: 0.6rem;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 10px;
+  background: #e9ecef;
+  color: #495057;
+  border: 1px solid #ced4da;
+  margin-left: 5px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
