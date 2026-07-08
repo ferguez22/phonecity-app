@@ -146,27 +146,16 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
   
 
   readonly lineasFiltradas = computed(() => {
-    let base = this.lineas();
-
-    const bt = this.botones.find((b) => b.label === this.botonActivo());
-    if (bt?.filtroClient) base = base.filter(bt.filtroClient);
-
-    const est = this.estadoActivo();
-    if (est) base = base.filter((l) => esEstadoActual(est, l));
-
     const q = this.busqueda().toLowerCase().trim();
-    if (q) {
-      base = base.filter((l) =>
-        String(l.id).includes(q) ||
-        l.modelo?.toLowerCase().includes(q) ||
-        l.cliente_nombre?.toLowerCase().includes(q) ||
-        l.cliente_telefono?.includes(q) ||
-        l.problema_o_pieza?.toLowerCase().includes(q),
-      );
-    }
-    return base;
+    if (!q) return this.lineas();
+    return this.lineas().filter((l) =>
+      String(l.id).includes(q) ||
+      l.modelo?.toLowerCase().includes(q) ||
+      l.cliente_nombre?.toLowerCase().includes(q) ||
+      l.cliente_telefono?.includes(q) ||
+      l.problema_o_pieza?.toLowerCase().includes(q),
+    );
   });
-
   readonly total = computed(() => this.lineasFiltradas().length);
 
   readonly mostrarDivisor = computed(() => {
@@ -257,8 +246,13 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
       filtros.incluir_historial = true;
       if (bt.fasesHistorial?.length) filtros.fases_historial = bt.fasesHistorial.join(',');
     }
-    this.lineas$.list(filtros).subscribe({      next: (data) => {
-        this.lineas.set(data);
+    this.lineas$.list(filtros).subscribe({
+      next: (data) => {
+        let filtradas = data;
+        if (bt?.filtroClient) filtradas = filtradas.filter(bt.filtroClient);
+        const est = this.estadoActivo();
+        if (est) filtradas = filtradas.filter((l) => esEstadoActual(est, l));
+        this.lineas.set(filtradas);
         this.cargando.set(false);
         setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'instant' }), 80);
         setTimeout(() => {
