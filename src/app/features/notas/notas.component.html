@@ -1,0 +1,68 @@
+<nav class="navbar navbar-dark bg-dark px-3 py-2">
+    <div class="d-flex align-items-center gap-3">
+        <a routerLink="/tablero" class="btn btn-sm btn-outline-light">← Tablero</a>
+        <span class="navbar-brand fw-bold mb-0">📝 Notas</span>
+    </div>
+    <span class="text-white-50 small">{{ pendientes().length }} pendientes</span>
+</nav>
+
+<div class="notas-container container py-3">
+
+    <div class="nueva-nota mb-3">
+        <input type="text" class="form-control" placeholder="Escribe una nota y pulsa Enter..." [ngModel]="nuevoTexto()"
+            (ngModelChange)="nuevoTexto.set($event)" (keydown.enter)="crear()" [disabled]="guardando()" />
+    </div>
+
+    @if (error()) {
+    <div class="alert alert-danger py-2">{{ error() }}</div>
+    }
+
+    @if (cargando()) {
+    <div class="text-center text-muted py-5">Cargando...</div>
+    } @else {
+
+    @if (pendientes().length === 0) {
+    <div class="text-center text-muted py-4">No hay notas pendientes.</div>
+    } @else {
+    <div class="lista-notas">
+        @for (nota of pendientes(); track nota.id) {
+        <div class="nota-item" @notaAnim [class.nota-resolviendo]="resolviendoId() === nota.id">
+            <input type="checkbox" class="form-check-input" [checked]="resolviendoId() === nota.id"
+                (change)="toggleResuelto(nota)" />
+
+            @if (editandoId() === nota.id) {
+            <input type="text" class="form-control form-control-sm nota-edit-input" [ngModel]="textoEdicion()"
+                (ngModelChange)="textoEdicion.set($event)" (keydown.enter)="guardarEdicion(nota)"
+                (keydown.escape)="cancelarEdicion()" />
+            <button type="button" class="btn btn-sm btn-success" (click)="guardarEdicion(nota)">✓</button>
+            <button type="button" class="btn btn-sm btn-link text-muted" (click)="cancelarEdicion()">✕</button>
+            } @else {
+            <span class="nota-texto">{{ nota.texto }}</span>
+            <span class="nota-fecha">{{ formatoFecha(nota.creado_en) }}</span>
+            <button type="button" class="btn btn-sm btn-link nota-editar" (click)="empezarEdicion(nota)">✏️</button>
+            }
+        </div>
+        }
+    </div>
+    }
+
+    <div class="mt-4">
+        <button type="button" class="btn btn-sm btn-outline-secondary" (click)="toggleVerResueltas()">
+            {{ verResueltas() ? '▲ Ocultar resueltas' : '▼ Ver resueltas' }} ({{ resueltas().length }})
+        </button>
+
+        @if (verResueltas() && resueltas().length > 0) {
+        <div class="lista-notas mt-2" @listaAnim>
+            @for (nota of resueltas(); track nota.id) {
+            <div class="nota-item nota-resuelta" @notaAnim>
+                <input type="checkbox" class="form-check-input" [checked]="true" (change)="toggleResuelto(nota)" />
+                <span class="nota-texto">{{ nota.texto }}</span>
+                <span class="nota-fecha">{{ formatoFecha(nota.resuelto_en ?? nota.creado_en) }}</span>
+            </div>
+            }
+        </div>
+        }
+    </div>
+
+    }
+</div>
