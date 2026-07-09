@@ -22,4 +22,16 @@ export class ClienteService {
       .post<ApiResponse<Cliente>>(this.base, { nombre, telefono })
       .pipe(map((r) => r.data));
   }
+
+  list(): Observable<Cliente[]> {
+    return this.http
+      .get<ApiResponse<Cliente[]>>(this.base)
+      .pipe(map((r) => r.data));
+  }
+
+  update(id: number, payload: { nombre?: string; telefono?: string | null }): Observable<Cliente> {
+    return this.http
+      .put<ApiResponse<Cliente>>(`${this.base}/${id}`, payload)
+      .pipe(map((r) => r.data));
+  }
 }

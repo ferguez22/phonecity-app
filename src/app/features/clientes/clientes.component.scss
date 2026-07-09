@@ -1,0 +1,67 @@
+:host {
+    display: block;
+}
+
+.clientes-container {
+    max-width: 900px;
+}
+
+.tabla-clientes {
+    font-size: 0.85rem;
+
+    th {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        white-space: nowrap;
+    }
+
+    td {
+        vertical-align: middle;
+    }
+}
+
+.th-acciones,
+.td-acciones {
+    width: 90px;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.btn-editar {
+    padding: 0 4px;
+    text-decoration: none;
+    opacity: 0.5;
+
+    &:hover {
+        opacity: 1;
+    }
+}
+
+.th-orden {
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.12s;
+
+    .orden-icono {
+        opacity: 0.4;
+        font-size: 0.72rem;
+        margin-left: 2px;
+    }
+
+    &:hover {
+        background: #495057;
+
+        .orden-icono {
+            opacity: 0.85;
+        }
+    }
+
+    &.activo {
+        background: #52585e;
+
+        .orden-icono {
+            opacity: 1;
+        }
+    }
+}

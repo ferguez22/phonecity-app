@@ -1,0 +1,75 @@
+<nav class="navbar navbar-dark bg-dark px-3 py-2 sticky-top">
+    <div class="d-flex align-items-center gap-3">
+        <a routerLink="/tablero" class="btn btn-sm btn-outline-light">← Tablero</a>
+        <span class="navbar-brand fw-bold mb-0">👥 Clientes</span>
+    </div>
+    <span class="text-white-50 small">{{ total() }} clientes</span>
+</nav>
+
+<div class="clientes-container container py-3">
+
+    <input type="text" class="form-control mb-3" placeholder="Buscar por nombre o teléfono..." [ngModel]="busqueda()"
+        (ngModelChange)="busqueda.set($event)" />
+
+    @if (error()) {
+    <div class="alert alert-danger py-2">{{ error() }}</div>
+    }
+
+    @if (cargando()) {
+    <div class="text-center text-muted py-5">Cargando...</div>
+    } @else if (filtrados().length === 0) {
+    <div class="text-center text-muted py-4">Sin resultados.</div>
+    } @else {
+    <table class="table table-sm tabla-clientes">
+        <thead class="table-dark">
+            <tr>
+                <th class="th-orden" [class.activo]="ordenCampo() === 'nombre'" (click)="ordenarPor('nombre')">
+                    Nombre <span class="orden-icono">{{ ordenCampo() === 'nombre' ? (ordenAsc() ? '▲' : '▼') : '⇅' }}</span>
+                </th>
+                <th>Teléfono</th>
+                <th class="th-orden" [class.activo]="ordenCampo() === 'primera_visita'" (click)="ordenarPor('primera_visita')">
+                    Primera visita <span class="orden-icono">{{ ordenCampo() === 'primera_visita' ? (ordenAsc() ? '▲' : '▼') : '⇅'
+                        }}</span>
+                </th>
+                <th class="th-orden text-center" [class.activo]="ordenCampo() === 'num_lineas'" (click)="ordenarPor('num_lineas')">
+                    Líneas <span class="orden-icono">{{ ordenCampo() === 'num_lineas' ? (ordenAsc() ? '▲' : '▼') : '⇅' }}</span>
+                </th>
+                <th class="th-acciones"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (c of filtrados(); track c.id) {
+            <tr>
+                @if (editandoId() === c.id) {
+                <td>
+                    <input type="text" class="form-control form-control-sm" [ngModel]="edNombre()"
+                        (ngModelChange)="edNombre.set($event)" (keydown.escape)="cancelarEdicion()" />
+                </td>
+                <td>
+                    <input type="tel" class="form-control form-control-sm" [ngModel]="edTelefono()"
+                        (ngModelChange)="edTelefono.set($event)" (keydown.enter)="guardarEdicion(c)"
+                        (keydown.escape)="cancelarEdicion()" />
+                </td>
+                <td>{{ formatoFecha(c.primera_visita) }}</td>
+                <td class="text-center">{{ c.num_lineas ?? 0 }}</td>
+                <td class="td-acciones">
+                    <button type="button" class="btn btn-sm btn-success" [disabled]="guardando()"
+                        (click)="guardarEdicion(c)">✓</button>
+                    <button type="button" class="btn btn-sm btn-link text-muted" (click)="cancelarEdicion()">✕</button>
+                </td>
+                } @else {
+                <td>{{ c.nombre }}</td>
+                <td>{{ c.telefono ?? '—' }}</td>
+                <td>{{ formatoFecha(c.primera_visita) }}</td>
+                <td class="text-center">{{ c.num_lineas ?? 0 }}</td>
+                <td class="td-acciones">
+                    <button type="button" class="btn btn-sm btn-link btn-editar" (click)="empezarEdicion(c)">✏️</button>
+                </td>
+                }
+            </tr>
+            }
+        </tbody>
+    </table>
+    }
+
+</div>
