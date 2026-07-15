@@ -231,6 +231,10 @@
     min-width: 0;
 }
 
+.layout-2col.sin-panel {
+    grid-template-columns: 1fr;
+}
+
 @media (max-width: 992px) {
     .layout-2col {
         grid-template-columns: 1fr;

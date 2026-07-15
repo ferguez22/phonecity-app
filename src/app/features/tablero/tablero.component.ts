@@ -153,7 +153,10 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
       l.modelo?.toLowerCase().includes(q) ||
       l.cliente_nombre?.toLowerCase().includes(q) ||
       l.cliente_telefono?.includes(q) ||
-      l.problema_o_pieza?.toLowerCase().includes(q),
+      l.problema_o_pieza?.toLowerCase().includes(q) ||
+      l.notas?.toLowerCase().includes(q) ||
+      String(l.importe ?? '').includes(q) ||
+      getEtiqueta(l).toLowerCase().includes(q),
     );
   });
   readonly total = computed(() => this.lineasFiltradas().length);

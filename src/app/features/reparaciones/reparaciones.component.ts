@@ -42,6 +42,7 @@ export class ReparacionesComponent implements OnInit, OnDestroy {
   readonly error = signal<string | null>(null);
   readonly confirmacion = signal<Confirmacion | null>(null);
   readonly mostrarFechaManual = signal(false);
+  readonly panelVisible = signal(true);
   readonly getEtiqueta = getEtiqueta;
 
 
@@ -101,6 +102,10 @@ export class ReparacionesComponent implements OnInit, OnDestroy {
         this.cargando.set(false);
       },
     });
+  }
+
+  togglePanel(): void {
+    this.panelVisible.update((v) => !v);
   }
 
   toggleFechaManual(): void {
