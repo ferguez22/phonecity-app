@@ -5,7 +5,7 @@ import { RouterLink } from '@angular/router';
 
 import { LineaService, LineaPayload } from '../../core/services/linea.service';
 import { Linea } from '../../core/models/linea.model';
-import { getEtiqueta } from '../../core/estados/estados';
+import { getEtiqueta, estadoActualDef } from '../../core/estados/estados';
 
 interface TimerCard {
   linea: Linea;
@@ -13,6 +13,9 @@ interface TimerCard {
   vencido: boolean;
   texto: string;
   color: string;
+  estadoId: string;
+  estadoLabel: string;
+  estadoColor: string;
 }
 
 interface Confirmacion {
@@ -20,8 +23,16 @@ interface Confirmacion {
   objetivo: string;
   objetivoLabel: string;
   estadoLabel: string;
-  yaEnReparar: boolean;
+  yaTieneTimer: boolean;
+  fueraDeTimer: boolean;
 }
+
+const ESTADOS_TIMER = ['reparar', 'pedir_pieza_movil', 'pieza_pedida_movil'];
+const ESTADO_TIMER_LABEL: Record<string, string> = {
+  reparar: 'Reparar',
+  pedir_pieza_movil: 'Pedir pieza',
+  pieza_pedida_movil: 'Pieza pedida',
+};
 
 @Component({
   selector: 'app-reparaciones',
@@ -41,6 +52,8 @@ export class ReparacionesComponent implements OnInit, OnDestroy {
   readonly guardando = signal(false);
   readonly error = signal<string | null>(null);
   readonly confirmacion = signal<Confirmacion | null>(null);
+  readonly confirmacionQuitar = signal<Linea | null>(null);
+  readonly filtroEstado = signal<string | null>(null);
   readonly mostrarFechaManual = signal(false);
   readonly panelVisible = signal(true);
   readonly getEtiqueta = getEtiqueta;
@@ -69,15 +82,36 @@ export class ReparacionesComponent implements OnInit, OnDestroy {
       .map((l) => {
         const objetivo = this.parseFecha(l.fecha_recogida_prevista as string).getTime();
         const restanteMs = objetivo - ahora;
+        const def = estadoActualDef(l);
+        const estadoId = def?.id ?? '';
         return {
           linea: l,
           restanteMs,
           vencido: restanteMs <= 0,
           texto: this.formatRestante(restanteMs),
           color: this.colorPara(restanteMs / 60000),
+          estadoId,
+          estadoLabel: ESTADO_TIMER_LABEL[estadoId] ?? getEtiqueta(l),
+          estadoColor: def?.color ?? '#ccc',
         };
       })
       .sort((a, b) => a.restanteMs - b.restanteMs);
+  });
+
+  readonly cardsFiltradas = computed<TimerCard[]>(() => {
+    const f = this.filtroEstado();
+    const cs = this.cards();
+    return f ? cs.filter((c) => c.estadoId === f) : cs;
+  });
+
+  readonly estadosPresentes = computed(() => {
+    const vistos = new Map<string, { id: string; label: string; color: string }>();
+    for (const c of this.cards()) {
+      if (!vistos.has(c.estadoId)) {
+        vistos.set(c.estadoId, { id: c.estadoId, label: c.estadoLabel, color: c.estadoColor });
+      }
+    }
+    return [...vistos.values()];
   });
 
   ngOnInit(): void {
@@ -92,9 +126,9 @@ export class ReparacionesComponent implements OnInit, OnDestroy {
   cargar(): void {
     this.cargando.set(true);
     this.error.set(null);
-    this.lineaSvc.list({ flujo: 'reparacion', fase: 'por_reparar' }).subscribe({
+    this.lineaSvc.list({ movil_en_tienda: true }).subscribe({
       next: (data) => {
-        this.lineas.set(data);
+        this.lineas.set(data.filter((l) => this.esEstadoTimer(l)));
         this.cargando.set(false);
       },
       error: () => {
@@ -110,6 +144,15 @@ export class ReparacionesComponent implements OnInit, OnDestroy {
 
   toggleFechaManual(): void {
     this.mostrarFechaManual.update((v) => !v);
+  }
+
+  private esEstadoTimer(l: Linea): boolean {
+    const def = estadoActualDef(l);
+    return !!def && ESTADOS_TIMER.includes(def.id);
+  }
+
+  toggleFiltroEstado(id: string): void {
+    this.filtroEstado.update((f) => (f === id ? null : id));
   }
 
   onLineaIdInput(v: string): void {
@@ -155,7 +198,8 @@ export class ReparacionesComponent implements OnInit, OnDestroy {
           objetivo,
           objetivoLabel: this.fmtLegible(objetivo),
           estadoLabel: getEtiqueta(linea),
-          yaEnReparar: linea.flujo === 'reparacion' && linea.fase === 'por_reparar',
+          yaTieneTimer: !!linea.fecha_recogida_prevista,
+          fueraDeTimer: !this.esEstadoTimer(linea),
         });
       },
       error: () => {
@@ -169,13 +213,6 @@ export class ReparacionesComponent implements OnInit, OnDestroy {
     const c = this.confirmacion();
     if (!c) return;
     const payload: LineaPayload = {
-      flujo: 'reparacion',
-      fase: 'por_reparar',
-      avisado: 0,
-      movil_en_tienda: 1,
-      subtipo: null,
-      taller: null,
-      proveedor_id: null,
       fecha_recogida_prevista: c.objetivo,
     };
     this.guardando.set(true);
@@ -199,11 +236,22 @@ export class ReparacionesComponent implements OnInit, OnDestroy {
     this.confirmacion.set(null);
   }
 
-  quitarTimer(linea: Linea): void {
+  pedirQuitarTimer(linea: Linea): void {
+    this.confirmacionQuitar.set(linea);
+  }
+
+  cancelarQuitar(): void {
+    this.confirmacionQuitar.set(null);
+  }
+
+  confirmarQuitarTimer(): void {
+    const linea = this.confirmacionQuitar();
+    if (!linea) return;
     this.guardando.set(true);
     this.lineaSvc.update(linea.id, { fecha_recogida_prevista: null }).subscribe({
       next: (updated) => {
         this.lineas.update((c) => c.map((l) => (l.id === linea.id ? { ...l, ...updated } : l)));
+        this.confirmacionQuitar.set(null);
         this.guardando.set(false);
       },
       error: (err) => {
