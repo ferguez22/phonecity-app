@@ -150,6 +150,7 @@
                 }
                 <span class="tc-tiempo">{{ card.texto }}</span>
               </div>
+                <div class="tc-fecha-entrega">{{ fmtFechaCard(card.linea.fecha_recogida_prevista) }}</div>
 
             <button type="button" class="btn btn-sm tc-quitar" [disabled]="guardando()" (click)="pedirQuitarTimer(card.linea)">
                 Quitar temporizador
