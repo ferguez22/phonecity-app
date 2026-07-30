@@ -78,7 +78,7 @@
 
     textarea {
 width: 100%;
-height: 60vh;
+height: 52vh;
 border: 1px solid #ced4da;
 border-radius: 6px;
 padding: 8px 10px;
@@ -94,4 +94,25 @@ resize: vertical;
     gap: 8px;
     padding: 12px 18px;
     border-top: 1px solid #e9ecef;
+}
+
+.pm-bloque-accion {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.pm-badge {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #198754;
+    white-space: nowrap;
+}
+
+.pm-pend {
+    font-size: 0.78rem;
+    color: #6c757d;
+    white-space: nowrap;
 }

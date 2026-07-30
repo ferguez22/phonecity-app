@@ -4,9 +4,17 @@ import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ApiResponse } from '../models/api-response.model';
 
+export type GrupoPedido = 'wephone' | 'apokin' | 'piezas';
+
 export interface PedidoPendientes {
-  bloques: { wephone: string; apokin: string; piezas: string };
-  ids: { wephone: number[]; apokin: number[]; piezas: number[] };
+  bloques: Record<GrupoPedido, string>;
+  conteos: Record<GrupoPedido, number>;
+}
+
+export interface MarcadoResultado {
+  grupo: string;
+  actualizadas: number;
+  detalle: Partial<Record<GrupoPedido, number>>;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -20,9 +28,9 @@ export class PedidosService {
       .pipe(map((r) => r.data));
   }
 
-  marcarPedido(ids: number[]): Observable<{ actualizadas: number }> {
+  marcarPedido(grupo: GrupoPedido | 'todos'): Observable<MarcadoResultado> {
     return this.http
-      .post<ApiResponse<{ actualizadas: number }>>(`${this.base}/marcar-pedido`, { ids })
+      .post<ApiResponse<MarcadoResultado>>(`${this.base}/marcar-pedido`, { grupo })
       .pipe(map((r) => r.data));
   }
 }
