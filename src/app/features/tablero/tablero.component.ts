@@ -17,6 +17,7 @@ import { ConsultaTallerModalComponent } from '../consulta-taller-modal/consulta-
 import { AvisarModalComponent } from '../avisar-modal/avisar-modal.component';
 
 import { Cliente } from '../../core/models/cliente.model';
+import { normalizar } from '../../core/utils/texto.util';
 import { ESTADO_OPTIONS, EstadoDef, esEstadoActual, getColor, getEtiqueta, etiquetaHistorialCompleta, estadoActualDef, siguientesDe, mensajeWhatsapp, tieneMensajeEspecifico} from '../../core/estados/estados';
 
 interface Boton { label: string; filtros: LineaFiltros; filtroClient?: (l: Linea) => boolean; aplicaHistorial?: boolean; fasesHistorial?: string[];}
@@ -67,12 +68,30 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
   private toastTimer: ReturnType<typeof setTimeout> | null = null;
   private resizeObs: ResizeObserver | null = null;
   private readonly busq$ = new Subject<string>();
+  private readonly busqueda$ = new Subject<string>();
+  private readonly cacheIndice = new WeakMap<Linea, string>();
+  private indiceDe(l: Linea): string {
+    const cacheado = this.cacheIndice.get(l);
+    if (cacheado !== undefined) return cacheado;
+    const texto = normalizar([
+      l.id,
+      l.modelo,
+      l.cliente_nombre,
+      l.cliente_telefono,
+      l.problema_o_pieza,
+      l.notas,
+      l.importe,
+      getEtiqueta(l),
+    ].filter((v) => v !== null && v !== undefined && v !== '').join(' '));
+    this.cacheIndice.set(l, texto);
+    return texto;
+  }
 
   readonly lineas = signal<Linea[]>([]);
   readonly cargando = signal(false);
   readonly error = signal<string | null>(null);
   readonly busqueda = signal('');
-  readonly botonActivo = signal('Todo');
+  readonly busquedaAplicada = signal('');
   readonly proveedores = signal<Proveedor[]>([]);
   readonly estadoOptions = ESTADO_OPTIONS;
   readonly guardando = signal(false);
@@ -96,6 +115,7 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly mostrarNuevoCliente = signal(false);
   readonly nuevoNombre = signal('');
   readonly nuevoTel = signal('');
+  readonly botonActivo = signal('Todo');
 
   readonly botones: Boton[] = [
     { label: 'Todo', filtros: {} },
@@ -143,22 +163,13 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
     const est = this.estadoActivo();
     return est?.id === 'reparado_avisado' || est?.id === 'no_reparable_avisado';
   });
-  
 
   readonly lineasFiltradas = computed(() => {
-    const q = this.busqueda().toLowerCase().trim();
+    const q = normalizar(this.busquedaAplicada());
     if (!q) return this.lineas();
-    return this.lineas().filter((l) =>
-      String(l.id).includes(q) ||
-      l.modelo?.toLowerCase().includes(q) ||
-      l.cliente_nombre?.toLowerCase().includes(q) ||
-      l.cliente_telefono?.includes(q) ||
-      l.problema_o_pieza?.toLowerCase().includes(q) ||
-      l.notas?.toLowerCase().includes(q) ||
-      String(l.importe ?? '').includes(q) ||
-      getEtiqueta(l).toLowerCase().includes(q),
-    );
+    return this.lineas().filter((l) => this.indiceDe(l).includes(q));
   });
+  
   readonly total = computed(() => this.lineasFiltradas().length);
 
   readonly mostrarDivisor = computed(() => {
@@ -183,8 +194,20 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     return out;
   });
+
   getColor = getColor;
   getEtiqueta = getEtiqueta;
+
+  onBuscar(q: string): void {
+    this.busqueda.set(q);
+    this.busqueda$.next(q);
+  }
+
+  limpiarBusqueda(): void {
+    this.busqueda.set('');
+    this.busquedaAplicada.set('');
+    this.busqueda$.next('');
+  }
 
   ngOnInit(): void {
     this.cargar();
@@ -192,6 +215,10 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
     this.busq$
       .pipe(debounceTime(300), distinctUntilChanged(), switchMap((q) => this.clienteSvc.buscar(q)))
       .subscribe((res) => this.resultClientes.set(res));
+
+    this.busqueda$
+      .pipe(debounceTime(150), distinctUntilChanged())
+      .subscribe((q) => this.busquedaAplicada.set(q));
   }
 
   ngAfterViewInit(): void {
@@ -212,7 +239,7 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
     this.filtrosActivos = boton.filtros;
     this.botonActivo.set(boton.label);
     this.estadoActivo.set(null);
-    this.busqueda.set('');
+    this.limpiarBusqueda();
     this.expandedId.set(null);
     this.cargar();
   }
@@ -221,7 +248,7 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
     this.filtrosActivos = {};
     this.botonActivo.set('');
     this.estadoActivo.set(est);
-    this.busqueda.set('');
+    this.limpiarBusqueda();
     this.expandedId.set(null);
     this.cargar();
   }
@@ -661,7 +688,7 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
     if (e.key === 'Escape') {
       if (this.ajustesAbierto()) this.ajustesAbierto.set(false);
       else if (this.expandedId() !== null) this.expandedId.set(null);
-      else if (this.busqueda()) this.busqueda.set('');
+      else if (this.busqueda()) this.limpiarBusqueda();
     }
   }
 
@@ -676,8 +703,7 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private proveedorIdPorNombre(nombre?: string | null): number | null {
     if (!nombre) return null;
-    const norm = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-    const p = this.proveedores().find((x) => norm(x.nombre) === norm(nombre));
+    const p = this.proveedores().find((x) => normalizar(x.nombre) === normalizar(nombre));
     return p ? p.id : null;
   }
 }

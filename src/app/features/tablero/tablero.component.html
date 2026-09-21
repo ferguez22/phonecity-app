@@ -60,7 +60,7 @@
   <div class="controles-bar px-3 py-2 d-flex flex-wrap gap-2 align-items-center">
     <input #busquedaInput type="text" class="form-control form-control-sm busqueda"
       placeholder="Buscar L-id, modelo, cliente, teléfono...   ( / )" [ngModel]="busqueda()"
-      (ngModelChange)="busqueda.set($event)" />
+            (ngModelChange)="onBuscar($event)" />
   </div>
 
   <div class="botones-bar px-3 pb-2 d-flex gap-2 align-items-center">
@@ -200,7 +200,7 @@
                 </div>
                 <label class="campo campo-full">
                   <span>Notas</span>
-                  <textarea rows="2" [(ngModel)]="edNotas" name="edNotas"></textarea>
+                  <textarea rows="4" [(ngModel)]="edNotas" name="edNotas"></textarea>
                 </label>
               </section>
 

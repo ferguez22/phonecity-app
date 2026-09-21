@@ -137,7 +137,7 @@
               @for (h of historial(); track h.id) {
                 <tr>
                   <td class="text-nowrap small text-muted">{{ h.fecha | date:'dd/MM/yy HH:mm' }}</td>
-                  <td>{{ etiquetaFase(h) }}</td>
+                  <td>{{ etiquetaHistorial(h) }}</td>
                 </tr>
               }
             </tbody>
