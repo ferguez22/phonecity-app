@@ -71,13 +71,17 @@
 
     <!-- ── CLIENTE ───────────────────────────────────────── -->
     <div class="card mb-3">
-      <div class="card-header fw-semibold">Cliente</div>
-      <div class="card-body row g-3">
+      <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
+        <span>Cliente</span>
+        <button type="button" class="btn btn-sm btn-outline-primary" (click)="toggleNuevoCliente()">
+          {{ mostrarNuevoCliente() ? '✕ Cancelar' : '+ Cliente nuevo' }}
+        </button>
+      </div>      <div class="card-body row g-3">
 
         <div class="col-12 position-relative">
           <label class="form-label">Buscar cliente</label>
           <input type="text" class="form-control" [ngModel]="busqCliente()" (ngModelChange)="onBuscarCliente($event)"
-            name="busqCliente" placeholder="Nombre o teléfono..." />
+            name="busqCliente" placeholder="Nombre o teléfono..." autocomplete="off" />
           @if (clienteSelec()) {
           <small class="text-success">✓ {{ clienteSelec()!.nombre }} ({{ clienteSelec()!.telefono ?? 'sin tel.'
             }})</small>
@@ -91,12 +95,6 @@
             }
           </ul>
           }
-        </div>
-
-        <div class="col-12">
-          <button type="button" class="btn btn-sm btn-outline-primary" (click)="toggleNuevoCliente()">
-            {{ mostrarNuevoCliente() ? '✕ Cancelar' : '+ Cliente nuevo' }}
-          </button>
         </div>
 
         @if (mostrarNuevoCliente()) {
@@ -265,12 +263,17 @@
     </div>
 
     <div class="card mb-3">
-      <div class="card-header fw-semibold">Cliente</div>
-      <div class="card-body row g-3">
+      <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
+        <span>Cliente</span>
+        <button type="button" class="btn btn-sm btn-outline-primary" (click)="toggleNuevoCliente()">
+          {{ mostrarNuevoCliente() ? '✕ Cancelar' : '+ Cliente nuevo' }}
+        </button>
+      </div>
+            <div class="card-body row g-3">
         <div class="col-12 position-relative">
           <label class="form-label">Buscar cliente</label>
           <input type="text" class="form-control" [ngModel]="busqCliente()" (ngModelChange)="onBuscarCliente($event)"
-            name="busqCliente" placeholder="Nombre o teléfono..." />
+            name="busqCliente" placeholder="Nombre o teléfono..." autocomplete="off" />
           @if (clienteSelec()) {
           <small class="text-success">✓ {{ clienteSelec()!.nombre }} ({{ clienteSelec()!.telefono ?? 'sin tel.'
             }})</small>
@@ -285,11 +288,7 @@
           </ul>
           }
         </div>
-        <div class="col-12">
-          <button type="button" class="btn btn-sm btn-outline-primary" (click)="toggleNuevoCliente()">
-            {{ mostrarNuevoCliente() ? '✕ Cancelar' : '+ Cliente nuevo' }}
-          </button>
-        </div>
+
         @if (mostrarNuevoCliente()) {
         <div class="col-6">
           <input type="text" class="form-control" placeholder="Nombre *" [ngModel]="nuevoClienteNombre()"

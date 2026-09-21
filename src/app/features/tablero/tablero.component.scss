@@ -3,8 +3,12 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 // ── STICKY HEADER ──────────────────────────────────────────────
@@ -46,7 +50,9 @@
   font-size: 0.75rem;
   flex-shrink: 0;
 
-  &:hover { background: #e9ecef; }
+  &:hover {
+    background: #e9ecef;
+  }
 
   &.activo {
     background: #212529;
@@ -78,9 +84,13 @@
 }
 
 .fila-linea {
-  td { vertical-align: middle; }
+  td {
+    vertical-align: middle;
+  }
 
-  &:hover { filter: brightness(0.94); }
+  &:hover {
+    filter: brightness(0.94);
+  }
 
   &.expandida {
     filter: brightness(0.9);
@@ -116,7 +126,9 @@
   justify-content: center;
   transition: background 0.15s;
 
-  &:hover { background: #fff; }
+  &:hover {
+    background: #fff;
+  }
 }
 
 .chev {
@@ -147,7 +159,7 @@
   min-height: 0;
 }
 
-.detalle-panel>.panel-grid {
+.detalle-panel > .panel-grid {
   padding: 1rem 1.25rem;
 }
 
@@ -166,7 +178,9 @@
     grid-template-columns: 1.2fr 1fr;
     align-items: start;
   }
-  .panel-estado { grid-column: 1 / -1; }
+  .panel-estado {
+    grid-column: 1 / -1;
+  }
 }
 
 .panel-sec-title {
@@ -176,6 +190,19 @@
   letter-spacing: 0.07em;
   color: #8a93a0;
   margin-bottom: 0.5rem;
+}
+
+.panel-sec-title-accion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+
+  .btn {
+    text-transform: none;
+    letter-spacing: normal;
+    font-weight: 500;
+  }
 }
 
 // ── SELECTOR DE ESTADO ─────────────────────────────────────────
@@ -194,7 +221,9 @@
   cursor: pointer;
   white-space: nowrap;
   border-left: 4px solid var(--chip, #ccc);
-  transition: background 0.12s, box-shadow 0.12s;
+  transition:
+    background 0.12s,
+    box-shadow 0.12s;
 
   &:hover:not(:disabled) {
     background: #eef2f7;
@@ -208,7 +237,10 @@
     font-weight: 600;
   }
 
-  &:disabled { opacity: 0.6; cursor: default; }
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
 }
 
 // ── CAMPOS EDITABLES ───────────────────────────────────────────
@@ -224,7 +256,10 @@
   gap: 0.2rem;
   font-size: 0.78rem;
 
-  span { color: #6c757d; font-weight: 500; }
+  span {
+    color: #6c757d;
+    font-weight: 500;
+  }
 
   input,
   select,
@@ -247,7 +282,9 @@
 .campo-full {
   margin-top: 0.6rem;
 
-  textarea { resize: vertical; }
+  textarea {
+    resize: vertical;
+  }
 }
 
 // ── CLIENTE ────────────────────────────────────────────────────
@@ -291,7 +328,9 @@
     cursor: pointer;
     font-size: 0.82rem;
 
-    &:hover { background: #f0f4ff; }
+    &:hover {
+      background: #f0f4ff;
+    }
   }
 }
 
@@ -326,7 +365,9 @@
   border-bottom: 1px dotted #e3e3e3;
   font-size: 0.8rem;
 
-  &:last-child { border-bottom: none; }
+  &:last-child {
+    border-bottom: none;
+  }
 }
 
 .hist-fecha {
@@ -345,7 +386,6 @@
 }
 
 .tabla-lineas {
-
   .th-id,
   .td-id {
     min-width: 72px;
@@ -553,7 +593,9 @@
   cursor: pointer;
   white-space: nowrap;
   border-left: 4px solid var(--chip, #ccc);
-  transition: background 0.12s, box-shadow 0.12s;
+  transition:
+    background 0.12s,
+    box-shadow 0.12s;
 
   &:hover {
     background: #eef2f7;

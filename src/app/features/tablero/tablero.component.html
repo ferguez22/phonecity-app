@@ -205,10 +205,16 @@
               </section>
 
               <section class="panel-sec">
-                <div class="panel-sec-title">Cliente</div>
+                <div class="panel-sec-title panel-sec-title-accion">
+                  <span>Cliente</span>
+                  <button type="button" class="btn btn-sm btn-outline-primary" (click)="toggleNuevoCliente()">
+                    {{ mostrarNuevoCliente() ? 'Cancelar' : '+ Cliente nuevo' }}
+                  </button>
+                </div>
                 <div class="cliente-box">
                   <input type="text" class="cliente-search" placeholder="Buscar nombre o teléfono..."
-                    [ngModel]="busqCliente()" (ngModelChange)="onBuscarCliente($event)" name="busqCliente" />
+                    [ngModel]="busqCliente()" (ngModelChange)="onBuscarCliente($event)" name="busqCliente"
+                    autocomplete="off" />
                   @if (clienteSelec()) {
                   <small class="cliente-ok">✓ {{ clienteSelec()!.nombre }} ({{ clienteSelec()!.telefono ?? 'sin tel.'
                     }})</small>
@@ -220,10 +226,6 @@
                     }
                   </ul>
                   }
-
-                  <button type="button" class="btn btn-sm btn-outline-primary mt-2" (click)="toggleNuevoCliente()">
-                    {{ mostrarNuevoCliente() ? 'Cancelar' : '+ Cliente nuevo' }}
-                  </button>
 
                   @if (mostrarNuevoCliente()) {
                   <div class="cliente-nuevo">
