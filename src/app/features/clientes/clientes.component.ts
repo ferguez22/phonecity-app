@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ClienteService } from '../../core/services/cliente.service';
 import { Cliente } from '../../core/models/cliente.model';
+import { normalizar } from '../../core/utils/texto.util';
 
 @Component({
   selector: 'app-clientes',
@@ -14,6 +15,14 @@ import { Cliente } from '../../core/models/cliente.model';
 })
 export class ClientesComponent implements OnInit {
   private readonly clienteSvc = inject(ClienteService);
+  private readonly cacheIndice = new WeakMap<Cliente, string>();
+  private indiceDe(c: Cliente): string {
+    const cacheado = this.cacheIndice.get(c);
+    if (cacheado !== undefined) return cacheado;
+    const texto = normalizar(`${c.nombre} ${c.telefono ?? ''}`);
+    this.cacheIndice.set(c, texto);
+    return texto;
+  }
 
   readonly clientes = signal<Cliente[]>([]);
   readonly cargando = signal(false);
@@ -27,14 +36,9 @@ export class ClientesComponent implements OnInit {
   readonly ordenAsc = signal(true);
 
   readonly filtrados = computed(() => {
-    const q = this.busqueda().toLowerCase().trim();
+    const q = normalizar(this.busqueda());
     let lista = this.clientes();
-    if (q) {
-      lista = lista.filter((c) =>
-        c.nombre.toLowerCase().includes(q) ||
-        c.telefono?.includes(q),
-      );
-    }
+    if (q) lista = lista.filter((c) => this.indiceDe(c).includes(q));
     const campo = this.ordenCampo();
     const asc = this.ordenAsc() ? 1 : -1;
     return [...lista].sort((a, b) => {

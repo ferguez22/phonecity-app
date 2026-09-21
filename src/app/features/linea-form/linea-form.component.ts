@@ -5,10 +5,12 @@ import { CommonModule } from '@angular/common';
 import { debounceTime, distinctUntilChanged, Subject, switchMap } from 'rxjs';
 
 import { LineaService, LineaPayload } from '../../core/services/linea.service';
-import { ESTADOS_ENTRADA } from '../../core/estados/estados';import { ClienteService } from '../../core/services/cliente.service';
+import { ESTADOS_ENTRADA } from '../../core/estados/estados';
+import { ClienteService } from '../../core/services/cliente.service';
 import { ProveedorService, Proveedor } from '../../core/services/proveedor.service';
 import { Linea, Flujo, Fase, TipoCobro } from '../../core/models/linea.model';
 import { Cliente } from '../../core/models/cliente.model';
+import { normalizar } from '../../core/utils/texto.util';
 
 @Component({
   selector: 'app-linea-form',
@@ -230,8 +232,7 @@ export class LineaFormComponent implements OnInit {
   }
 
   private proveedorIdPorNombre(nombre: string): number | null {
-    const norm = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-    const p = this.proveedores().find((x) => norm(x.nombre) === norm(nombre));
+    const p = this.proveedores().find((x) => normalizar(x.nombre) === normalizar(nombre));
     return p ? p.id : null;
   }
 
