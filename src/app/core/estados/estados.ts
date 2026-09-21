@@ -41,7 +41,7 @@ export const ESTADOS: EstadoDef[] = [
   { id: 'acc_en_tienda_wephone', label: 'Accesorio en tienda Avisado WEPHONE', flujo: 'accesorio', fase: 'en_tienda', avisado: true, movil_en_tienda: false, proveedor: 'Wephone', color: '#5FA0E0', siguientes: ['finalizado', 'cancelado'] },
   { id: 'no_reparable_avisado', label: 'No se puede reparar - avisado', flujo: 'reparacion', fase: 'no_reparable', avisado: true, movil_en_tienda: true, color: '#F3B6A4', siguientes: ['no_reparable_entregado', 'finalizado', 'cancelado'] },
   { id: 'no_reparable_entregado', label: 'No se puede Reparar - Entregado', flujo: 'reparacion', fase: 'no_reparable', avisado: true, movil_en_tienda: false, color: '#DD8770', siguientes: ['finalizado', 'cancelado'] },
-  { id: 'cancelado', label: 'Cancelado', flujo: 'reparacion', fase: 'cancelado', avisado: false, movil_en_tienda: false, color: '#D2CEC4', siguientes: [] },
+  { id: 'cancelado', label: 'Cancelado', flujo: 'reparacion', fase: 'cancelado', avisado: false, movil_en_tienda: false, color: '#D2CEC4', preservaFlujo: true, siguientes: [] },
   { id: 'compra', label: 'Compra de Dispositivo', flujo: 'venta', fase: 'entregado', avisado: false, movil_en_tienda: false, subtipo: 'compra', color: COLOR_COMPRA, esEntrada: true, ordenEntrada: 7, siguientes: ['cancelado'] },
   { id: 'venta', label: 'Venta de Dispositivo', flujo: 'venta', fase: 'entregado', avisado: false, movil_en_tienda: false, subtipo: 'venta', color: COLOR_VENTA, esEntrada: true, ordenEntrada: 6, siguientes: ['cancelado'] },
   { id: 'enviar_taller_phonestorm', label: 'Enviar a Taller - Phonestorm', flujo: 'reparacion', fase: 'por_enviar_taller', avisado: false, movil_en_tienda: true, taller: 'Phonestorm', color: '#D6D0F5', siguientes: ['enviado_taller_phonestorm', 'cancelado', 'finalizado'] },
@@ -64,16 +64,22 @@ function coincide(def: EstadoDef, l: Linea): boolean {
   return true;
 }
 
+function coincideTerminal(def: EstadoDef, l: Linea): boolean {
+  if (l.fase !== def.fase) return false;
+  if (def.fase === 'entregado' && l.flujo === 'venta') return false;
+  return true;
+}
+
 function matchEstado(l: Linea): EstadoDef | null {
   for (const def of ESTADOS) {
-    if (def.preservaFlujo) continue;
-    if (coincide(def, l)) return def;
+    const ok = def.preservaFlujo ? coincideTerminal(def, l) : coincide(def, l);
+    if (ok) return def;
   }
   return null;
 }
 
 export function esEstadoActual(def: EstadoDef, l: Linea): boolean {
-  if (def.preservaFlujo) return l.fase === 'entregado' && l.flujo !== 'venta';
+  if (def.preservaFlujo) return coincideTerminal(def, l);
   return coincide(def, l);
 }
 
@@ -113,7 +119,6 @@ export function getColor(l: Linea): string {
   if (l.flujo === 'reparacion' && (l.fase === 'por_enviar_taller' || l.fase === 'en_taller')) {
     return COLOR_TALLER;
   }
-  return '#FFFFFF';
   return '#FFFFFF';
 }
 
