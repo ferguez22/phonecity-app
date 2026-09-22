@@ -17,7 +17,7 @@ import { ConsultaTallerModalComponent } from '../consulta-taller-modal/consulta-
 import { AvisarModalComponent } from '../avisar-modal/avisar-modal.component';
 
 import { Cliente } from '../../core/models/cliente.model';
-import { normalizar } from '../../core/utils/texto.util';
+import { normalizar, soloDigitos } from '../../core/utils/texto.util';
 import { ESTADO_OPTIONS, EstadoDef, esEstadoActual, getColor, getEtiqueta, etiquetaHistorialCompleta, estadoActualDef, siguientesDe, mensajeWhatsapp, tieneMensajeEspecifico} from '../../core/estados/estados';
 
 interface Boton { label: string; filtros: LineaFiltros; filtroClient?: (l: Linea) => boolean; aplicaHistorial?: boolean; fasesHistorial?: string[];}
@@ -83,8 +83,10 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
       l.importe,
       getEtiqueta(l),
     ].filter((v) => v !== null && v !== undefined && v !== '').join(' '));
-    this.cacheIndice.set(l, texto);
-    return texto;
+    const digitos = soloDigitos(`${l.id} ${l.cliente_telefono ?? ''} ${l.importe ?? ''}`);
+    const completo = `${texto} ${digitos}`;
+    this.cacheIndice.set(l, completo);
+    return completo;
   }
 
   readonly lineas = signal<Linea[]>([]);
@@ -167,6 +169,13 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly lineasFiltradas = computed(() => {
     const q = normalizar(this.busquedaAplicada());
     if (!q) return this.lineas();
+    const qd = soloDigitos(q);
+    if (qd.length >= 3) {
+      return this.lineas().filter((l) => {
+        const idx = this.indiceDe(l);
+        return idx.includes(q) || idx.includes(qd);
+      });
+    }
     return this.lineas().filter((l) => this.indiceDe(l).includes(q));
   });
   
