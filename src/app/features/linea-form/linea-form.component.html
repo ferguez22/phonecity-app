@@ -71,47 +71,9 @@
 
     <!-- ── CLIENTE ───────────────────────────────────────── -->
     <div class="card mb-3">
-      <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
-        <span>Cliente</span>
-        <button type="button" class="btn btn-sm btn-outline-primary" (click)="toggleNuevoCliente()">
-          {{ mostrarNuevoCliente() ? '✕ Cancelar' : '+ Cliente nuevo' }}
-        </button>
-      </div>      <div class="card-body row g-3">
-
-        <div class="col-12 position-relative">
-          <label class="form-label">Buscar cliente</label>
-          <input type="text" class="form-control" [ngModel]="busqCliente()" (ngModelChange)="onBuscarCliente($event)"
-            name="busqCliente" placeholder="Nombre o teléfono..." autocomplete="off" />
-          @if (clienteSelec()) {
-          <small class="text-success">✓ {{ clienteSelec()!.nombre }} ({{ clienteSelec()!.telefono ?? 'sin tel.'
-            }})</small>
-          }
-          @if (resultClientes().length > 0) {
-          <ul class="dropdown-clientes list-group shadow-sm">
-            @for (c of resultClientes(); track c.id) {
-            <li class="list-group-item list-group-item-action" (click)="seleccionarCliente(c)">
-              {{ c.nombre }} — {{ c.telefono ?? 'sin tel.' }}
-            </li>
-            }
-          </ul>
-          }
-        </div>
-
-        @if (mostrarNuevoCliente()) {
-        <div class="col-6">
-          <input type="text" class="form-control" placeholder="Nombre *" [ngModel]="nuevoClienteNombre()"
-            (ngModelChange)="nuevoClienteNombre.set($event)" name="nuevoNombre" />
-        </div>
-        <div class="col-6">
-          <input type="tel" class="form-control" placeholder="Teléfono" [ngModel]="nuevoClienteTel()"
-            (ngModelChange)="nuevoClienteTel.set($event)" name="nuevoTel" />
-        </div>
-        <div class="col-12">
-          <button type="button" class="btn btn-sm btn-success" (click)="crearCliente()">
-            Crear y seleccionar
-          </button>
-        </div>
-        }
+      <div class="card-header fw-semibold">Cliente</div>
+      <div class="card-body">
+        <app-cliente-selector [cliente]="clienteSelec()" (clienteChange)="onClienteChange($event)" />
       </div>
     </div>
 
@@ -263,45 +225,9 @@
     </div>
 
     <div class="card mb-3">
-      <div class="card-header fw-semibold d-flex justify-content-between align-items-center">
-        <span>Cliente</span>
-        <button type="button" class="btn btn-sm btn-outline-primary" (click)="toggleNuevoCliente()">
-          {{ mostrarNuevoCliente() ? '✕ Cancelar' : '+ Cliente nuevo' }}
-        </button>
-      </div>
-            <div class="card-body row g-3">
-        <div class="col-12 position-relative">
-          <label class="form-label">Buscar cliente</label>
-          <input type="text" class="form-control" [ngModel]="busqCliente()" (ngModelChange)="onBuscarCliente($event)"
-            name="busqCliente" placeholder="Nombre o teléfono..." autocomplete="off" />
-          @if (clienteSelec()) {
-          <small class="text-success">✓ {{ clienteSelec()!.nombre }} ({{ clienteSelec()!.telefono ?? 'sin tel.'
-            }})</small>
-          }
-          @if (resultClientes().length > 0) {
-          <ul class="dropdown-clientes list-group shadow-sm">
-            @for (c of resultClientes(); track c.id) {
-            <li class="list-group-item list-group-item-action" (click)="seleccionarCliente(c)">
-              {{ c.nombre }} — {{ c.telefono ?? 'sin tel.' }}
-            </li>
-            }
-          </ul>
-          }
-        </div>
-
-        @if (mostrarNuevoCliente()) {
-        <div class="col-6">
-          <input type="text" class="form-control" placeholder="Nombre *" [ngModel]="nuevoClienteNombre()"
-            (ngModelChange)="nuevoClienteNombre.set($event)" name="nuevoNombre" />
-        </div>
-        <div class="col-6">
-          <input type="tel" class="form-control" placeholder="Teléfono" [ngModel]="nuevoClienteTel()"
-            (ngModelChange)="nuevoClienteTel.set($event)" name="nuevoTel" />
-        </div>
-        <div class="col-12">
-          <button type="button" class="btn btn-sm btn-success" (click)="crearCliente()">Crear y seleccionar</button>
-        </div>
-        }
+      <div class="card-header fw-semibold">Cliente</div>
+      <div class="card-body">
+        <app-cliente-selector [cliente]="clienteSelec()" (clienteChange)="onClienteChange($event)" />
       </div>
     </div>
 

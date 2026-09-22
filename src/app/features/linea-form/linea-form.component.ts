@@ -2,12 +2,12 @@ import { Component, OnInit, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { debounceTime, distinctUntilChanged, Subject, switchMap } from 'rxjs';
 
 import { LineaService, LineaPayload } from '../../core/services/linea.service';
 import { ESTADOS_ENTRADA } from '../../core/estados/estados';
 import { ClienteService } from '../../core/services/cliente.service';
 import { ProveedorService, Proveedor } from '../../core/services/proveedor.service';
+import { ClienteSelectorComponent } from '../cliente-selector/cliente-selector.component';
 import { Linea, Flujo, Fase, TipoCobro } from '../../core/models/linea.model';
 import { Cliente } from '../../core/models/cliente.model';
 import { normalizar } from '../../core/utils/texto.util';
@@ -15,7 +15,7 @@ import { normalizar } from '../../core/utils/texto.util';
 @Component({
   selector: 'app-linea-form',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ClienteSelectorComponent],
   templateUrl: './linea-form.component.html',
   styleUrl: './linea-form.component.scss',
 })
@@ -23,7 +23,6 @@ export class LineaFormComponent implements OnInit {
   private readonly route     = inject(ActivatedRoute);
   private readonly router    = inject(Router);
   private readonly lineaSvc  = inject(LineaService);
-  private readonly clienteSvc = inject(ClienteService);
   private readonly proveedorSvc = inject(ProveedorService);
 
   // Modo
@@ -39,13 +38,8 @@ export class LineaFormComponent implements OnInit {
   readonly proveedores = signal<Proveedor[]>([]);
 
   // Busqueda de cliente
-  readonly busqCliente   = signal('');
-  readonly resultClientes = signal<Cliente[]>([]);
-  readonly clienteSelec  = signal<Cliente | null>(null);
-  readonly mostrarNuevoCliente = signal(false);
-  readonly nuevoClienteNombre  = signal('');
-  readonly nuevoClienteTel     = signal('');
-  private readonly busq$ = new Subject<string>();
+  // Cliente
+  readonly clienteSelec = signal<Cliente | null>(null);
 
   // --- CAMPOS DEL FORMULARIO ---
   flujo: Flujo = 'reparacion';
@@ -113,8 +107,6 @@ export class LineaFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.cargarProveedores();
-    this.configurarBusquedaCliente();
-
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
       this.modoEdicion.set(true);
@@ -134,16 +126,6 @@ export class LineaFormComponent implements OnInit {
       next: (p) => this.proveedores.set(p),
       error: () => {},
     });
-  }
-
-  private configurarBusquedaCliente(): void {
-    this.busq$
-      .pipe(
-        debounceTime(300),
-        distinctUntilChanged(),
-        switchMap((q) => this.clienteSvc.buscar(q)),
-      )
-      .subscribe((res) => this.resultClientes.set(res));
   }
 
   private cargarLinea(id: number): void {
@@ -173,7 +155,6 @@ export class LineaFormComponent implements OnInit {
             nombre: l.cliente_nombre,
             telefono: l.cliente_telefono,
           });
-          this.busqCliente.set(l.cliente_nombre);
         }
         this.cargando.set(false);
       },
@@ -184,34 +165,8 @@ export class LineaFormComponent implements OnInit {
     });
   }
 
-  onBuscarCliente(q: string): void {
-    this.busqCliente.set(q);
-    this.clienteSelec.set(null);
-    if (q.trim().length >= 2) this.busq$.next(q.trim());
-    else this.resultClientes.set([]);
-  }
-
-  seleccionarCliente(c: Cliente): void {
+  onClienteChange(c: Cliente | null): void {
     this.clienteSelec.set(c);
-    this.busqCliente.set(c.nombre);
-    this.resultClientes.set([]);
-  }
-
-  crearCliente(): void {
-    const nombre = this.nuevoClienteNombre().trim();
-    const tel    = this.nuevoClienteTel().trim();
-    if (!nombre) return;
-    this.clienteSvc.crear(nombre, tel).subscribe({
-      next: (c) => {
-        this.seleccionarCliente(c);
-        this.mostrarNuevoCliente.set(false);
-        this.nuevoClienteNombre.set('');
-        this.nuevoClienteTel.set('');
-      },
-      error: (err) => {
-        this.error.set(err?.error?.error?.message ?? 'Error al crear cliente');
-      },
-    });
   }
 
   onFlujoChange(): void {
@@ -234,10 +189,6 @@ export class LineaFormComponent implements OnInit {
   private proveedorIdPorNombre(nombre: string): number | null {
     const p = this.proveedores().find((x) => normalizar(x.nombre) === normalizar(nombre));
     return p ? p.id : null;
-  }
-
-  toggleNuevoCliente(): void {
-    this.mostrarNuevoCliente.update((v) => !v);
   }
 
   onSubmit(): void {

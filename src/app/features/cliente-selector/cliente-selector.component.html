@@ -1,0 +1,81 @@
+<div class="cs-wrap" (keydown)="onTecla($event)">
+
+    @if (seleccionado()) {
+    <div class="cs-elegido">
+        <span class="cs-check">✓</span>
+        <span class="cs-nombre">{{ seleccionado()!.nombre }}</span>
+        @if (seleccionado()!.telefono) {
+        <span class="cs-tel">{{ seleccionado()!.telefono }}</span>
+        } @else {
+        <span class="cs-sintel">sin teléfono</span>
+        }
+        <button type="button" class="cs-quitar" title="Quitar cliente" (click)="limpiar()">✕</button>
+    </div>
+    } @else if (modo() === 'creando') {
+    <div class="cs-crear">
+        <div class="cs-crear-head">Nuevo cliente</div>
+
+        <input #inputNombre type="text" class="cs-input" placeholder="Nombre"[(ngModel)]="nuevoNombre" name="csNuevoNombre" autocomplete="off"
+        (keydown.enter)="$event.preventDefault(); crear()" />
+
+        <input #inputTel type="tel" class="cs-input" placeholder="Teléfono (opcional)" [(ngModel)]="nuevoTel"
+            name="csNuevoTel" autocomplete="off" (keydown.enter)="$event.preventDefault(); crear()" />
+
+        @if (conflicto()) {
+        <div class="cs-conflicto">
+            <div class="cs-conflicto-txt">
+                Ese teléfono ya es de <strong>{{ conflicto()!.nombre }}</strong>
+            </div>
+            <div class="cs-conflicto-btns">
+                <button type="button" class="cs-btn cs-btn-ok" (click)="usarConflicto()">
+                    Usar {{ conflicto()!.nombre }}
+                </button>
+                <button type="button" class="cs-btn" (click)="descartarConflicto()">Revisar</button>
+            </div>
+        </div>
+        } @else if (error()) {
+        <div class="cs-error">{{ error() }}</div>
+        }
+
+        <div class="cs-crear-btns">
+            <button type="button" class="cs-btn" (click)="escapar()">Cancelar</button>
+            <button type="button" class="cs-btn cs-btn-ok" [disabled]="guardando()" (click)="crear()">
+                {{ guardando() ? 'Creando...' : 'Crear cliente' }}
+            </button>
+        </div>
+    </div>
+    } @else {
+    <div class="cs-buscar">
+        <input type="text" class="cs-input" placeholder="Buscar nombre o teléfono..." [ngModel]="texto()"
+            (ngModelChange)="onTexto($event)" name="csBusqueda" autocomplete="off" />
+
+        @if (abierto()) {
+        <ul class="cs-lista">
+            @if (buscando()) {
+            <li class="cs-estado">Buscando...</li>
+            } @else {
+            @for (c of resultados(); track c.id; let i = $index) {
+            <li class="cs-fila" [class.activa]="esActiva(i)" [attr.data-fila]="i" (mouseenter)="activo.set(i)"
+                (click)="seleccionar(c)">
+                <span class="cs-fila-nombre">{{ c.nombre }}</span>
+                <span class="cs-fila-tel">{{ c.telefono ?? 'sin teléfono' }}</span>
+            </li>
+            }
+
+            @if (resultados().length === 0) {
+            <li class="cs-estado">Sin coincidencias</li>
+            }
+
+            @if (puedeCrear()) {
+            <li class="cs-fila cs-fila-crear" [class.activa]="esCrearActiva()" [attr.data-fila]="resultados().length"
+                (mouseenter)="activo.set(resultados().length)" (click)="abrirCrear()">
+                + Crear cliente «{{ texto().trim() }}»
+            </li>
+            }
+            }
+        </ul>
+        }
+    </div>
+    }
+
+</div>

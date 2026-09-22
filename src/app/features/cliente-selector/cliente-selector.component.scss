@@ -1,0 +1,217 @@
+.cs-wrap {
+    position: relative;
+    font-size: 0.85rem;
+}
+
+.cs-input {
+    width: 100%;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 0.85rem;
+    background: #fff;
+
+    &:focus {
+        outline: none;
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.15);
+    }
+}
+
+// ── SELECCIONADO ───────────────────────────────────────────────
+.cs-elegido {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border: 1px solid #b7e0c4;
+    border-radius: 6px;
+    background: #f2fbf5;
+}
+
+.cs-check {
+    color: #198754;
+    font-weight: 700;
+}
+
+.cs-nombre {
+    font-weight: 600;
+    color: #212529;
+}
+
+.cs-tel {
+    color: #6c757d;
+    font-size: 0.8rem;
+}
+
+.cs-sintel {
+    color: #adb5bd;
+    font-size: 0.78rem;
+    font-style: italic;
+}
+
+.cs-quitar {
+    margin-left: auto;
+    border: none;
+    background: none;
+    color: #6c757d;
+    font-size: 0.9rem;
+    line-height: 1;
+    padding: 2px 4px;
+    cursor: pointer;
+    border-radius: 4px;
+
+    &:hover {
+        background: #e9ecef;
+        color: #dc3545;
+    }
+}
+
+// ── LISTA ──────────────────────────────────────────────────────
+.cs-buscar {
+    position: relative;
+}
+
+.cs-lista {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    z-index: 200;
+    list-style: none;
+    margin: 0;
+    padding: 4px;
+    max-height: 240px;
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+}
+
+.cs-fila {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+
+    &.activa {
+        background: #0d6efd;
+        color: #fff;
+    }
+
+    &.activa .cs-fila-tel {
+        color: rgba(255, 255, 255, 0.75);
+    }
+}
+
+.cs-fila-nombre {
+    font-weight: 500;
+}
+
+.cs-fila-tel {
+    margin-left: auto;
+    color: #6c757d;
+    font-size: 0.8rem;
+}
+
+.cs-fila-crear {
+    margin-top: 4px;
+    border-top: 1px solid #eceff2;
+    padding-top: 9px;
+    color: #0d6efd;
+    font-weight: 600;
+
+    &.activa {
+        color: #fff;
+    }
+}
+
+.cs-estado {
+    padding: 8px 10px;
+    color: #8a93a0;
+    font-size: 0.8rem;
+}
+
+// ── CREAR ──────────────────────────────────────────────────────
+.cs-crear {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px;
+    border: 1px solid #cfe0f8;
+    border-radius: 8px;
+    background: #f7faff;
+}
+
+.cs-crear-head {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #8a93a0;
+}
+
+.cs-crear-btns {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.cs-btn {
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    background: #fff;
+    padding: 5px 12px;
+    font-size: 0.82rem;
+    cursor: pointer;
+
+    &:hover {
+        background: #f1f3f5;
+    }
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: default;
+    }
+}
+
+.cs-btn-ok {
+    border-color: #198754;
+    background: #198754;
+    color: #fff;
+
+    &:hover {
+        background: #157347;
+    }
+}
+
+// ── CONFLICTO / ERROR ──────────────────────────────────────────
+.cs-conflicto {
+    border: 1px solid #ffe08a;
+    background: #fffaf0;
+    border-radius: 6px;
+    padding: 8px 10px;
+}
+
+.cs-conflicto-txt {
+    font-size: 0.82rem;
+    color: #664d03;
+    margin-bottom: 6px;
+}
+
+.cs-conflicto-btns {
+    display: flex;
+    gap: 8px;
+}
+
+.cs-error {
+    font-size: 0.82rem;
+    color: #b02a37;
+    background: #fdf1f2;
+    border: 1px solid #f5c2c7;
+    border-radius: 6px;
+    padding: 6px 10px;
+}
