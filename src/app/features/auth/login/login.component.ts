@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute , Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
@@ -13,14 +13,19 @@ import { AuthService } from '../../../core/services/auth.service';
 export class LoginComponent {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   nombreUsuario = '';
   password = '';
   readonly error = signal<string | null>(null);
   readonly cargando = signal(false);
+  readonly expirado = signal(
+    this.route.snapshot.queryParamMap.get('expirado') === '1',
+  );
 
   onSubmit(): void {
     this.error.set(null);
+    this.expirado.set(false);
     this.cargando.set(true);
 
     this.auth.login(this.nombreUsuario, this.password).subscribe({

@@ -2,7 +2,13 @@
   <div class="card shadow-sm login-card">
     <div class="card-body p-4">
       <h1 class="h4 mb-4 text-center">PhoneCity</h1>
-
+      
+      @if (expirado()) {
+      <div class="alert alert-info py-2">
+        Tu sesión ha caducado. Vuelve a iniciar sesión.
+      </div>
+      }
+      
       <form (ngSubmit)="onSubmit()">
         <div class="mb-3">
           <label class="form-label" for="usuario">Usuario</label>
