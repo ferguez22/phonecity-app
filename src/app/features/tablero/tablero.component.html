@@ -205,39 +205,8 @@
               </section>
 
               <section class="panel-sec">
-                <div class="panel-sec-title panel-sec-title-accion">
-                  <span>Cliente</span>
-                  <button type="button" class="btn btn-sm btn-outline-primary" (click)="toggleNuevoCliente()">
-                    {{ mostrarNuevoCliente() ? 'Cancelar' : '+ Cliente nuevo' }}
-                  </button>
-                </div>
-                <div class="cliente-box">
-                  <input type="text" class="cliente-search" placeholder="Buscar nombre o teléfono..."
-                    [ngModel]="busqCliente()" (ngModelChange)="onBuscarCliente($event)" name="busqCliente"
-                    autocomplete="off" />
-                  @if (clienteSelec()) {
-                  <small class="cliente-ok">✓ {{ clienteSelec()!.nombre }} ({{ clienteSelec()!.telefono ?? 'sin tel.'
-                    }})</small>
-                  }
-                  @if (resultClientes().length > 0) {
-                  <ul class="cliente-result">
-                    @for (c of resultClientes(); track c.id) {
-                    <li (click)="seleccionarCliente(c)">{{ c.nombre }} — {{ c.telefono ?? 'sin tel.' }}</li>
-                    }
-                  </ul>
-                  }
-
-                  @if (mostrarNuevoCliente()) {
-                  <div class="cliente-nuevo">
-                    <input type="text" placeholder="Nombre *" [ngModel]="nuevoNombre()"
-                      (ngModelChange)="nuevoNombre.set($event)" name="nuevoNombre" />
-                    <input type="tel" placeholder="Teléfono" [ngModel]="nuevoTel()"
-                      (ngModelChange)="nuevoTel.set($event)" name="nuevoTel" />
-                    <button type="button" class="btn btn-sm btn-success" (click)="crearCliente()">Crear y
-                      seleccionar</button>
-                  </div>
-                  }
-                </div>
+                <div class="panel-sec-title">Cliente</div>
+                <app-cliente-selector [cliente]="clienteSelec()" (clienteChange)="onClienteChange($event)" />
               </section>
 
               <section class="panel-sec">

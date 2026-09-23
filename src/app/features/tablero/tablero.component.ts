@@ -4,12 +4,12 @@ import JsBarcode from 'jsbarcode';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { trigger, transition, style, animate } from '@angular/animations';
-import { debounceTime, distinctUntilChanged, Subject, switchMap } from 'rxjs';
+import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 
 import { AuthService } from '../../core/services/auth.service';
 import { LineaService, LineaFiltros, LineaPayload } from '../../core/services/linea.service';
 import { HistorialService, EntradaHistorial } from '../../core/services/historial.service';
-import { ClienteService } from '../../core/services/cliente.service';
+import { ClienteSelectorComponent } from '../cliente-selector/cliente-selector.component';
 import { ProveedorService, Proveedor } from '../../core/services/proveedor.service';
 import { Linea, TipoCobro } from '../../core/models/linea.model';
 import { PedidoModalComponent } from '../pedido-modal/pedido-modal.component';
@@ -29,7 +29,7 @@ type FilaTablero =
 @Component({
   selector: 'app-tablero',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, PedidoModalComponent, ConsultaTallerModalComponent, AvisarModalComponent],
+  imports: [CommonModule, FormsModule, RouterLink, PedidoModalComponent, ConsultaTallerModalComponent, AvisarModalComponent, ClienteSelectorComponent],
   templateUrl: './tablero.component.html',
   styleUrl: './tablero.component.scss',
   animations: [
@@ -61,13 +61,11 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly auth = inject(AuthService);
   private readonly lineas$ = inject(LineaService);
   private readonly histSvc = inject(HistorialService);
-  private readonly clienteSvc = inject(ClienteService);
   private readonly proveedorSvc = inject(ProveedorService);
   private readonly router = inject(Router);
   private filtrosActivos: LineaFiltros = {};
   private toastTimer: ReturnType<typeof setTimeout> | null = null;
   private resizeObs: ResizeObserver | null = null;
-  private readonly busq$ = new Subject<string>();
   private readonly busqueda$ = new Subject<string>();
   private readonly cacheIndice = new WeakMap<Linea, string>();
   private indiceDe(l: Linea): string {
@@ -111,12 +109,8 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly panelHistorial = signal<EntradaHistorial[]>([]);
   readonly panelCargando = signal(false);
   readonly filasVacias = [0, 1, 2, 3, 4];
-  readonly busqCliente = signal('');
-  readonly resultClientes = signal<Cliente[]>([]);
+
   readonly clienteSelec = signal<Cliente | null>(null);
-  readonly mostrarNuevoCliente = signal(false);
-  readonly nuevoNombre = signal('');
-  readonly nuevoTel = signal('');
   readonly botonActivo = signal('Todo');
 
   readonly botones: Boton[] = [
@@ -221,10 +215,6 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void {
     this.cargar();
     this.proveedorSvc.list().subscribe({ next: (p) => this.proveedores.set(p), error: () => {} });
-    this.busq$
-      .pipe(debounceTime(300), distinctUntilChanged(), switchMap((q) => this.clienteSvc.buscar(q)))
-      .subscribe((res) => this.resultClientes.set(res));
-
     this.busqueda$
       .pipe(debounceTime(150), distinctUntilChanged())
       .subscribe((q) => this.busquedaAplicada.set(q));
@@ -320,17 +310,11 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
     this.edRecogida = linea.fecha_recogida_prevista ?? '';
     this.edNotas = linea.notas ?? '';
 
-    if (linea.cliente_nombre) {
+      if (linea.cliente_nombre) {
       this.clienteSelec.set({ id: linea.cliente_id!, nombre: linea.cliente_nombre, telefono: linea.cliente_telefono });
-      this.busqCliente.set(linea.cliente_nombre);
     } else {
       this.clienteSelec.set(null);
-      this.busqCliente.set('');
     }
-    this.resultClientes.set([]);
-    this.mostrarNuevoCliente.set(false);
-    this.nuevoNombre.set('');
-    this.nuevoTel.set('');
 
     this.panelHistorial.set([]);
     this.panelCargando.set(true);
@@ -390,34 +374,8 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  onBuscarCliente(q: string): void {
-    this.busqCliente.set(q);
-    this.clienteSelec.set(null);
-    if (q.trim().length >= 2) this.busq$.next(q.trim());
-    else this.resultClientes.set([]);
-  }
-
-  seleccionarCliente(c: Cliente): void {
+  onClienteChange(c: Cliente | null): void {
     this.clienteSelec.set(c);
-    this.busqCliente.set(c.nombre);
-    this.resultClientes.set([]);
-  }
-
-  toggleNuevoCliente(): void { this.mostrarNuevoCliente.update((v) => !v); }
-
-  crearCliente(): void {
-    const nombre = this.nuevoNombre().trim();
-    const tel = this.nuevoTel().trim();
-    if (!nombre) return;
-    this.clienteSvc.crear(nombre, tel).subscribe({
-      next: (c) => {
-        this.seleccionarCliente(c);
-        this.mostrarNuevoCliente.set(false);
-        this.nuevoNombre.set('');
-        this.nuevoTel.set('');
-      },
-      error: (err) => this.error.set(err?.error?.error?.message ?? 'Error al crear cliente'),
-    });
   }
 
   esEstadoActual(opt: EstadoDef, linea: Linea): boolean {

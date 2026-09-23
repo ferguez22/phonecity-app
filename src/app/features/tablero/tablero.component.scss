@@ -287,68 +287,6 @@
   }
 }
 
-// ── CLIENTE ────────────────────────────────────────────────────
-.cliente-box {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-  font-size: 0.82rem;
-}
-
-.cliente-search {
-  border: 1px solid #ced4da;
-  border-radius: 5px;
-  padding: 5px 8px;
-  font-size: 0.85rem;
-
-  &:focus {
-    outline: none;
-    border-color: #0d6efd;
-    box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.15);
-  }
-}
-
-.cliente-ok {
-  color: #198754;
-  font-weight: 500;
-}
-
-.cliente-result {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  border: 1px solid #e0e0e0;
-  border-radius: 5px;
-  max-height: 160px;
-  overflow-y: auto;
-  background: #fff;
-
-  li {
-    padding: 5px 9px;
-    cursor: pointer;
-    font-size: 0.82rem;
-
-    &:hover {
-      background: #f0f4ff;
-    }
-  }
-}
-
-.cliente-nuevo {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-  margin-top: 0.3rem;
-
-  input {
-    border: 1px solid #ced4da;
-    border-radius: 5px;
-    padding: 4px 8px;
-    font-size: 0.85rem;
-    flex: 1 1 130px;
-  }
-}
-
 // ── HISTORIAL ──────────────────────────────────────────────────
 .historial-list {
   display: flex;
