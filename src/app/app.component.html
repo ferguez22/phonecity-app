@@ -1,1 +1,8 @@
+@if (conexion.caida()) {
+<div class="banda-offline">
+    <span class="banda-texto">⚠ No se puede conectar con el servidor</span>
+    <button type="button" class="banda-btn" (click)="conexion.reintentar()">Reintentar</button>
+</div>
+}
+
 <router-outlet />
