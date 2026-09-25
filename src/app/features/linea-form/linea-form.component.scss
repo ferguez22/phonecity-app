@@ -1,12 +1,207 @@
-.dropdown-clientes {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  z-index: 100;
-  max-height: 200px;
-  overflow-y: auto;
-  border-radius: 0 0 4px 4px;
+// ── BANDA DE ESTADOS ───────────────────────────────────────────
+.estados-banda {
+  --tinte: #ffffff;
 
-  li { cursor: pointer; font-size: 0.85rem; }
+  background: var(--tinte);
+  padding: 14px 20px;
+  transition: --tinte 300ms ease;
+}
+
+@property --tinte {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: #ffffff;
+}
+
+.estados-titulo {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #8a93a0;
+  margin-bottom: 8px;
+}
+
+.estados-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.estado-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 62px;
+  padding: 8px 6px;
+  border: 1px solid var(--color-estado, #ced4da);
+  border-radius: 10px;
+  background: #fff;
+  color: #343a40;
+  font-size: 0.76rem;
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: center;
+  cursor: pointer;
+    box-shadow: 0 5px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.08);
+    transition: background 160ms ease, border-color 160ms ease, transform 120ms ease,
+      box-shadow 160ms ease;
+  
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.16), 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+  
+    &:active {
+      transform: translateY(0);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.14);
+    }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.35);
+  }
+
+  &.activa {
+    border-width: 3px;
+    font-weight: 700;
+    background: var(--color-estado, #fff);
+  }
+
+    &.activa {
+      border-width: 3px;
+      font-weight: 700;
+      background: var(--color-estado, #fff);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18), 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+}
+
+.estado-check {
+  font-size: 0.8rem;
+  line-height: 1;
+  color: #212529;
+}
+
+// ── FORMULARIO TEÑIDO ──────────────────────────────────────────
+.form-zona {
+  --tinte: #ffffff;
+
+  background: linear-gradient(180deg, var(--tinte) 0%, #ffffff 65vh);
+  min-height: calc(100vh - 160px);
+  transition: --tinte 300ms ease;
+}
+
+// ── FORMULARIO DE ALTA ─────────────────────────────────────────
+.form-alta {
+  --color-activo: #0d6efd;
+
+  .card {
+    position: relative;
+    border: none;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 14px rgba(0, 0, 0, 0.06);
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--color-activo);
+    transition: background 300ms ease;
+  }
+
+  .card-header {
+    border: none;
+    background: transparent;
+    padding: 14px 18px 0;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #8a93a0;
+  }
+
+  .card-body {
+    padding: 12px 18px 18px;
+  }
+
+  .form-label {
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: #6c757d;
+    margin-bottom: 4px;
+  }
+
+  .form-control {
+    border: 1px solid #dde1e6;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    transition: border-color 140ms ease, box-shadow 140ms ease;
+
+    &:focus {
+      border-color: var(--color-activo);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-activo) 40%, transparent);
+    }
+  }
+
+  textarea.form-control {
+    border-radius: 10px;
+  }
+
+  .btn-primary {
+    border: none;
+    border-radius: 9px;
+    padding: 8px 22px;
+    font-weight: 600;
+    color: #1f2328;
+    background: var(--color-activo);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.14);
+    transition: background 300ms ease, transform 120ms ease, box-shadow 160ms ease;
+
+    &:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 5px 14px rgba(0, 0, 0, 0.18);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.16);
+    }
+  }
+
+  .btn-outline-secondary {
+    border-radius: 9px;
+    padding: 8px 18px;
+  }
+}
+
+// ── RESPONSIVE ─────────────────────────────────────────────────
+@media (max-width: 991px) {
+  .estados-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 575px) {
+  .estados-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .estados-banda {
+    padding: 12px 12px;
+  }
+
+  .estado-card {
+    min-height: 56px;
+    font-size: 0.72rem;
+  }
 }

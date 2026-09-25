@@ -1,10 +1,10 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
 import { LineaService, LineaPayload } from '../../core/services/linea.service';
-import { ESTADOS_ENTRADA } from '../../core/estados/estados';
+import { ESTADOS_ENTRADA, EstadoDef } from '../../core/estados/estados';
 import { ClienteService } from '../../core/services/cliente.service';
 import { ProveedorService, Proveedor } from '../../core/services/proveedor.service';
 import { ClienteSelectorComponent } from '../cliente-selector/cliente-selector.component';
@@ -60,8 +60,41 @@ export class LineaFormComponent implements OnInit {
   fecha_retorno_taller = '';
 
   readonly estadosEntrada = ESTADOS_ENTRADA;
-  estadoEntradaId = ESTADOS_ENTRADA[0]?.id ?? 'reparar';
+  readonly estadoEntradaId = signal(ESTADOS_ENTRADA[0]?.id ?? 'reparar');
   subtipo: 'venta' | 'compra' | null = null;
+
+  readonly defActivo = computed(
+    () => this.estadosEntrada.find((e) => e.id === this.estadoEntradaId()) ?? null,
+  );
+
+  readonly tinte = computed(() => this.diluir(this.defActivo()?.color ?? '#FFFFFF'));
+  
+  esClaro(color: string): boolean {
+    const { r, g, b } = this.aRgb(color);
+    const croma = Math.max(r, g, b) - Math.min(r, g, b);
+    return croma < 20;
+  }
+
+  seleccionarEstado(def: EstadoDef): void {
+    this.estadoEntradaId.set(def.id);
+    this.aplicarEstadoEntrada();
+  }
+
+  private aRgb(hex: string): { r: number; g: number; b: number } {
+    const h = hex.replace('#', '');
+    return {
+      r: parseInt(h.substring(0, 2), 16),
+      g: parseInt(h.substring(2, 4), 16),
+      b: parseInt(h.substring(4, 6), 16),
+    };
+  }
+
+  private diluir(hex: string): string {
+    const FUERZA = 0.80;
+    const { r, g, b } = this.aRgb(hex);
+    const mezcla = (c: number) => Math.round(c + (255 - c) * (1 - FUERZA));
+    return `rgb(${mezcla(r)}, ${mezcla(g)}, ${mezcla(b)})`;
+  }
 
   // Opciones de selects
   readonly flujos: { val: Flujo; label: string }[] = [
@@ -175,7 +208,7 @@ export class LineaFormComponent implements OnInit {
   }
 
   aplicarEstadoEntrada(): void {
-    const def = this.estadosEntrada.find((e) => e.id === this.estadoEntradaId);
+    const def = this.defActivo();
     if (!def) return;
     this.flujo = def.flujo;
     this.fase = def.fase;

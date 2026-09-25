@@ -5,11 +5,29 @@
   <button class="btn btn-sm btn-outline-light" (click)="volver()">← Volver</button>
 </nav>
 
-<div class="container py-4" style="max-width:720px">
+@if (!modoEdicion()) {
+<div class="estados-banda" [style.--tinte]="tinte()">
+  <div class="estados-titulo">Estado inicial</div>
+  <div class="estados-grid">
+    @for (e of estadosEntrada; track e.id) {
+    <button type="button" class="estado-card" [class.activa]="estadoEntradaId() === e.id"
+      [class.claro]="esClaro(e.color)" [style.--color-estado]="e.color" (click)="seleccionarEstado(e)">
+      @if (estadoEntradaId() === e.id) {
+      <span class="estado-check">✓</span>
+      }
+      <span>{{ e.label }}</span>
+    </button>
+    }
+  </div>
+</div>
+}
 
-  <!--------------------------------------------------------------------------------->
+<div class="form-zona" [style.--tinte]="modoEdicion() ? '#ffffff' : tinte()">
+  <div class="container py-4" style="max-width:720px">
 
-  @if (modoEdicion()) {
+    <!--------------------------------------------------------------------------------->
+
+    @if (modoEdicion()) {
 
   <form (ngSubmit)="onSubmit()">
     <!-- ── TIPO ───────────────────────────────────────────── -->
@@ -189,23 +207,11 @@
   </form>
 
   } @else {
-
-  <form (ngSubmit)="onSubmit()">
-
+  
+  <form class="form-alta" [style.--color-activo]="defActivo()?.color ?? '#0d6efd'" (ngSubmit)="onSubmit()">
+  
     <div class="card mb-3">
-      <div class="card-header fw-semibold">Estado inicial</div>
-      <div class="card-body">
-        <select class="form-select" [(ngModel)]="estadoEntradaId" name="estadoEntradaId"
-          (ngModelChange)="aplicarEstadoEntrada()">
-          @for (e of estadosEntrada; track e.id) {
-          <option [value]="e.id">{{ e.label }}</option>
-          }
-        </select>
-      </div>
-    </div>
-
-    <div class="card mb-3">
-      <div class="card-header fw-semibold">Datos</div>
+      <div class="card-header fw-semibold">Datos</div>      
       <div class="card-body row g-3">
         <div class="col-12">
           <label class="form-label">Modelo</label>
@@ -249,4 +255,5 @@
     </div>
   </form>
   }
+</div>
 </div>
