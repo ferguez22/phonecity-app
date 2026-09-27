@@ -447,10 +447,34 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
   esEstadoActual(opt: EstadoDef, linea: Linea): boolean {
     return esEstadoActual(opt, linea);
   }
-
+// Tweak para tener los dias de antiguedad y duracion de cada entrada del historial de la linea. Para un vistazo rapido
   etiquetaHistorial(h: EntradaHistorial): string {
     return etiquetaHistorialCompleta(h);
   }
+
+  duracionHist(i: number): string {
+    const hs = this.panelHistorial();
+    const sig = hs[i + 1];
+    if (!sig) return '';
+    const d = this.diasEntre(hs[i].fecha, sig.fecha);
+    return d === 0 ? '<1d' : `${d}d`;
+  }
+
+  antiguedadHist(i: number): string {
+    const hs = this.panelHistorial();
+    const h = hs[i];
+    if (!h) return '';
+    const d = this.diasEntre(h.fecha, new Date().toISOString());
+    return d === 0 ? 'hoy' : `hace ${d}d`;
+  }
+
+  private diasEntre(a: unknown, b: unknown): number {
+    const ta = new Date(String(a).replace(' ', 'T')).getTime();
+    const tb = new Date(String(b).replace(' ', 'T')).getTime();
+    if (Number.isNaN(ta) || Number.isNaN(tb)) return 0;
+    return Math.max(0, Math.floor((tb - ta) / 86_400_000));
+  }
+  // fin de Tweark para tener los dias de.....
   
   diasDesde(fecha: string): number {
     return Math.floor((Date.now() - new Date(fecha).getTime()) / 86_400_000);
@@ -705,7 +729,8 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
     } else d = new Date(fecha);
     if (isNaN(d.getTime())) return fecha;
     const meses = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
-    return `${d.getDate()} DE ${meses[d.getMonth()]} DE ${d.getFullYear()}`;
+    const dias = ['DOMINGO', 'LUNES', 'MARTES', 'MIÉRCOLES', 'JUEVES', 'VIERNES', 'SÁBADO'];
+    return `${dias[d.getDay()]} ${d.getDate()} DE ${meses[d.getMonth()]} DE ${d.getFullYear()}`;
   }
 
   @HostListener('document:keydown', ['$event'])

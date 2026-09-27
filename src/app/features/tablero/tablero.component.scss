@@ -398,6 +398,32 @@
   white-space: nowrap;
 }
 
+.hist-txt {
+  flex: 1;
+}
+
+.hist-dur {
+  flex-shrink: 0;
+  padding: 0 6px;
+  border-radius: 10px;
+  background: #eef2f7;
+  color: #495057;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.hist-edad {
+  flex-shrink: 0;
+  min-width: 62px;
+  text-align: right;
+  color: #adb5bd;
+  font-size: 0.74rem;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
 // ── ACCIONES ───────────────────────────────────────────────────
 .panel-acciones {
   display: flex;
