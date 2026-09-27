@@ -89,7 +89,7 @@
 .form-zona {
   --tinte: #ffffff;
 
-  background: linear-gradient(180deg, var(--tinte) 0%, #ffffff 65vh);
+  background: linear-gradient(180deg, var(--tinte) 0%, #eef0f3 65vh);
   min-height: calc(100vh - 160px);
   transition: --tinte 300ms ease;
 }
@@ -101,21 +101,12 @@
   .card {
     position: relative;
     border: none;
+    border-top: 6px solid var(--color-activo);
     border-radius: 14px;
-    overflow: hidden;
+    transition: border-color 300ms ease;
     background: #fff;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 14px rgba(0, 0, 0, 0.06);
-  }
-
-  .card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: var(--color-activo);
-    transition: background 300ms ease;
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.10), 0 6px 20px rgba(0, 0, 0, 0.12),
+        0 0 0 2px rgba(0, 0, 0, 0.05);
   }
 
   .card-header {

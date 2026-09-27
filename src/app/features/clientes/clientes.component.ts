@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ClienteService } from '../../core/services/cliente.service';
 import { Cliente } from '../../core/models/cliente.model';
-import { normalizar } from '../../core/utils/texto.util';
+import { normalizar, soloDigitos } from '../../core/utils/texto.util';
 
 @Component({
   selector: 'app-clientes',
@@ -19,7 +19,7 @@ export class ClientesComponent implements OnInit {
   private indiceDe(c: Cliente): string {
     const cacheado = this.cacheIndice.get(c);
     if (cacheado !== undefined) return cacheado;
-    const texto = normalizar(`${c.nombre} ${c.telefono ?? ''}`);
+    const texto = `${normalizar(`${c.nombre} ${c.telefono ?? ''}`)} ${soloDigitos(c.telefono)}`;
     this.cacheIndice.set(c, texto);
     return texto;
   }
@@ -38,7 +38,12 @@ export class ClientesComponent implements OnInit {
   readonly filtrados = computed(() => {
     const q = normalizar(this.busqueda());
     let lista = this.clientes();
-    if (q) lista = lista.filter((c) => this.indiceDe(c).includes(q));
+    if (q) {
+      const qd = soloDigitos(q);
+      lista = qd.length >= 3
+        ? lista.filter((c) => { const i = this.indiceDe(c); return i.includes(q) || i.includes(qd); })
+        : lista.filter((c) => this.indiceDe(c).includes(q));
+    }
     const campo = this.ordenCampo();
     const asc = this.ordenAsc() ? 1 : -1;
     return [...lista].sort((a, b) => {
