@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ClienteService } from '../../core/services/cliente.service';
 import { Cliente } from '../../core/models/cliente.model';
-import { normalizar, soloDigitos } from '../../core/utils/texto.util';
+import { normalizar, soloDigitos, terminosDe, casaTodos } from '../../core/utils/texto.util';
 
 @Component({
   selector: 'app-clientes',
@@ -36,13 +36,10 @@ export class ClientesComponent implements OnInit {
   readonly ordenAsc = signal(true);
 
   readonly filtrados = computed(() => {
-    const q = normalizar(this.busqueda());
+    const terminos = terminosDe(this.busqueda());
     let lista = this.clientes();
-    if (q) {
-      const qd = soloDigitos(q);
-      lista = qd.length >= 3
-        ? lista.filter((c) => { const i = this.indiceDe(c); return i.includes(q) || i.includes(qd); })
-        : lista.filter((c) => this.indiceDe(c).includes(q));
+    if (terminos.length > 0) {
+      lista = lista.filter((c) => casaTodos(this.indiceDe(c), terminos));
     }
     const campo = this.ordenCampo();
     const asc = this.ordenAsc() ? 1 : -1;
