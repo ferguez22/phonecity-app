@@ -8,7 +8,7 @@ import { ESTADOS_ENTRADA, EstadoDef } from '../../core/estados/estados';
 import { ClienteService } from '../../core/services/cliente.service';
 import { ProveedorService, Proveedor } from '../../core/services/proveedor.service';
 import { ClienteSelectorComponent } from '../cliente-selector/cliente-selector.component';
-import { Linea, Flujo, Fase, TipoCobro } from '../../core/models/linea.model';
+import { Linea, Flujo, Fase, TipoCobro, Pieza } from '../../core/models/linea.model';
 import { Cliente } from '../../core/models/cliente.model';
 import { normalizar } from '../../core/utils/texto.util';
 
@@ -48,6 +48,7 @@ export class LineaFormComponent implements OnInit {
   movil_en_tienda = false;
   modelo       = '';
   problema_o_pieza = '';
+  piezas: Pieza[] = [{ descripcion: '', importe: null }];
   notas        = '';
   importe: number | null = null;
   tipo_cobro: TipoCobro = 'normal';
@@ -137,6 +138,67 @@ export class LineaFormComponent implements OnInit {
   get fases() { return this.fasesPorFlujo[this.flujo]; }
   get esPieza()      { return this.flujo === 'pieza' || this.flujo === 'accesorio'; }
   get esReparacion() { return this.flujo === 'reparacion'; }
+
+  get etiquetaPiezas(): string {
+    if (this.flujo === 'pieza')     return 'Piezas';
+    if (this.flujo === 'accesorio') return 'Accesorios';
+    if (this.flujo === 'venta')     return 'Artículos';
+    return 'Problema';
+  }
+
+  get totalPiezas(): number | null {
+    let hay = false;
+    let suma = 0;
+    for (const p of this.piezas) {
+      const n = Number(p.importe);
+      if (p.importe !== null && p.importe !== undefined && String(p.importe) !== '' && !Number.isNaN(n)) {
+        hay = true;
+        suma += n;
+      }
+    }
+    return hay ? Math.round(suma * 100) / 100 : null;
+  }
+
+  anadirPieza(): void {
+    this.piezas.push({ descripcion: '', importe: null });
+    this.focoEnPieza(this.piezas.length - 1);
+  }
+
+  quitarPieza(i: number): void {
+    if (this.piezas.length === 1) {
+      this.piezas[0] = { descripcion: '', importe: null };
+      return;
+    }
+    this.piezas.splice(i, 1);
+  }
+
+  onEnterPieza(ev: Event, i: number): void {
+    ev.preventDefault();
+    if (i < this.piezas.length - 1) {
+      this.focoEnPieza(i + 1);
+      return;
+    }
+    if (!(this.piezas[i].descripcion ?? '').trim()) return;
+    this.anadirPieza();
+  }
+
+  private focoEnPieza(i: number): void {
+    setTimeout(() => {
+      document.querySelector<HTMLInputElement>(`[data-pieza-alta="${i}"]`)?.focus();
+    });
+  }
+
+  private piezasLimpias(): Pieza[] {
+    return this.piezas
+      .map((p, i) => ({
+        descripcion: (p.descripcion ?? '').trim(),
+        importe: p.importe === null || p.importe === undefined || String(p.importe) === ''
+          ? null
+          : Number(p.importe),
+        orden: i,
+      }))
+      .filter((p) => p.descripcion !== '');
+  }
 
   ngOnInit(): void {
     this.cargarProveedores();
@@ -233,9 +295,7 @@ export class LineaFormComponent implements OnInit {
       avisado:   this.avisado as any,
       movil_en_tienda: this.movil_en_tienda as any,
       modelo:    this.modelo || null,
-      problema_o_pieza: this.problema_o_pieza || null,
       notas:     this.notas || null,
-      importe:   this.importe,
       tipo_cobro: this.tipo_cobro,
       fecha_entrada: this.fecha_entrada || null,
       fecha_pedido:  this.fecha_pedido || null,
@@ -247,6 +307,13 @@ export class LineaFormComponent implements OnInit {
       subtipo: this.subtipo,
       cliente_id: this.clienteSelec()?.id ?? null,
     };
+
+    if (this.modoEdicion()) {
+      payload.problema_o_pieza = this.problema_o_pieza || null;
+      payload.importe = this.importe;
+    } else {
+      payload.piezas = this.piezasLimpias();
+    }
 
     this.guardando.set(true);
     this.error.set(null);

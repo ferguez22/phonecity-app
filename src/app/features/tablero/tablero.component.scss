@@ -287,7 +287,92 @@
   }
 }
 
+// ── EDITOR DE PIEZAS ───────────────────────────────────────────
+.piezas-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.pieza-fila {
+  display: grid;
+  grid-template-columns: 1fr 100px 28px;
+  gap: 5px;
+  align-items: center;
+}
+
+.pieza-imp {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.pieza-quitar {
+  width: 28px;
+  height: 28px;
+  border: 1px solid #dde1e6;
+  border-radius: 5px;
+  background: #fff;
+  color: #adb5bd;
+  font-size: 0.78rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+
+  &:hover {
+    background: #fff1f2;
+    border-color: #f2c2c7;
+    color: #d6455d;
+  }
+}
+
+.piezas-pie {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.pieza-anadir {
+  border: 1px dashed #ccd2d9;
+  border-radius: 5px;
+  background: #fff;
+  color: #6c757d;
+  font-size: 0.76rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  cursor: pointer;
+  transition: border-color 0.12s, color 0.12s, background 0.12s;
+
+  &:hover {
+    border-color: #0d6efd;
+    color: #343a40;
+    background: #fbfcfd;
+  }
+}
+
+.pieza-total {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+
+  span {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #8a93a0;
+  }
+
+  strong {
+    font-size: 0.98rem;
+    color: #1f2328;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
 // ── HISTORIAL ──────────────────────────────────────────────────
+
 .historial-list {
   display: flex;
   flex-direction: column;

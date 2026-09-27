@@ -219,19 +219,35 @@
             placeholder="ej. iPhone 11, Redmi 13C..." />
         </div>
         <div class="col-12">
-          <label class="form-label">Problema / Pieza</label>
-          <input type="text" class="form-control" [(ngModel)]="problema_o_pieza" name="problema_o_pieza"
-            placeholder="ej. Pantalla, Batería..." />
+          <label class="form-label">{{ etiquetaPiezas }}</label>
+        
+          <div class="piezas-lista">
+            @for (p of piezas; track p) {
+            <div class="pieza-fila">
+              <input type="text" class="form-control pieza-desc" [(ngModel)]="p.descripcion"
+                [ngModelOptions]="{ standalone: true }" [attr.data-pieza-alta]="$index" placeholder="ej. Pantalla, Batería..."
+                (keydown.enter)="onEnterPieza($event, $index)" />
+              <input type="number" class="form-control pieza-imp" [(ngModel)]="p.importe"
+                [ngModelOptions]="{ standalone: true }" min="0" step="0.01" placeholder="€" />
+              <button type="button" class="pieza-quitar" tabindex="-1" (click)="quitarPieza($index)"
+                aria-label="Quitar">✕</button>
+            </div>
+            }
+          </div>
+        
+          <div class="piezas-pie">
+            <button type="button" class="pieza-anadir" (click)="anadirPieza()">+ Añadir</button>
+            <div class="pieza-total">
+              <span>Total</span>
+              <strong>{{ totalPiezas != null ? (totalPiezas | number:'1.2-2') + ' €' : '—' }}</strong>
+            </div>
+          </div>
         </div>
-        <div class="col-6">
-          <label class="form-label">Importe (€)</label>
-          <input type="number" class="form-control" [(ngModel)]="importe" name="importe" min="0" step="0.01" />
         </div>
-      </div>
-    </div>
-
-    <div class="card mb-3">
-      <div class="card-header fw-semibold">Cliente</div>
+        </div>
+        
+        <div class="card mb-3">
+          <div class="card-header fw-semibold">Cliente</div>
       <div class="card-body">
         <app-cliente-selector [cliente]="clienteSelec()" (clienteChange)="onClienteChange($event)" />
       </div>

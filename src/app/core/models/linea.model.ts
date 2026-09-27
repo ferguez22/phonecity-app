@@ -15,6 +15,14 @@ export type Fase =
 export type TipoCobro = 'normal' | 'garantia' | 'presupuesto_taller';
 export type Taller = 'Phonestorm' | 'Infotec';
 
+export interface Pieza {
+  id?: number;
+  linea_id?: number;
+  descripcion: string;
+  importe: number | null;
+  orden?: number;
+}
+
 export interface Linea {
   id: number;
   tienda_id: number;
@@ -39,6 +47,9 @@ export interface Linea {
   cliente_id: number | null;
   linea_origen_id: number | null;
   subtipo: 'venta' | 'compra' | null;
+
+  // Solo llega en getById; los listados no las adjuntan por peso
+  piezas?: Pieza[];
   
   // Flag solo presente con incluir_historial=true (0/1 desde MariaDB)
   es_historico?: number;

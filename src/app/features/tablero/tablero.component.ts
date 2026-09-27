@@ -5,17 +5,15 @@ import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
-
 import { AuthService } from '../../core/services/auth.service';
 import { LineaService, LineaFiltros, LineaPayload } from '../../core/services/linea.service';
 import { HistorialService, EntradaHistorial } from '../../core/services/historial.service';
 import { ClienteSelectorComponent } from '../cliente-selector/cliente-selector.component';
 import { ProveedorService, Proveedor } from '../../core/services/proveedor.service';
-import { Linea, TipoCobro } from '../../core/models/linea.model';
+import { Linea, TipoCobro, Pieza } from '../../core/models/linea.model';
 import { PedidoModalComponent } from '../pedido-modal/pedido-modal.component';
 import { ConsultaTallerModalComponent } from '../consulta-taller-modal/consulta-taller-modal.component';
 import { AvisarModalComponent } from '../avisar-modal/avisar-modal.component';
-
 import { Cliente } from '../../core/models/cliente.model';
 import { normalizar, soloDigitos, terminosDe, casaTodos } from '../../core/utils/texto.util';
 import { ESTADO_OPTIONS, EstadoDef, esEstadoActual, getColor, getEtiqueta, etiquetaHistorialCompleta, estadoActualDef, siguientesDe, mensajeWhatsapp, tieneMensajeEspecifico} from '../../core/estados/estados';
@@ -50,8 +48,7 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('busquedaInput') busquedaInput!: ElementRef<HTMLInputElement>;
   
   edModelo = '';
-  edProblema = '';
-  edImporte: number | null = null;
+  edPiezas: Pieza[] = [{ descripcion: '', importe: null }];
   edTipoCobro: TipoCobro = 'normal';
   edFechaEntrada = '';
   edRecogida = '';
@@ -108,6 +105,7 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly divisorModo = signal<'todos' | 'solo_todo' | 'off'>(this.leerDivisorModo());
   readonly panelHistorial = signal<EntradaHistorial[]>([]);
   readonly panelCargando = signal(false);
+  readonly edPiezasCargando = signal(false);
   readonly filasVacias = [0, 1, 2, 3, 4];
 
   readonly clienteSelec = signal<Cliente | null>(null);
@@ -296,8 +294,6 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
 
 
     this.edModelo = linea.modelo ?? '';
-    this.edProblema = linea.problema_o_pieza ?? '';
-    this.edImporte = linea.importe;
     this.edTipoCobro = linea.tipo_cobro;
     this.edFechaEntrada = linea.fecha_entrada ?? '';
     this.edRecogida = linea.fecha_recogida_prevista ?? '';
@@ -308,6 +304,23 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
     } else {
       this.clienteSelec.set(null);
     }
+
+    this.edPiezas = [{ descripcion: linea.problema_o_pieza ?? '', importe: linea.importe }];
+    this.edPiezasCargando.set(true);
+    this.lineas$.getById(linea.id).subscribe({
+      next: (l) => {
+        if (this.expandedId() !== linea.id) return;
+        const ps = l.piezas ?? [];
+        this.edPiezas = ps.length
+          ? ps.map((p) => ({
+              descripcion: p.descripcion,
+              importe: p.importe === null || p.importe === undefined ? null : Number(p.importe),
+            }))
+          : [{ descripcion: l.problema_o_pieza ?? '', importe: l.importe }];
+        this.edPiezasCargando.set(false);
+      },
+      error: () => this.edPiezasCargando.set(false),
+    });
 
     this.panelHistorial.set([]);
     this.panelCargando.set(true);
@@ -346,11 +359,71 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  etiquetaPiezasDe(linea: Linea): string {
+    if (linea.flujo === 'pieza')     return 'Piezas';
+    if (linea.flujo === 'accesorio') return 'Accesorios';
+    if (linea.flujo === 'venta')     return 'Artículos';
+    return 'Problema';
+  }
+
+  get totalEdPiezas(): number | null {
+    let hay = false;
+    let suma = 0;
+    for (const p of this.edPiezas) {
+      const n = Number(p.importe);
+      if (p.importe !== null && p.importe !== undefined && String(p.importe) !== '' && !Number.isNaN(n)) {
+        hay = true;
+        suma += n;
+      }
+    }
+    return hay ? Math.round(suma * 100) / 100 : null;
+  }
+
+  anadirEdPieza(): void {
+    this.edPiezas.push({ descripcion: '', importe: null });
+    this.focoEnEdPieza(this.edPiezas.length - 1);
+  }
+
+  quitarEdPieza(i: number): void {
+    if (this.edPiezas.length === 1) {
+      this.edPiezas[0] = { descripcion: '', importe: null };
+      return;
+    }
+    this.edPiezas.splice(i, 1);
+  }
+
+  onEnterEdPieza(ev: Event, i: number): void {
+    ev.preventDefault();
+    if (i < this.edPiezas.length - 1) {
+      this.focoEnEdPieza(i + 1);
+      return;
+    }
+    if (!(this.edPiezas[i].descripcion ?? '').trim()) return;
+    this.anadirEdPieza();
+  }
+
+  private focoEnEdPieza(i: number): void {
+    setTimeout(() => {
+      document.querySelector<HTMLInputElement>(`[data-pieza-panel="${i}"]`)?.focus();
+    });
+  }
+
+  private edPiezasLimpias(): Pieza[] {
+    return this.edPiezas
+      .map((p, i) => ({
+        descripcion: (p.descripcion ?? '').trim(),
+        importe: p.importe === null || p.importe === undefined || String(p.importe) === ''
+          ? null
+          : Number(p.importe),
+        orden: i,
+      }))
+      .filter((p) => p.descripcion !== '');
+  }
+
   guardarDatos(linea: Linea): void {
     const payload: LineaPayload = {
       modelo: this.edModelo || null,
-      problema_o_pieza: this.edProblema || null,
-      importe: this.edImporte,
+      piezas: this.edPiezasLimpias(),
       tipo_cobro: this.edTipoCobro,
       fecha_entrada: this.edFechaEntrada || null,
       fecha_recogida_prevista: this.edRecogida || null,
