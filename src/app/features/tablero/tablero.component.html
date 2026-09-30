@@ -249,10 +249,10 @@
                     : "—"
                 }}
               </td>
-              <td class="text-truncate col-pieza">
-                {{ linea.problema_o_pieza ?? "—" }}
-              </td>
-              <td class="text-truncate col-notas">{{ linea.notas ?? "—" }}</td>
+                  <td class="text-truncate col-pieza">@if (linea.num_piezas && linea.num_piezas > 1) {<span class="badge-multi"
+                      [title]="linea.num_piezas + ' piezas'">×{{ linea.num_piezas }}</span>}{{
+                    linea.problema_o_pieza ?? '—' }}</td>              
+                  <td class="text-truncate col-notas">{{ linea.notas ?? "—" }}</td>
               <td>
                 @if (linea.fecha_entrada) {
                   {{ diasDesde(linea.fecha_entrada) }}d

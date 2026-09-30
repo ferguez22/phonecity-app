@@ -50,6 +50,9 @@ export interface Linea {
 
   // Solo llega en getById; los listados no las adjuntan por peso
   piezas?: Pieza[];
+
+  // Contador calculado en el SQL del listado
+  num_piezas?: number;
   
   // Flag solo presente con incluir_historial=true (0/1 desde MariaDB)
   es_historico?: number;
