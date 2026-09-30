@@ -18,7 +18,7 @@
         <input #inputNombre type="text" class="cs-input" placeholder="Nombre"[(ngModel)]="nuevoNombre" name="csNuevoNombre" autocomplete="off"
         (keydown.enter)="$event.preventDefault(); crear()" />
 
-        <input #inputTel type="tel" class="cs-input" placeholder="Teléfono (opcional)" [(ngModel)]="nuevoTel"
+        <input #inputTel type="tel" class="cs-input" placeholder="Telefono" [(ngModel)]="nuevoTel"
             name="csNuevoTel" autocomplete="off" (keydown.enter)="$event.preventDefault(); crear()" />
 
         @if (conflicto()) {
