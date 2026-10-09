@@ -14,6 +14,7 @@ import { PedidoModalComponent } from '../pedido-modal/pedido-modal.component';
 import { ConsultaTallerModalComponent } from '../consulta-taller-modal/consulta-taller-modal.component';
 import { AvisarModalComponent } from '../avisar-modal/avisar-modal.component';
 import { TicketService } from '../../core/tickets/ticket.service';
+import { EtiquetaService } from '../../core/etiquetas/etiqueta.service';
 import { Cliente } from '../../core/models/cliente.model';
 import { normalizar, soloDigitos, terminosDe, casaTodos } from '../../core/utils/texto.util';
 import { ESTADO_OPTIONS, EstadoDef, esEstadoActual, getColor, getEtiqueta, etiquetaHistorialCompleta, estadoActualDef, siguientesDe, mensajeWhatsapp, tieneMensajeEspecifico} from '../../core/estados/estados';
@@ -61,7 +62,7 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly proveedorSvc = inject(ProveedorService);
   private readonly router = inject(Router);
   private readonly ticketSvc = inject(TicketService);
-  private filtrosActivos: LineaFiltros = {};
+  private readonly etiquetaSvc = inject(EtiquetaService);  private filtrosActivos: LineaFiltros = {};
   private toastTimer: ReturnType<typeof setTimeout> | null = null;
   private resizeObs: ResizeObserver | null = null;
   private readonly busqueda$ = new Subject<string>();
@@ -518,6 +519,16 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
 
   imprimirTicketSimple(linea: Linea): void {
     const err = this.ticketSvc.imprimirSimple(linea);
+    if (err) this.error.set(err);
+  }
+
+  imprimirEtiqueta(linea: Linea): void {
+    const err = this.etiquetaSvc.imprimirDispositivo(linea);
+    if (err) this.error.set(err);
+  }
+
+  imprimirEtiquetaEnvio(linea: Linea): void {
+    const err = this.etiquetaSvc.imprimirEnvio(linea);
     if (err) this.error.set(err);
   }
 
