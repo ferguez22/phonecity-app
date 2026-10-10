@@ -1,5 +1,6 @@
-export const ANCHO_MM = 50;
-export const ALTO_MM = 30;
+export const ANCHO_MM = 48;
+export const ALTO_MM = 28;
+const DESPLAZAR_Y_MM = 1;
 
 export const ESTILOS_ETIQUETA = `
   @page { size: ${ANCHO_MM}mm ${ALTO_MM}mm; margin: 0; }
@@ -8,6 +9,8 @@ export const ESTILOS_ETIQUETA = `
   body {
     width: ${ANCHO_MM}mm;
     height: ${ALTO_MM}mm;
+    transform: translateY(${DESPLAZAR_Y_MM}mm);
+    transform-origin: top left;
     font-family: Arial, Helvetica, sans-serif;
     color: #000;
     background: #fff;
