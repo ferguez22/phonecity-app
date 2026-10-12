@@ -1,4 +1,4 @@
-import { Linea } from '../models/linea.model';
+import { Linea, Pieza } from '../models/linea.model';
 import { ESTILOS_TICKET } from './ticket.estilos';
 
 export type TipoTicket = 'completo' | 'simple';
@@ -36,7 +36,13 @@ function fecha(valor: string | null): string {
   return d.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
 
-export function construirTicket(linea: Linea, tipo: TipoTicket, barcode: string): string {
+export function construirTicket(linea: Linea, tipo: TipoTicket, barcode: string, piezas: Pieza[] = []): string {
+  const bloquePiezas =
+    tipo === 'completo' && piezas.length > 0
+      ? `<div class="sec-titulo">PIEZAS DEVUELTAS AL CLIENTE:</div>` +
+        piezas.map((p) => `<p class="pieza-check">&#9744;&nbsp;&nbsp;${esc(p.descripcion)}</p>`).join('')
+      : '';
+
   const legales =
     tipo === 'completo'
       ? `<div class="cond-titulo">CONDICIONES DE REPARACIÓN</div>` +
@@ -68,6 +74,8 @@ export function construirTicket(linea: Linea, tipo: TipoTicket, barcode: string)
   <p class="dato">Problema: ${esc(linea.problema_o_pieza)}</p>
   <p class="dato">Precio: ${precio(linea.importe)}</p>
   <p class="dato">Fecha entrada: ${fecha(linea.fecha_entrada)}</p>
+
+  ${bloquePiezas}
 
   <div class="gracias">¡Gracias por confiar en nosotros!</div>
 

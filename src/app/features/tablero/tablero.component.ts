@@ -50,6 +50,7 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
   
   edModelo = '';
   edPiezas: Pieza[] = [{ descripcion: '', importe: null }];
+  piezasLinea: Pieza[] = [];
   edTipoCobro: TipoCobro = 'normal';
   edFechaEntrada = '';
   edRecogida = '';
@@ -80,7 +81,7 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
       l.importe,
       getEtiqueta(l),
     ].filter((v) => v !== null && v !== undefined && v !== '').join(' '));
-    const digitos = soloDigitos(`${l.id} ${l.cliente_telefono ?? ''} ${l.importe ?? ''}`);
+    const digitos = soloDigitos(`${l.id} ${l.cliente_telefono ?? ''} ${l.importe ?? ''} ${l.modelo ?? ''} ${l.notas ?? ''}`,);
     const completo = `${texto} ${digitos}`;
     this.cacheIndice.set(l, completo);
     return completo;
@@ -156,6 +157,8 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
   });
   
   readonly mostrarBotonAvisar = computed(() => {
+    const bt = this.botonActivo();
+    if (bt === 'Reparar + Avisado' || bt === 'No reparable') return true;
     const est = this.estadoActivo();
     return est?.id === 'reparado_avisado' || est?.id === 'no_reparable_avisado';
   });
@@ -308,11 +311,13 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     this.edPiezas = [{ descripcion: linea.problema_o_pieza ?? '', importe: linea.importe }];
+    this.piezasLinea = [];
     this.edPiezasCargando.set(true);
     this.lineas$.getById(linea.id).subscribe({
       next: (l) => {
         if (this.expandedId() !== linea.id) return;
         const ps = l.piezas ?? [];
+        this.piezasLinea = ps;
         this.edPiezas = ps.length
           ? ps.map((p) => ({
               descripcion: p.descripcion,
@@ -513,7 +518,7 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   imprimirTicket(linea: Linea): void {
-    const err = this.ticketSvc.imprimirCompleto(linea);
+    const err = this.ticketSvc.imprimirCompleto(linea, this.piezasLinea);
     if (err) this.error.set(err);
   }
 

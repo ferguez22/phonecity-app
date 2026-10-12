@@ -14,6 +14,7 @@ export const ESTILOS_TICKET = `
   .sec-titulo { font-size: 10px; font-weight: bold; letter-spacing: 1px; margin: 10px 0 4px; padding-bottom: 2px; border-bottom: 1px solid #000; }
   .dato { font-size: 13px; font-weight: bold; margin: 3px 0; }
   .gracias { font-size: 15px; font-weight: bold; text-align: center; margin: 12px 0; }
+  .pieza-check { font-size: 12px; font-weight: bold; margin: 5px 0; }
   .cond-titulo { font-size: 10px; font-weight: bold; text-align: center; letter-spacing: 1px; margin: 8px 0 4px; }
   .legal { font-size: 9px; text-align: justify; line-height: 1.4; margin: 4px 0; }
   .contacto { font-size: 11px; text-align: center; line-height: 1.6; margin: 2px 0; }

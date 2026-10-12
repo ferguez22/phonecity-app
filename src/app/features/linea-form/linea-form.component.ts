@@ -139,6 +139,10 @@ export class LineaFormComponent implements OnInit {
   get esPieza()      { return this.flujo === 'pieza' || this.flujo === 'accesorio'; }
   get esReparacion() { return this.flujo === 'reparacion'; }
 
+  get muestraRecogida(): boolean {
+    return this.flujo === 'reparacion' || (this.flujo === 'pieza' && this.movil_en_tienda);
+  }
+
   get etiquetaPiezas(): string {
     if (this.flujo === 'pieza')     return 'Piezas';
     if (this.flujo === 'accesorio') return 'Accesorios';
