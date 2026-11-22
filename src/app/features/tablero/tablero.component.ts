@@ -517,23 +517,23 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
     window.open(url, '_blank');
   }
 
-  imprimirTicket(linea: Linea): void {
-    const err = this.ticketSvc.imprimirCompleto(linea, this.piezasLinea);
+  async imprimirTicket(linea: Linea): Promise<void> {
+    const err = await this.ticketSvc.imprimirCompleto(linea, this.piezasLinea);
     if (err) this.error.set(err);
   }
 
-  imprimirTicketSimple(linea: Linea): void {
-    const err = this.ticketSvc.imprimirSimple(linea);
+  async imprimirTicketSimple(linea: Linea): Promise<void> {
+    const err = await this.ticketSvc.imprimirSimple(linea);
     if (err) this.error.set(err);
   }
 
-  imprimirEtiqueta(linea: Linea): void {
-    const err = this.etiquetaSvc.imprimirDispositivo(linea);
+  async imprimirEtiqueta(linea: Linea): Promise<void> {
+    const err = await this.etiquetaSvc.imprimirDispositivo(linea);
     if (err) this.error.set(err);
   }
 
-  imprimirEtiquetaEnvio(linea: Linea): void {
-    const err = this.etiquetaSvc.imprimirEnvio(linea);
+  async imprimirEtiquetaEnvio(linea: Linea): Promise<void> {
+    const err = await this.etiquetaSvc.imprimirEnvio(linea);
     if (err) this.error.set(err);
   }
 
