@@ -15,7 +15,7 @@
     } @else {
     <div class="lista">
       @for (l of lineas(); track l.id) {
-      <div class="fila" [class.hecho]="estaHecho(l)">
+      <div class="fila" [class.hecho]="estaHecho(l)" [style.background]="colorFila(l)">
         <input type="checkbox" class="chk" [checked]="estaHecho(l)" (change)="toggleMarcado(l)" />
         <div class="info">
           <div class="linea1">
@@ -23,6 +23,9 @@
             <span class="nombre">{{ l.cliente_nombre ?? 'TIENDA' }}</span>
             @if (etiquetaAviso(l); as et) {
             <span class="aviso-tag">{{ et }}</span>
+            }
+            @if (etiquetaPrimerAviso(l); as et1) {
+            <span class="aviso-tag primer">{{ et1 }}</span>
             }
           </div>
           <div class="linea2">{{ l.modelo ?? '—' }} · {{ l.cliente_telefono ?? 'sin tel.' }}</div>

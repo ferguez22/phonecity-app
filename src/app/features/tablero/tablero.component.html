@@ -585,7 +585,7 @@
 
 @if (avisarAbierto()) {
   <app-avisar-modal
-    [filtros]="filtrosAvisar()"
+    [modo]="modoAvisar()"
     (cerrado)="cerrarAvisar($event)"
   ></app-avisar-modal>
 }

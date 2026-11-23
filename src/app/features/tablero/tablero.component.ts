@@ -12,7 +12,7 @@ import { ProveedorService, Proveedor } from '../../core/services/proveedor.servi
 import { Linea, TipoCobro, Pieza } from '../../core/models/linea.model';
 import { PedidoModalComponent } from '../pedido-modal/pedido-modal.component';
 import { ConsultaTallerModalComponent } from '../consulta-taller-modal/consulta-taller-modal.component';
-import { AvisarModalComponent } from '../avisar-modal/avisar-modal.component';
+import { AvisarModalComponent, ModoAvisar } from '../avisar-modal/avisar-modal.component';
 import { TicketService } from '../../core/tickets/ticket.service';
 import { EtiquetaService } from '../../core/etiquetas/etiqueta.service';
 import { Cliente } from '../../core/models/cliente.model';
@@ -103,7 +103,7 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly pedidoAbierto = signal(false);
   readonly tallerAbierto = signal(false);
   readonly avisarAbierto = signal(false);
-  readonly filtrosAvisar = signal<LineaFiltros>({});
+  readonly modoAvisar = signal<ModoAvisar>('todos');
   readonly toastWa = signal<Linea | null>(null);
   readonly divisorModo = signal<'todos' | 'solo_todo' | 'off'>(this.leerDivisorModo());
   readonly panelHistorial = signal<EntradaHistorial[]>([]);
@@ -158,7 +158,7 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
   
   readonly mostrarBotonAvisar = computed(() => {
     const bt = this.botonActivo();
-    if (bt === 'Reparar + Avisado' || bt === 'No reparable') return true;
+    if (bt === 'Móviles en tienda' || bt === 'Reparar + Avisado' || bt === 'No reparable') return true;
     const est = this.estadoActivo();
     return est?.id === 'reparado_avisado' || est?.id === 'no_reparable_avisado';
   });
@@ -574,18 +574,13 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
 
   abrirAvisar(): void {
     const est = this.estadoActivo();
-    if (est) {
-      this.filtrosAvisar.set({
-        flujo: est.flujo,
-        fase: est.fase,
-        avisado: est.avisado,
-        movil_en_tienda: est.movil_en_tienda,
-      });
-    } else if (this.botonActivo() === 'Reparar + Avisado') {
-      this.filtrosAvisar.set({ flujo: 'reparacion', fase: 'reparado', avisado: true });
+    const bt = this.botonActivo();
+    if (est?.id === 'reparado_avisado' || bt === 'Reparar + Avisado') {
+      this.modoAvisar.set('reparado');
+    } else if (est?.id === 'no_reparable_avisado' || bt === 'No reparable') {
+      this.modoAvisar.set('no_reparable');
     } else {
-      const b = this.botones.find((x) => x.label === this.botonActivo());
-      this.filtrosAvisar.set(b ? { ...b.filtros } : {});
+      this.modoAvisar.set('todos');
     }
     this.avisarAbierto.set(true);
   }

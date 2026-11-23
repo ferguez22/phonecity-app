@@ -77,7 +77,6 @@
 
 .fila.hecho {
     opacity: .5;
-    background: #f3f5f7;
 }
 
 .chk {
@@ -116,6 +115,11 @@
     background: #e6f4ea;
     padding: 2px 8px;
     border-radius: 10px;
+}
+
+.aviso-tag.primer {
+    color: #374151;
+    background: rgba(255, 255, 255, .7);
 }
 
 .linea2 {

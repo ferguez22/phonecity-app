@@ -213,7 +213,7 @@ const PLANTILLAS_WA: Record<string, (l: Linea) => string> = {
 // Devuelve la clave de plantilla específica si el estado actual la tiene
 function claveMensaje(l: Linea): string | null {
   if (l.flujo === 'reparacion' && l.fase === 'reparado') return 'reparado';
-  if (l.flujo === 'reparacion' && l.fase === 'no_reparable' && !!l.avisado) return 'no_reparable';
+  if (l.flujo === 'reparacion' && l.fase === 'no_reparable') return 'no_reparable';
   if (l.flujo === 'pieza' && l.fase === 'en_tienda') return 'pieza_en_tienda';
   if (l.flujo === 'accesorio' && l.fase === 'en_tienda') return 'acc_en_tienda';
   return null;
