@@ -8,6 +8,7 @@ import { ESTADOS_ENTRADA, EstadoDef } from '../../core/estados/estados';
 import { ClienteService } from '../../core/services/cliente.service';
 import { ProveedorService, Proveedor } from '../../core/services/proveedor.service';
 import { ClienteSelectorComponent } from '../cliente-selector/cliente-selector.component';
+import { ClienteResumenComponent } from '../cliente-resumen/cliente-resumen.component';
 import { Linea, Flujo, Fase, TipoCobro, Pieza } from '../../core/models/linea.model';
 import { Cliente } from '../../core/models/cliente.model';
 import { normalizar } from '../../core/utils/texto.util';
@@ -15,7 +16,7 @@ import { normalizar } from '../../core/utils/texto.util';
 @Component({
   selector: 'app-linea-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, ClienteSelectorComponent],
+  imports: [CommonModule, FormsModule, ClienteSelectorComponent, ClienteResumenComponent],
   templateUrl: './linea-form.component.html',
   styleUrl: './linea-form.component.scss',
 })

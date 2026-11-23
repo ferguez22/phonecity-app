@@ -16,6 +16,7 @@ export interface LineaFiltros {
   subtipo?: string;    // ← añadir
   incluir_historial?: boolean;
   fases_historial?: string;
+  cliente_id?: number;
 }
 export type LineaPayload = Partial<Omit<Linea,
   'id' | 'cliente_nombre' | 'cliente_telefono' | 'credenciales_borradas'

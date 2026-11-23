@@ -258,6 +258,9 @@
           <div class="card-header fw-semibold">Cliente</div>
       <div class="card-body">
         <app-cliente-selector [cliente]="clienteSelec()" (clienteChange)="onClienteChange($event)" />
+        @if (clienteSelec(); as cli) {
+        <app-cliente-resumen [clienteId]="cli.id" />
+        }
       </div>
     </div>
 

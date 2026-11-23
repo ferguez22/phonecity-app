@@ -17,6 +17,7 @@ export interface EstadoDef {
   preservaFlujo?: boolean;
   esEntrada?: boolean;
   ordenEntrada?: number;
+  terminal?: boolean;
   siguientes: string[];
 }
 
@@ -40,15 +41,15 @@ export const ESTADOS: EstadoDef[] = [
   { id: 'acc_en_tienda_apokin', label: 'Accesorio en tienda Avisado APOKIN', flujo: 'accesorio', fase: 'en_tienda', avisado: true, movil_en_tienda: false, proveedor: 'Apokin', color: '#52B0A0', siguientes: ['finalizado', 'cancelado'] },
   { id: 'acc_en_tienda_wephone', label: 'Accesorio en tienda Avisado WEPHONE', flujo: 'accesorio', fase: 'en_tienda', avisado: true, movil_en_tienda: false, proveedor: 'Wephone', color: '#5FA0E0', siguientes: ['finalizado', 'cancelado'] },
   { id: 'no_reparable_avisado', label: 'No se puede reparar - avisado', flujo: 'reparacion', fase: 'no_reparable', avisado: true, movil_en_tienda: true, color: '#F3B6A4', siguientes: ['no_reparable_entregado', 'finalizado', 'cancelado'] },
-  { id: 'no_reparable_entregado', label: 'No se puede Reparar - Entregado', flujo: 'reparacion', fase: 'no_reparable', avisado: true, movil_en_tienda: false, color: '#DD8770', siguientes: ['finalizado', 'cancelado'] },
-  { id: 'cancelado', label: 'Cancelado', flujo: 'reparacion', fase: 'cancelado', avisado: false, movil_en_tienda: false, color: '#D2CEC4', preservaFlujo: true, siguientes: [] },
-  { id: 'compra', label: 'Compra de Dispositivo', flujo: 'venta', fase: 'entregado', avisado: false, movil_en_tienda: false, subtipo: 'compra', color: COLOR_COMPRA, esEntrada: true, ordenEntrada: 7, siguientes: ['cancelado'] },
-  { id: 'venta', label: 'Venta de Dispositivo', flujo: 'venta', fase: 'entregado', avisado: false, movil_en_tienda: false, subtipo: 'venta', color: COLOR_VENTA, esEntrada: true, ordenEntrada: 6, siguientes: ['cancelado'] },
+  { id: 'no_reparable_entregado', label: 'No se puede Reparar - Entregado', flujo: 'reparacion', fase: 'no_reparable', avisado: true, movil_en_tienda: false, color: '#DD8770', terminal: true, siguientes: ['finalizado', 'cancelado'] },
+  { id: 'cancelado', label: 'Cancelado', flujo: 'reparacion', fase: 'cancelado', avisado: false, movil_en_tienda: false, color: '#D2CEC4', preservaFlujo: true, terminal: true, siguientes: [] },
+  { id: 'compra', label: 'Compra de Dispositivo', flujo: 'venta', fase: 'entregado', avisado: false, movil_en_tienda: false, subtipo: 'compra', color: COLOR_COMPRA, terminal: true, esEntrada: true, ordenEntrada: 7, siguientes: ['cancelado'] },
+  { id: 'venta', label: 'Venta de Dispositivo', flujo: 'venta', fase: 'entregado', avisado: false, movil_en_tienda: false, subtipo: 'venta', color: COLOR_VENTA, terminal: true, esEntrada: true, ordenEntrada: 6, siguientes: ['cancelado'] },
   { id: 'enviar_taller_phonestorm', label: 'Enviar a Taller - Phonestorm', flujo: 'reparacion', fase: 'por_enviar_taller', avisado: false, movil_en_tienda: true, taller: 'Phonestorm', color: '#D6D0F5', siguientes: ['enviado_taller_phonestorm', 'cancelado', 'finalizado'] },
   { id: 'enviar_taller_infotec', label: 'Enviar a Taller - Infotec', flujo: 'reparacion', fase: 'por_enviar_taller', avisado: false, movil_en_tienda: true, taller: 'Infotec', color: '#C2CEF2', siguientes: ['enviado_taller_infotec', 'cancelado', 'finalizado'] },
   { id: 'enviado_taller_phonestorm', label: 'Enviado a Taller - Phonestorm', flujo: 'reparacion', fase: 'en_taller', avisado: false, movil_en_tienda: false, taller: 'Phonestorm', color: '#B3A9EC', siguientes: ['reparado_avisado', 'no_reparable_avisado', 'cancelado', 'finalizado'] },
   { id: 'enviado_taller_infotec', label: 'Enviado a Taller - Infotec', flujo: 'reparacion', fase: 'en_taller', avisado: false, movil_en_tienda: false, taller: 'Infotec', color: '#94A8E5', siguientes: ['reparado_avisado', 'no_reparable_avisado', 'cancelado', 'finalizado'] },
-  { id: 'finalizado', label: 'Finalizado', flujo: 'reparacion', fase: 'entregado', avisado: false, movil_en_tienda: false, color: COLOR_FINALIZADO, preservaFlujo: true, siguientes: [] },
+  { id: 'finalizado', label: 'Finalizado', flujo: 'reparacion', fase: 'entregado', avisado: false, movil_en_tienda: false, color: COLOR_FINALIZADO, preservaFlujo: true, terminal: true, siguientes: [] },
 ];
 
 export const ESTADO_OPTIONS = ESTADOS;
@@ -193,6 +194,12 @@ export function estadoActualDef(l: Linea): EstadoDef | null {
   }
   if (l.fase === 'entregado') return ESTADOS.find((e) => e.id === 'finalizado') ?? null;
   return matchEstado(l);
+}
+
+export function esTerminal(l: Linea): boolean {
+  const def = estadoActualDef(l);
+  if (def) return !!def.terminal;
+  return l.fase === 'entregado' || l.fase === 'cancelado';
 }
 
 export function siguientesDe(l: Linea): EstadoDef[] {

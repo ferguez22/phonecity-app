@@ -1,0 +1,128 @@
+.cr-wrap {
+    margin-top: 8px;
+    font-size: 0.8rem;
+}
+
+.cr-vacio {
+    color: #adb5bd;
+    font-style: italic;
+    padding: 2px 2px;
+}
+
+.cr-cabecera {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    color: #6c757d;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.cr-punto {
+    color: #ced4da;
+}
+
+.cr-activas {
+    color: #212529;
+}
+
+.cr-tienda {
+    margin-left: auto;
+    padding: 1px 8px;
+    border-radius: 10px;
+    background: #fff4d6;
+    color: #8a5a00;
+    font-weight: 700;
+}
+
+.cr-lista {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.cr-expandida {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.cr-mas {
+    display: block;
+    margin: 4px 0 0 auto;
+    padding: 2px 4px;
+    border: none;
+    background: none;
+    color: #0d6efd;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.cr-fila {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 10px;
+    background: #fff;
+
+    & + & {
+        border-top: 1px solid #f1f3f5;
+    }
+}
+
+.cr-cerrada {
+    opacity: 0.6;
+}
+
+.cr-lid {
+    font-weight: 700;
+    color: #212529;
+    white-space: nowrap;
+}
+
+.cr-detalle {
+    min-width: 0;
+    color: #495057;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.cr-estado {
+    padding: 1px 8px;
+    border-radius: 10px;
+    color: #212529;
+    font-size: 0.72rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.cr-fecha {
+    color: #868e96;
+    font-size: 0.75rem;
+    white-space: nowrap;
+}
+
+@media (max-width: 576px) {
+    .cr-fila {
+        grid-template-columns: auto 1fr auto;
+        grid-template-areas:
+            'lid detalle detalle'
+            'estado estado fecha';
+        row-gap: 3px;
+    }
+
+    .cr-lid { grid-area: lid; }
+    .cr-detalle { grid-area: detalle; }
+    .cr-estado { grid-area: estado; justify-self: start; }
+    .cr-fecha { grid-area: fecha; }
+}

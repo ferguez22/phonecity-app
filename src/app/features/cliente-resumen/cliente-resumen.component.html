@@ -1,0 +1,37 @@
+<div class="cr-wrap">
+    @if (cargando()) {
+    <div class="cr-vacio">Cargando historial...</div>
+    } @else if (error()) {
+    <div class="cr-vacio">No se pudo cargar el historial</div>
+    } @else if (lineas().length === 0) {
+    <div class="cr-vacio">Sin líneas anteriores</div>
+    } @else {
+    <div class="cr-cabecera">
+        <span>{{ lineas().length }} {{ lineas().length === 1 ? 'línea' : 'líneas' }}</span>
+        <span class="cr-punto">·</span>
+        <span [class.cr-activas]="activas().length > 0">
+            {{ activas().length }} {{ activas().length === 1 ? 'activa' : 'activas' }}
+        </span>
+        @if (enTienda() > 0) {
+        <span class="cr-tienda">📱 {{ enTienda() }} en tienda</span>
+        }
+    </div>
+
+    <ul class="cr-lista" [class.cr-expandida]="expandido()">
+        @for (l of filas(); track l.id) {
+        <li class="cr-fila" [class.cr-cerrada]="!esActiva(l)">
+            <span class="cr-lid">L-{{ l.id }}</span>
+            <span class="cr-detalle">{{ detalle(l) }}</span>
+            <span class="cr-estado" [style.background]="color(l)">{{ etiqueta(l) }}</span>
+            <span class="cr-fecha">{{ fecha(l.fecha_entrada) }}</span>
+        </li>
+        }
+    </ul>
+
+    @if (ocultas() > 0) {
+    <button type="button" class="cr-mas" (click)="alternar()">
+        {{ expandido() ? 'Ver menos' : 'Ver más (' + ocultas() + ')' }}
+    </button>
+    }
+    }
+</div>
