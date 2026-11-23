@@ -15,7 +15,7 @@ const CONDICIONES = [
   'Los plazos de entrega son orientativos y pueden retrasarse. Una vez solicitadas, las reparaciones no se pueden anular.',
   'El cliente declara ser el propietario legítimo del terminal y autoriza su manipulación, desbloqueo o liberación.',
   'La empresa no se responsabiliza de la pérdida de datos del dispositivo; se recomienda realizar una copia de seguridad. Tampoco se responden por tarjetas SIM, SD o accesorios que no hayan sido retirados.',
-  'El dispositivo debe recogerse en un plazo máximo de tres meses desde la fecha del presente documento. Pasado dicho plazo podrá ser desmontado o reciclado para cubrir gastos.',
+  'El dispositivo debe recogerse en un plazo máximo de tres meses desde la fecha de entrega del aparato reparado. Pasado dicho plazo podrá ser desmontado o reciclado para cubrir gastos.',
 ];
 
 function esc(valor: string | null | undefined): string {
@@ -29,11 +29,20 @@ function precio(importe: number | null): string {
   return Number.isInteger(n) ? `${n}€` : `${n.toFixed(2)}€`;
 }
 
-function fecha(valor: string | null): string {
+function fechaEntrada(valor: string | null): string {
   if (!valor) return '-';
-  const d = new Date(String(valor).replace(' ', 'T'));
+  const texto = String(valor).replace(' ', 'T');
+  const d = new Date(texto);
   if (Number.isNaN(d.getTime())) return '-';
-  return d.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  const dia = d.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  if (!/T\d{2}:\d{2}/.test(texto)) return dia;
+  return `${dia} ${d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}`;
+}
+
+function fechaImpreso(): string {
+  const d = new Date();
+  const dia = d.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: '2-digit' });
+  return `${dia} ${d.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}`;
 }
 
 export function construirTicket(linea: Linea, tipo: TipoTicket, barcode: string, piezas: Pieza[] = []): string {
@@ -73,7 +82,8 @@ export function construirTicket(linea: Linea, tipo: TipoTicket, barcode: string,
   <p class="dato">Dispositivo: ${esc(linea.modelo)}</p>
   <p class="dato">Problema: ${esc(linea.problema_o_pieza)}</p>
   <p class="dato">Precio: ${precio(linea.importe)}</p>
-  <p class="dato">Fecha entrada: ${fecha(linea.fecha_entrada)}</p>
+  <p class="dato">Fecha entrada: ${fechaEntrada(linea.fecha_entrada)}</p>
+  <p class="impreso">Impreso: ${fechaImpreso()}</p>
 
   ${bloquePiezas}
 

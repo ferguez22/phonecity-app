@@ -13,6 +13,7 @@ export const ESTILOS_TICKET = `
   .aviso-texto { font-size: 11px; margin-top: 4px; line-height: 1.35; }
   .sec-titulo { font-size: 10px; font-weight: bold; letter-spacing: 1px; margin: 10px 0 4px; padding-bottom: 2px; border-bottom: 1px solid #000; }
   .dato { font-size: 13px; font-weight: bold; margin: 3px 0; }
+  .impreso { font-size: 9px; margin: 1px 0 3px; }
   .gracias { font-size: 15px; font-weight: bold; text-align: center; margin: 12px 0; }
   .pieza-check { font-size: 12px; font-weight: bold; margin: 5px 0; }
   .cond-titulo { font-size: 10px; font-weight: bold; text-align: center; letter-spacing: 1px; margin: 8px 0 4px; }
