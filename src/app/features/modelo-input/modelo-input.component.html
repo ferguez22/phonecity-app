@@ -1,0 +1,39 @@
+<input
+    #campo
+    type="text"
+    class="mi-input"
+    [class.mi-panel]="variante === 'panel'"
+    [value]="texto()"
+    [placeholder]="placeholder"
+    [disabled]="deshabilitado()"
+    autocomplete="off"
+    autocapitalize="off"
+    spellcheck="false"
+    (input)="onInput(campo.value)"
+    (keydown)="onTecla($event)"
+    (blur)="onBlur()"
+/>
+
+@if (visible()) {
+<ul
+    class="mi-lista"
+    role="listbox"
+    [style.top.px]="posicion().top"
+    [style.left.px]="posicion().left"
+    [style.width.px]="posicion().width"
+>
+    @for (m of sugerencias(); track m.nombre; let i = $index) {
+    <li
+        class="mi-fila"
+        role="option"
+        [class.activa]="activo() === i"
+        [attr.aria-selected]="activo() === i"
+        (mouseenter)="activo.set(i)"
+        (pointerdown)="onPulsar($event, m)"
+    >
+        <span class="mi-nombre">{{ m.nombre }}</span>
+        <span class="mi-marca">{{ m.marca }}</span>
+    </li>
+    }
+</ul>
+}

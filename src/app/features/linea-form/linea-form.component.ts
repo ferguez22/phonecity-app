@@ -9,6 +9,7 @@ import { ClienteService } from '../../core/services/cliente.service';
 import { ProveedorService, Proveedor } from '../../core/services/proveedor.service';
 import { ClienteSelectorComponent } from '../cliente-selector/cliente-selector.component';
 import { ClienteResumenComponent } from '../cliente-resumen/cliente-resumen.component';
+import { ModeloInputComponent } from '../modelo-input/modelo-input.component';
 import { Linea, Flujo, Fase, TipoCobro, Pieza } from '../../core/models/linea.model';
 import { Cliente } from '../../core/models/cliente.model';
 import { normalizar } from '../../core/utils/texto.util';
@@ -16,7 +17,7 @@ import { normalizar } from '../../core/utils/texto.util';
 @Component({
   selector: 'app-linea-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, ClienteSelectorComponent, ClienteResumenComponent],
+  imports: [CommonModule, FormsModule, ClienteSelectorComponent, ClienteResumenComponent, ModeloInputComponent],
   templateUrl: './linea-form.component.html',
   styleUrl: './linea-form.component.scss',
 })

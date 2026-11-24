@@ -13,6 +13,7 @@ import { Linea, TipoCobro, Pieza } from '../../core/models/linea.model';
 import { PedidoModalComponent } from '../pedido-modal/pedido-modal.component';
 import { ConsultaTallerModalComponent } from '../consulta-taller-modal/consulta-taller-modal.component';
 import { AvisarModalComponent, ModoAvisar } from '../avisar-modal/avisar-modal.component';
+import { ModeloInputComponent } from '../modelo-input/modelo-input.component';
 import { TicketService } from '../../core/tickets/ticket.service';
 import { EtiquetaService } from '../../core/etiquetas/etiqueta.service';
 import { Cliente } from '../../core/models/cliente.model';
@@ -28,7 +29,7 @@ type FilaTablero =
 @Component({
   selector: 'app-tablero',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, PedidoModalComponent, ConsultaTallerModalComponent, AvisarModalComponent, ClienteSelectorComponent],
+  imports: [CommonModule, FormsModule, RouterLink, PedidoModalComponent, ConsultaTallerModalComponent, AvisarModalComponent, ClienteSelectorComponent, ModeloInputComponent],
   templateUrl: './tablero.component.html',
   styleUrl: './tablero.component.scss',
   animations: [
