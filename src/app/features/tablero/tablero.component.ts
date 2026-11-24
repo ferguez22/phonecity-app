@@ -17,7 +17,7 @@ import { ModeloInputComponent } from '../modelo-input/modelo-input.component';
 import { TicketService } from '../../core/tickets/ticket.service';
 import { EtiquetaService } from '../../core/etiquetas/etiqueta.service';
 import { Cliente } from '../../core/models/cliente.model';
-import { normalizar, soloDigitos, terminosDe, casaTodos } from '../../core/utils/texto.util';
+import { normalizar, soloDigitos, casaTodos, separarBusqueda, casaFrases } from '../../core/utils/texto.util';
 import { ESTADO_OPTIONS, EstadoDef, esEstadoActual, getColor, getEtiqueta, etiquetaHistorialCompleta, estadoActualDef, siguientesDe, mensajeWhatsapp, tieneMensajeEspecifico} from '../../core/estados/estados';
 
 interface Boton { label: string; filtros: LineaFiltros; filtroClient?: (l: Linea) => boolean; aplicaHistorial?: boolean; fasesHistorial?: string[];}
@@ -81,7 +81,7 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
       l.notas,
       l.importe,
       getEtiqueta(l),
-    ].filter((v) => v !== null && v !== undefined && v !== '').join(' '));
+    ].filter((v) => v !== null && v !== undefined && v !== '').join(' | '));
     const digitos = soloDigitos(`${l.id} ${l.cliente_telefono ?? ''} ${l.importe ?? ''} ${l.modelo ?? ''} ${l.notas ?? ''}`,);
     const completo = `${texto} ${digitos}`;
     this.cacheIndice.set(l, completo);
@@ -165,9 +165,12 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
   });
 
   readonly lineasFiltradas = computed(() => {
-    const terminos = terminosDe(this.busquedaAplicada());
-    if (terminos.length === 0) return this.lineas();
-    return this.lineas().filter((l) => casaTodos(this.indiceDe(l), terminos));
+    const { terminos, frases } = separarBusqueda(this.busquedaAplicada());
+    if (terminos.length === 0 && frases.length === 0) return this.lineas();
+    return this.lineas().filter((l) => {
+      const indice = this.indiceDe(l);
+      return casaTodos(indice, terminos) && casaFrases(indice, frases);
+    });
   });
   
   readonly total = computed(() => this.lineasFiltradas().length);
