@@ -1,10 +1,10 @@
-import {Component, OnInit, AfterViewInit, OnDestroy, ViewChild, ElementRef, inject, signal, computed, HostListener} from '@angular/core';
+import {Component, OnInit, ViewChild, ElementRef, inject, signal, computed, effect, HostListener} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
-import { AuthService } from '../../core/services/auth.service';
+import { IconoComponent } from '../../core/layout/icono/icono.component';
+import { PantallaService } from '../../core/layout/pantalla.service';
 import { LineaService, LineaFiltros, LineaPayload } from '../../core/services/linea.service';
 import { HistorialService, EntradaHistorial } from '../../core/services/historial.service';
 import { ClienteSelectorComponent } from '../cliente-selector/cliente-selector.component';
@@ -14,10 +14,14 @@ import { PedidoModalComponent } from '../pedido-modal/pedido-modal.component';
 import { ConsultaTallerModalComponent } from '../consulta-taller-modal/consulta-taller-modal.component';
 import { AvisarModalComponent, ModoAvisar } from '../avisar-modal/avisar-modal.component';
 import { ModeloInputComponent } from '../modelo-input/modelo-input.component';
+import { TarjetasLineasComponent, GrupoDia } from './tarjetas-lineas/tarjetas-lineas.component';
+import { HojaLineaComponent } from './hoja-linea/hoja-linea.component';
 import { TicketService } from '../../core/tickets/ticket.service';
 import { EtiquetaService } from '../../core/etiquetas/etiqueta.service';
 import { Cliente } from '../../core/models/cliente.model';
 import { normalizar, soloDigitos, casaTodos, separarBusqueda, casaFrases } from '../../core/utils/texto.util';
+import { limpiarTelefono } from '../../core/utils/telefono.util';
+import { diasDesde } from '../../core/utils/fecha.util';
 import { ESTADO_OPTIONS, EstadoDef, esEstadoActual, getColor, getEtiqueta, etiquetaHistorialCompleta, estadoActualDef, siguientesDe, mensajeWhatsapp, tieneMensajeEspecifico} from '../../core/estados/estados';
 
 interface Boton { label: string; filtros: LineaFiltros; filtroClient?: (l: Linea) => boolean; aplicaHistorial?: boolean; fasesHistorial?: string[];}
@@ -29,7 +33,7 @@ type FilaTablero =
 @Component({
   selector: 'app-tablero',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, PedidoModalComponent, ConsultaTallerModalComponent, AvisarModalComponent, ClienteSelectorComponent, ModeloInputComponent],
+  imports: [CommonModule, FormsModule, IconoComponent, PedidoModalComponent, ConsultaTallerModalComponent, AvisarModalComponent, ClienteSelectorComponent, ModeloInputComponent, TarjetasLineasComponent, HojaLineaComponent],
   templateUrl: './tablero.component.html',
   styleUrl: './tablero.component.scss',
   animations: [
@@ -45,8 +49,8 @@ type FilaTablero =
   ],
 })
   
-export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild('controlsRef') controlsRef!: ElementRef<HTMLElement>;
+export class TableroComponent implements OnInit {
+  @ViewChild('tablaArea', { static: true }) tablaArea!: ElementRef<HTMLElement>;
   @ViewChild('busquedaInput') busquedaInput!: ElementRef<HTMLInputElement>;
   
   edModelo = '';
@@ -58,15 +62,13 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
   edTelAlt = '';
   edNotas = '';
 
-  private readonly auth = inject(AuthService);
+  readonly pantalla = inject(PantallaService);
   private readonly lineas$ = inject(LineaService);
   private readonly histSvc = inject(HistorialService);
   private readonly proveedorSvc = inject(ProveedorService);
-  private readonly router = inject(Router);
   private readonly ticketSvc = inject(TicketService);
   private readonly etiquetaSvc = inject(EtiquetaService);  private filtrosActivos: LineaFiltros = {};
   private toastTimer: ReturnType<typeof setTimeout> | null = null;
-  private resizeObs: ResizeObserver | null = null;
   private readonly busqueda$ = new Subject<string>();
   private readonly cacheIndice = new WeakMap<Linea, string>();
   private indiceDe(l: Linea): string {
@@ -91,6 +93,15 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
   readonly lineas = signal<Linea[]>([]);
   readonly cargando = signal(false);
   readonly error = signal<string | null>(null);
+  private errorTimer: ReturnType<typeof setTimeout> | null = null;
+
+  constructor() {
+    effect(() => {
+      const msg = this.error();
+      if (this.errorTimer) clearTimeout(this.errorTimer);
+      this.errorTimer = msg ? setTimeout(() => this.error.set(null), 4000) : null;
+    });
+  }
   readonly busqueda = signal('');
   readonly busquedaAplicada = signal('');
   readonly proveedores = signal<Proveedor[]>([]);
@@ -198,6 +209,24 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
     return out;
   });
 
+  readonly gruposMovil = computed<GrupoDia[]>(() => {
+    const ls = [...this.lineasFiltradas()].reverse();
+    if (!this.mostrarDivisor()) return [{ clave: 'todas', titulo: null, lineas: ls }];
+    const grupos: GrupoDia[] = [];
+    for (const l of ls) {
+      const f = l.fecha_entrada ?? '';
+      const ultimo = grupos[grupos.length - 1];
+      if (ultimo && ultimo.clave === `dia-${f}`) ultimo.lineas.push(l);
+      else grupos.push({ clave: `dia-${f}`, titulo: f ? this.formatoDivisor(f) : null, lineas: [l] });
+    }
+    return grupos;
+  });
+
+  readonly lineaAbierta = computed(() => {
+    const id = this.expandedId();
+    return id === null ? null : this.lineas().find((l) => l.id === id) ?? null;
+  });
+
   getColor = getColor;
   getEtiqueta = getEtiqueta;
 
@@ -218,20 +247,6 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
     this.busqueda$
       .pipe(debounceTime(150), distinctUntilChanged())
       .subscribe((q) => this.busquedaAplicada.set(q));
-  }
-
-  ngAfterViewInit(): void {
-    const el = this.controlsRef?.nativeElement;
-    if (!el) return;
-    this.resizeObs = new ResizeObserver(() => {
-      document.documentElement.style.setProperty('--controls-h', `${el.offsetHeight}px`);
-    });
-    this.resizeObs.observe(el);
-  }
-
-  ngOnDestroy(): void {
-    this.resizeObs?.disconnect();
-    this.resizeObs = null;
   }
 
   seleccionarBoton(boton: Boton): void {
@@ -283,11 +298,10 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
         if (est) filtradas = filtradas.filter((l) => esEstadoActual(est, l));
         this.lineas.set(filtradas);
         this.cargando.set(false);
-        setTimeout(() => window.scrollTo({ top: document.body.scrollHeight, behavior: 'instant' }), 80);
         setTimeout(() => {
-          const h = this.controlsRef?.nativeElement?.offsetHeight ?? 148;
-          document.documentElement.style.setProperty('--controls-h', `${h}px`);
-        }, 100);
+          const area = this.tablaArea.nativeElement;
+          area.scrollTo({ top: this.pantalla.esMovil() ? 0 : area.scrollHeight, behavior: 'instant' });
+        }, 80);
       },
       error: () => { this.error.set('Error al cargar'); this.cargando.set(false); },
     });
@@ -451,6 +465,18 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  guardarNotas(linea: Linea, notas: string): void {
+    this.guardando.set(true);
+    this.lineas$.update(linea.id, { notas: notas || null }).subscribe({
+      next: (updated) => {
+        this.lineas.update((c) => c.map((x) => x.id === linea.id ? { ...x, ...updated } : x));
+        this.edNotas = notas;
+        this.guardando.set(false);
+      },
+      error: (err) => { this.guardando.set(false); this.error.set(err?.error?.error?.message ?? 'Error'); },
+    });
+  }
+
   onClienteChange(c: Cliente | null): void {
     this.clienteSelec.set(c);
   }
@@ -487,9 +513,12 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
   }
   // fin de Tweark para tener los dias de.....
   
-  diasDesde(fecha: string): number {
-    return Math.floor((Date.now() - new Date(fecha).getTime()) / 86_400_000);
+  fechaCorta(fecha: string): string {
+    const [, m, d] = fecha.split('-');
+    return `${d}/${m}`;
   }
+
+  diasDesde = diasDesde;
 
   chipsParaLinea(linea: Linea): EstadoDef[] {
     if (this.verTodos()) return this.estadoOptions;
@@ -511,7 +540,7 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   enviarWhatsapp(linea: Linea): void {
-    const tel = this.limpiarTelefono(linea.cliente_telefono);
+    const tel = limpiarTelefono(linea.cliente_telefono);
     if (!tel) {
       this.error.set('Esta línea no tiene número de teléfono');
       return;
@@ -556,15 +585,6 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
   cerrarToast(): void {
     this.toastWa.set(null);
     if (this.toastTimer) { clearTimeout(this.toastTimer); this.toastTimer = null; }
-  }
-
-  private limpiarTelefono(tel: string | null): string | null {
-    if (!tel) return null;
-    let s = tel.replace(/\D/g, '');
-    if (!s || s.length < 6) return null;
-    if (s.length === 9) s = '34' + s;        // móvil español sin prefijo
-    // si ya viene con 34 (11-12 díg) se deja tal cual
-    return s;
   }
 
   cerrarPedido(recargar: boolean): void {
@@ -643,8 +663,6 @@ export class TableroComponent implements OnInit, AfterViewInit, OnDestroy {
     const t = e.target as HTMLElement;
     if (t && !t.closest('.ajustes-wrap')) this.ajustesAbierto.set(false);
   }
-
-  logout(): void { this.auth.logout(); this.router.navigate(['/login']); }
 
   private proveedorIdPorNombre(nombre?: string | null): number | null {
     if (!nombre) return null;

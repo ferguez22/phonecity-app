@@ -99,3 +99,7 @@ src/app/
 ## Fecha clave
 
 **29/11/2026:** presentación a todas las tiendas. Prioridad: que funcione y se vea bien en portátil, móvil normal e iPhone Duo.
+
+## Diseño
+
+Antes de cualquier tarea visual (estilos, layout, componentes, responsive), lee y aplica DESIGN.md.

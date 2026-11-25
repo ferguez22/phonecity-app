@@ -1,0 +1,32 @@
+<div class="hoja-fondo" [class.saliendo]="saliendo()" (click)="solicitarCierre()"></div>
+
+<div
+  class="hoja"
+  role="dialog"
+  aria-modal="true"
+  [attr.aria-label]="etiqueta() || null"
+  [class.arrastrando]="arrastrando()"
+  [style.transform]="transformacion()"
+>
+  <div
+    class="hoja-arrastre"
+    (pointerdown)="onPointerDown($event)"
+    (pointermove)="onPointerMove($event)"
+    (pointerup)="onPointerUp()"
+    (pointercancel)="onPointerUp()"
+  >
+    <div class="hoja-asa"></div>
+    <div class="hoja-cabecera">
+      <div class="hoja-cabecera-contenido">
+        <ng-content select="[hoja-cabecera]" />
+      </div>
+      <button type="button" class="hoja-cerrar" (click)="solicitarCierre()" aria-label="Cerrar">
+        <app-icono nombre="cerrar" />
+      </button>
+    </div>
+  </div>
+
+  <div class="hoja-cuerpo">
+    <ng-content />
+  </div>
+</div>

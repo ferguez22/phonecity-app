@@ -1,13 +1,13 @@
-<nav class="navbar navbar-dark bg-dark px-3 py-2">
-  <span class="navbar-brand fw-bold">Ficha de línea</span>
-  <div class="d-flex gap-2">
-    @if (linea()) {
-      <a [routerLink]="['/linea', linea()!.id, 'editar']"
-         class="btn btn-sm btn-warning">✏️ Editar</a>
-    }
-    <button class="btn btn-sm btn-outline-light" (click)="volver()">← Volver</button>
+<header class="cabecera-pagina">
+  <div class="cabecera-titulo">
+    <h1>{{ linea() ? 'L-' + linea()!.id : 'Ficha de línea' }}</h1>
   </div>
-</nav>
+  @if (pantalla.esMovil()) {
+    <div class="cabecera-acciones">
+      <ng-container *ngTemplateOutlet="editar" />
+    </div>
+  }
+</header>
 
 <div class="container py-4" style="max-width:720px">
 
@@ -29,11 +29,16 @@
               {{ getEtiqueta(l) }}
             </span>
           </div>
-          @if (l.fecha_entrada) {
-            <span class="text-muted small">
-              {{ diasDesde(l.fecha_entrada) }} días
-            </span>
-          }
+          <div class="d-flex align-items-center gap-2">
+            @if (l.fecha_entrada) {
+              <span class="text-muted small">
+                {{ diasDesde(l.fecha_entrada) }} días
+              </span>
+            }
+            @if (!pantalla.esMovil()) {
+              <ng-container *ngTemplateOutlet="editar" />
+            }
+          </div>
         </div>
       </div>
     </div>
@@ -148,3 +153,12 @@
 
   }
 </div>
+
+<ng-template #editar>
+  @if (linea()) {
+    <a [routerLink]="['/linea', linea()!.id, 'editar']" class="boton-accion" aria-label="Editar" title="Editar">
+      <app-icono nombre="editar" />
+      <span class="accion-texto">Editar</span>
+    </a>
+  }
+</ng-template>

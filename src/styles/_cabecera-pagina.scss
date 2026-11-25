@@ -1,0 +1,144 @@
+@use 'breakpoints' as *;
+
+.cabecera-pagina {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--esp-3);
+  min-height: var(--cabecera-h);
+  padding: 0 calc(var(--esp-4) + env(safe-area-inset-right)) 0 calc(var(--esp-4) + env(safe-area-inset-left));
+  background: var(--color-superficie);
+  border-bottom: 1px solid var(--color-borde);
+  font-family: var(--fuente);
+
+  @include movil {
+    min-height: calc(var(--cabecera-h) + env(safe-area-inset-top));
+    padding-top: env(safe-area-inset-top);
+  }
+
+  @include medio {
+    display: none;
+  }
+
+  @include escritorio {
+    display: none;
+  }
+}
+
+.cabecera-titulo {
+  display: flex;
+  align-items: baseline;
+  gap: var(--esp-2);
+  min-width: 0;
+
+  h1 {
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--color-texto);
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.25;
+  }
+}
+
+.cabecera-detalle {
+  flex-shrink: 0;
+  color: var(--color-texto-2);
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.cabecera-acciones {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-2);
+  flex-shrink: 0;
+}
+
+.boton-accion {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 32px;
+  height: 32px;
+  padding: 0 var(--esp-3);
+  border: 0;
+  border-radius: var(--radio-s);
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--color-texto);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 150ms, transform 150ms;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.08);
+    color: var(--color-texto);
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--color-acento);
+    outline-offset: 2px;
+  }
+
+  &.principal {
+    background: var(--color-acento);
+    color: #fff;
+
+    &:hover {
+      background: #0077ed;
+      color: #fff;
+    }
+  }
+
+  &.solo-icono {
+    padding: 0;
+  }
+
+  app-icono {
+    width: 18px;
+    height: 18px;
+  }
+
+  @include movil {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+
+    .accion-texto {
+      display: none;
+    }
+  }
+}
+
+.acciones-contenido {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--esp-2);
+}
+
+.contador-contenido {
+  color: var(--color-texto-2);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+@include movil {
+  .contador-contenido {
+    display: none;
+  }
+}

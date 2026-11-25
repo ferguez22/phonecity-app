@@ -1,0 +1,20 @@
+$movil-max: 600px;
+$escritorio-min: 1025px;
+
+@mixin movil {
+  @media (max-width: $movil-max) {
+    @content;
+  }
+}
+
+@mixin medio {
+  @media (min-width: $movil-max + 1) and (max-width: $escritorio-min - 1) {
+    @content;
+  }
+}
+
+@mixin escritorio {
+  @media (min-width: $escritorio-min) {
+    @content;
+  }
+}

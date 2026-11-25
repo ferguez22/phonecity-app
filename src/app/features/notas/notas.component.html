@@ -1,10 +1,9 @@
-<nav class="navbar navbar-dark bg-dark px-3 py-2">
-    <div class="d-flex align-items-center gap-3">
-        <a routerLink="/tablero" class="btn btn-sm btn-outline-light">← Tablero</a>
-        <span class="navbar-brand fw-bold mb-0">📝 Notas</span>
+<header class="cabecera-pagina">
+    <div class="cabecera-titulo">
+        <h1>Notas</h1>
+        <span class="cabecera-detalle">{{ pendientes().length }} pendientes</span>
     </div>
-    <span class="text-white-50 small">{{ pendientes().length }} pendientes</span>
-</nav>
+</header>
 
 <div class="notas-container container py-3">
 
@@ -12,6 +11,7 @@
         <input type="text" class="form-control" placeholder="Escribe una nota y pulsa Enter..." [ngModel]="nuevoTexto()"
             (ngModelChange)="nuevoTexto.set($event)" (keydown.enter)="crear()" [disabled]="guardando()" />
     </div>
+    <div class="contador-contenido mb-2">{{ pendientes().length }} pendientes</div>
 
     @if (error()) {
     <div class="alert alert-danger py-2">{{ error() }}</div>

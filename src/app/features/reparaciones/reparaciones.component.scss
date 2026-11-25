@@ -1,3 +1,5 @@
+@use 'breakpoints' as *;
+
 :host {
     display: block;
     min-height: 100vh;
@@ -306,6 +308,10 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, .06);
     position: sticky;
     top: 12px;
+
+    @include movil {
+        top: calc(var(--cabecera-h) + env(safe-area-inset-top) + 12px);
+    }
 }
 
 .pr-titulo {

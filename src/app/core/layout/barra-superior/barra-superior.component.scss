@@ -1,0 +1,129 @@
+@use 'breakpoints' as *;
+
+:host {
+  display: block;
+
+  @include movil {
+    display: none;
+  }
+}
+
+.barra {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-4);
+  height: calc(52px + env(safe-area-inset-top));
+  padding: env(safe-area-inset-top) calc(var(--esp-4) + env(safe-area-inset-right)) 0
+    calc(var(--esp-4) + env(safe-area-inset-left));
+  background: var(--fondo-translucido);
+  -webkit-backdrop-filter: var(--desenfoque);
+  backdrop-filter: var(--desenfoque);
+  border-bottom: 1px solid var(--color-borde);
+  font-family: var(--fuente);
+  font-size: 14px;
+  view-transition-name: barra;
+}
+
+.marca {
+  flex-shrink: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-texto);
+  text-decoration: none;
+}
+
+.enlaces {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-1);
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.acciones {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-1);
+  flex-shrink: 0;
+}
+
+.enlace {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--esp-2);
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 var(--esp-3);
+  border: 0;
+  border-radius: var(--radio-s);
+  background: transparent;
+  color: var(--color-texto-2);
+  font: inherit;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 150ms, color 150ms, transform 150ms;
+
+  &:hover {
+    color: var(--color-texto);
+    background: rgba(0, 0, 0, 0.04);
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--color-acento);
+    outline-offset: 0;
+  }
+
+  &.activo {
+    color: var(--color-acento);
+    background: rgba(0, 113, 227, 0.08);
+  }
+
+  &.salir:hover {
+    color: var(--color-peligro);
+  }
+}
+
+app-icono {
+  width: 18px;
+  height: 18px;
+}
+
+.texto-corto {
+  display: none;
+}
+
+@include escritorio {
+  .acciones app-icono {
+    display: none;
+  }
+}
+
+@include medio {
+  .enlace {
+    padding: 0 var(--esp-2);
+  }
+
+  .enlaces .texto-largo {
+    display: none;
+  }
+
+  .enlaces .texto-corto {
+    display: inline;
+  }
+
+  .acciones .texto-largo {
+    display: none;
+  }
+}

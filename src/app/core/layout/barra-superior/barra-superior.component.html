@@ -1,0 +1,25 @@
+<header class="barra">
+  <a routerLink="/tablero" class="marca">PhoneCity</a>
+
+  <nav class="enlaces" aria-label="Navegación principal">
+    @for (e of izquierda; track e.ruta) {
+      <a [routerLink]="e.ruta" routerLinkActive="activo" class="enlace">
+        <span class="texto-largo">{{ e.texto }}</span>
+        <span class="texto-corto">{{ e.corto }}</span>
+      </a>
+    }
+  </nav>
+
+  <div class="acciones">
+    @for (e of derecha; track e.ruta) {
+      <a [routerLink]="e.ruta" routerLinkActive="activo" class="enlace" [attr.aria-label]="e.texto" [title]="e.texto">
+        <app-icono [nombre]="e.icono" />
+        <span class="texto-largo">{{ e.texto }}</span>
+      </a>
+    }
+    <button type="button" class="enlace salir" (click)="cerrarSesion()" aria-label="Cerrar sesión" title="Cerrar sesión">
+      <app-icono nombre="salir" />
+      <span class="texto-largo">Cerrar sesión</span>
+    </button>
+  </div>
+</header>

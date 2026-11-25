@@ -1,119 +1,15 @@
-<div class="sticky-controls" #controlsRef>
-  <nav class="navbar navbar-dark bg-dark px-3 py-2 position-relative">
-    <span class="navbar-brand fw-bold">PhoneCity</span>
-    @if (mostrarBotonTaller()) {
-      <button
-        class="btn btn-sm btn-primary btn-consulta-taller"
-        type="button"
-        (click)="abrirTaller()"
-        style="position: absolute; left: 50%; transform: translateX(-50%)"
-      >
-        📋 Consulta de taller
-      </button>
-    }
-    @if (mostrarBotonAvisar()) {
-      <button
-        class="btn btn-sm btn-success btn-consulta-taller"
-        type="button"
-        (click)="abrirAvisar()"
-        style="position: absolute; left: 50%; transform: translateX(-50%)"
-      >
-        💬 Avisar clientes
-      </button>
-    }
-    <div class="d-flex align-items-center gap-3">
-      <span class="text-white-50 small">{{ total() }} líneas</span>
-      <button
-        class="btn btn-sm btn-warning"
-        type="button"
-        (click)="abrirPedido()"
-      >
-        Generar pedido
-      </button>
-      <a routerLink="/linea/nueva" class="btn btn-sm btn-success"
-        >+ Nueva línea</a
-      >
-      <a routerLink="/reparaciones" class="btn btn-sm btn-info"
-        >⏱ Temporizadores</a
-      >
-      <a routerLink="/notas" class="btn btn-sm btn-secondary">📝 Notas</a>
-      <a routerLink="/clientes" class="btn btn-sm btn-outline-light"
-        >👥 Clientes</a
-      >
-      <div class="ajustes-wrap position-relative">
-        <button
-          class="btn btn-sm btn-outline-light ajustes-btn"
-          type="button"
-          (click)="toggleAjustes()"
-          title="Ajustes"
-        >
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <circle cx="12" cy="12" r="3"></circle>
-            <path
-              d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"
-            ></path>
-          </svg>
-        </button>
-
-        @if (ajustesAbierto()) {
-          <div class="ajustes-panel">
-            <div class="ap-sec-title">Ajustes</div>
-            <div class="ap-group">
-              <span class="ap-label">Divisor de fecha</span>
-              <label class="ap-opt"
-                ><input
-                  type="radio"
-                  name="divmodo"
-                  [checked]="divisorModo() === 'todos'"
-                  (change)="setDivisorModo('todos')"
-                />
-                En todos los filtros</label
-              >
-              <label class="ap-opt"
-                ><input
-                  type="radio"
-                  name="divmodo"
-                  [checked]="divisorModo() === 'solo_todo'"
-                  (change)="setDivisorModo('solo_todo')"
-                />
-                Solo en "Todo"</label
-              >
-              <label class="ap-opt"
-                ><input
-                  type="radio"
-                  name="divmodo"
-                  [checked]="divisorModo() === 'off'"
-                  (change)="setDivisorModo('off')"
-                />
-                Desactivado</label
-              >
-            </div>
-
-            <div class="ap-sec-title">Acciones</div>
-            <div class="ap-group">
-              <a routerLink="/importar" class="ap-action">Importar CSV</a>
-              <button
-                type="button"
-                class="ap-action ap-danger"
-                (click)="logout()"
-              >
-                Cerrar sesión
-              </button>
-            </div>
-          </div>
-        }
-      </div>
+<div class="sticky-controls">
+  <header class="cabecera-pagina">
+    <div class="cabecera-titulo">
+      <h1>Tablero</h1>
+      <span class="cabecera-detalle">{{ total() }} líneas</span>
     </div>
-  </nav>
+    @if (pantalla.esMovil()) {
+      <div class="cabecera-acciones">
+        <ng-container *ngTemplateOutlet="acciones" />
+      </div>
+    }
+  </header>
 
   <div
     class="controles-bar px-3 py-2 d-flex flex-wrap gap-2 align-items-center"
@@ -126,6 +22,12 @@
       [ngModel]="busqueda()"
       (ngModelChange)="onBuscar($event)"
     />
+    @if (!pantalla.esMovil()) {
+      <span class="contador-contenido">{{ total() }} líneas</span>
+      <div class="acciones-contenido ms-auto">
+        <ng-container *ngTemplateOutlet="acciones" />
+      </div>
+    }
   </div>
 
   <div class="botones-bar px-3 pb-2 d-flex gap-2 align-items-center">
@@ -185,29 +87,29 @@
   }
 </div>
 
-<div class="table-area container-fluid">
+<div class="table-area container-fluid" #tablaArea>
   @if (cargando()) {
     <div class="text-center text-muted py-5">Cargando...</div>
-  } @else if (error()) {
-    <div class="alert alert-danger">{{ error() }}</div>
   } @else if (lineasFiltradas().length === 0) {
     <div class="text-center text-muted py-5 TU-WRAPPER-TABLA">
       No hay líneas en este estado.
     </div>
+  } @else if (pantalla.esMovil()) {
+    <app-tarjetas-lineas [grupos]="gruposMovil()" (abrir)="toggleExpand($event)" />
   } @else {
     <table class="table table-sm tabla-lineas">
       <thead class="table-dark">
         <tr>
           <th class="th-id">L-ID</th>
-          <th>Estado</th>
-          <th>Fecha</th>
-          <th>Modelo</th>
-          <th>Cliente</th>
-          <th>Teléfono</th>
-          <th>€</th>
-          <th>Problema / Pieza</th>
-          <th>Notas</th>
-          <th>Días</th>
+          <th class="col-estado">Estado</th>
+          <th class="col-fecha">Fecha</th>
+          <th class="col-modelo">Modelo</th>
+          <th class="col-cliente">Cliente</th>
+          <th class="col-tel">Teléfono</th>
+          <th class="col-importe">€</th>
+          <th class="col-pieza" title="Problema / Pieza">Problema / Pieza</th>
+          <th class="col-notas">Notas</th>
+          <th class="col-dias">Días</th>
           <th class="th-expand"></th>
         </tr>
       </thead>
@@ -235,25 +137,25 @@
                   <span class="badge-historico">Histórico</span>
                 }
               </td>
-              <td>
-                <span class="badge-estado">{{ getEtiqueta(linea) }}</span>
+              <td class="col-estado">
+                <span class="badge-estado" [title]="getEtiqueta(linea)">{{ getEtiqueta(linea) }}</span>
               </td>
-              <td>{{ linea.fecha_entrada ?? "—" }}</td>
-              <td class="text-truncate col-modelo">{{ linea.modelo ?? '—' }}</td>
-              <td>{{ linea.cliente_nombre ?? "TIENDA" }}</td>
-              <td>{{ linea.cliente_telefono ?? "—" }}</td>
-              <td>
+              <td class="col-fecha">{{ linea.fecha_entrada ? fechaCorta(linea.fecha_entrada) : "—" }}</td>
+              <td class="col-modelo" [title]="linea.modelo ?? ''">{{ linea.modelo ?? '—' }}</td>
+              <td class="col-cliente" [title]="linea.cliente_nombre ?? 'TIENDA'">{{ linea.cliente_nombre ?? "TIENDA" }}</td>
+              <td class="col-tel">{{ linea.cliente_telefono ?? "—" }}</td>
+              <td class="col-importe">
                 {{
                   linea.importe != null
                     ? (linea.importe | number: "1.0-0") + " €"
                     : "—"
                 }}
               </td>
-                  <td class="text-truncate col-pieza">@if (linea.num_piezas && linea.num_piezas > 1) {<span class="badge-multi"
+                  <td class="col-pieza" [title]="linea.problema_o_pieza ?? ''">@if (linea.num_piezas && linea.num_piezas > 1) {<span class="badge-multi"
                       [title]="linea.num_piezas + ' piezas'">×{{ linea.num_piezas }}</span>}{{
                     linea.problema_o_pieza ?? '—' }}</td>              
-                  <td class="text-truncate col-notas">{{ linea.notas ?? "—" }}</td>
-              <td>
+                  <td class="col-notas" [title]="linea.notas ?? ''">{{ linea.notas ?? "—" }}</td>
+              <td class="col-dias">
                 @if (linea.fecha_entrada) {
                   {{ diasDesde(linea.fecha_entrada) }}d
                 }
@@ -530,15 +432,15 @@
         @for (n of filasVacias; track n) {
           <tr class="fila-vacia" aria-hidden="true">
             <td class="td-id">&nbsp;</td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
+            <td class="col-estado"></td>
+            <td class="col-fecha"></td>
+            <td class="col-modelo"></td>
+            <td class="col-cliente"></td>
+            <td class="col-tel"></td>
+            <td class="col-importe"></td>
+            <td class="col-pieza"></td>
+            <td class="col-notas"></td>
+            <td class="col-dias"></td>
             <td class="td-expand"></td>
           </tr>
         }
@@ -547,6 +449,32 @@
     <div class="espacio-final" aria-hidden="true"></div>
   }
 </div>
+
+@if (error(); as msg) {
+  <div class="toast-error" role="alert" (click)="error.set(null)">{{ msg }}</div>
+}
+
+@if (pantalla.esMovil() && lineaAbierta(); as l) {
+  <app-hoja-linea
+    [linea]="l"
+    [piezas]="edPiezas"
+    [total]="totalEdPiezas"
+    [cargandoPiezas]="edPiezasCargando()"
+    [etiquetaPiezas]="etiquetaPiezasDe(l)"
+    [chips]="chipsParaLinea(l)"
+    [verTodos]="verTodos()"
+    [guardando]="guardando()"
+    (cerrar)="expandedId.set(null)"
+    (cambiarEstado)="cambiarEstado($event, l)"
+    (toggleVerTodos)="toggleVerTodos()"
+    (avisar)="enviarWhatsapp(l)"
+    (ticket)="imprimirTicket(l)"
+    (ticketSimple)="imprimirTicketSimple(l)"
+    (etiqueta)="imprimirEtiqueta(l)"
+    (etiquetaEnvio)="imprimirEtiquetaEnvio(l)"
+    (guardarNotas)="guardarNotas(l, $event)"
+  />
+}
 
 @if (pedidoAbierto()) {
   <app-pedido-modal (cerrado)="cerrarPedido($event)"></app-pedido-modal>
@@ -589,3 +517,63 @@
     (cerrado)="cerrarAvisar($event)"
   ></app-avisar-modal>
 }
+
+<ng-template #acciones>
+  @if (mostrarBotonTaller()) {
+    <button class="boton-accion principal" type="button" (click)="abrirTaller()" aria-label="Consulta de taller" title="Consulta de taller">
+      <app-icono nombre="taller" />
+      <span class="accion-texto">Consulta de taller</span>
+    </button>
+  }
+  @if (mostrarBotonAvisar()) {
+    <button class="boton-accion principal" type="button" (click)="abrirAvisar()" aria-label="Avisar clientes" title="Avisar clientes">
+      <app-icono nombre="avisar" />
+      <span class="accion-texto">Avisar clientes</span>
+    </button>
+  }
+  <button class="boton-accion" type="button" (click)="abrirPedido()" aria-label="Generar pedido" title="Generar pedido">
+    <app-icono nombre="pedido" />
+    <span class="accion-texto">Generar pedido</span>
+  </button>
+  <div class="ajustes-wrap position-relative">
+    <button class="boton-accion solo-icono" type="button" (click)="toggleAjustes()" aria-label="Ajustes" title="Ajustes">
+      <app-icono nombre="ajustes" />
+    </button>
+
+    @if (ajustesAbierto()) {
+      <div class="ajustes-panel">
+        <div class="ap-sec-title">Ajustes</div>
+        <div class="ap-group">
+          <span class="ap-label">Divisor de fecha</span>
+          <label class="ap-opt"
+            ><input
+              type="radio"
+              name="divmodo"
+              [checked]="divisorModo() === 'todos'"
+              (change)="setDivisorModo('todos')"
+            />
+            En todos los filtros</label
+          >
+          <label class="ap-opt"
+            ><input
+              type="radio"
+              name="divmodo"
+              [checked]="divisorModo() === 'solo_todo'"
+              (change)="setDivisorModo('solo_todo')"
+            />
+            Solo en "Todo"</label
+          >
+          <label class="ap-opt"
+            ><input
+              type="radio"
+              name="divmodo"
+              [checked]="divisorModo() === 'off'"
+              (change)="setDivisorModo('off')"
+            />
+            Desactivado</label
+          >
+        </div>
+      </div>
+    }
+  </div>
+</ng-template>

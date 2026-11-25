@@ -1,23 +1,25 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { LineaService } from '../../core/services/linea.service';
 import { HistorialService, EntradaHistorial } from '../../core/services/historial.service';
 import { Linea } from '../../core/models/linea.model';
 import { getColor, getEtiqueta } from '../tablero/color.util';
 import { etiquetaHistorialCompleta } from '../../core/estados/estados';
+import { IconoComponent } from '../../core/layout/icono/icono.component';
+import { PantallaService } from '../../core/layout/pantalla.service';
 
 @Component({
   selector: 'app-linea-detalle',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, IconoComponent],
   templateUrl: './linea-detalle.component.html',
   styleUrl: './linea-detalle.component.scss',
 })
   
 export class LineaDetalleComponent implements OnInit {
+  readonly pantalla = inject(PantallaService);
   private readonly route     = inject(ActivatedRoute);
-  private readonly router    = inject(Router);
   private readonly lineaSvc  = inject(LineaService);
   private readonly histSvc   = inject(HistorialService);
 
@@ -60,9 +62,5 @@ export class LineaDetalleComponent implements OnInit {
 
   diasDesde(fecha: string): number {
     return Math.floor((Date.now() - new Date(fecha).getTime()) / 86_400_000);
-  }
-
-  volver(): void {
-    this.router.navigate(['/tablero']);
   }
 }

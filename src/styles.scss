@@ -1,6 +1,80 @@
 /* Estilos globales. Bootstrap se carga desde angular.json. */
+@use 'breakpoints' as *;
+@use 'cabecera-pagina';
+
+:root {
+  --color-fondo: #f5f5f7;
+  --color-superficie: #ffffff;
+  --color-texto: #1d1d1f;
+  --color-texto-2: #6e6e73;
+  --color-borde: rgba(0, 0, 0, 0.08);
+  --color-acento: #0071e3;
+  --color-peligro: #d70015;
+  --color-exito: #1a7f37;
+
+  --fuente: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+
+  --esp-1: 4px;
+  --esp-2: 8px;
+  --esp-3: 12px;
+  --esp-4: 16px;
+  --esp-5: 24px;
+  --esp-6: 32px;
+
+  --radio-s: 8px;
+  --radio-m: 12px;
+  --radio-l: 16px;
+
+  --sombra-1: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --sombra-2: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+  --desenfoque: saturate(180%) blur(20px);
+  --fondo-translucido: rgba(255, 255, 255, 0.72);
+
+  --curva-ios: cubic-bezier(0.32, 0.72, 0, 1);
+
+  --cabecera-h: 48px;
+  --pestanas-h: 49px;
+}
+
 html,
 body {
-  height: 100%;
+  height: 100vh;
+  height: 100dvh;
   margin: 0;
+  overflow: hidden;
+}
+
+body {
+  font-family: var(--fuente);
+  color: var(--color-texto);
+  background: var(--color-fondo);
+}
+
+@include movil {
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 150ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

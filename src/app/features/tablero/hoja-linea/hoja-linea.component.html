@@ -1,0 +1,107 @@
+@let l = linea();
+
+<app-hoja [etiqueta]="'Línea L-' + l.id" (cerrar)="cerrar.emit()">
+  <div hoja-cabecera class="cabecera" [style.--color-estado]="getColor(l)">
+    <div class="cab-fila">
+      <strong class="lid">L-{{ l.id }}</strong>
+      <span class="estado">{{ getEtiqueta(l) }}</span>
+      @if (l.fecha_entrada) {
+        <span class="dias">{{ diasDesde(l.fecha_entrada) }}d</span>
+      }
+    </div>
+    <div class="cab-modelo">{{ l.modelo ?? 'Sin modelo' }}</div>
+    <div class="cab-cliente">{{ l.cliente_nombre ?? 'TIENDA' }}</div>
+  </div>
+
+  <section class="seccion">
+    <div class="seccion-titulo">Estado</div>
+    <div class="chips">
+      @for (opt of chips(); track opt.id) {
+        <button
+          type="button"
+          class="chip"
+          [class.activo]="esEstadoActual(opt, l)"
+          [style.--chip]="opt.color"
+          [disabled]="guardando()"
+          (click)="cambiarEstado.emit(opt)"
+        >
+          {{ opt.label }}
+        </button>
+      }
+    </div>
+    <button type="button" class="enlace" (click)="toggleVerTodos.emit()">
+      {{ verTodos() ? 'Ver menos' : 'Ver todos los estados' }}
+    </button>
+  </section>
+
+  <section class="seccion">
+    <div class="seccion-titulo">{{ etiquetaPiezas() }}</div>
+    @if (cargandoPiezas()) {
+      <div class="secundario">Cargando...</div>
+    } @else {
+      <div class="piezas">
+        @for (p of piezas(); track $index) {
+          <div class="pieza">
+            <span class="pieza-desc">{{ p.descripcion || '—' }}</span>
+            <span class="pieza-imp">{{ p.importe != null ? (p.importe | number: '1.2-2') + ' €' : '—' }}</span>
+          </div>
+        }
+        <div class="pieza total">
+          <span>Total</span>
+          <span class="pieza-imp">{{ total() != null ? (total() | number: '1.2-2') + ' €' : '—' }}</span>
+        </div>
+      </div>
+    }
+
+    @if (l.fecha_recogida_prevista) {
+      <div class="dato">
+        <span class="secundario">Recogida prevista</span>
+        <span>{{ l.fecha_recogida_prevista | date: 'dd/MM/yyyy HH:mm' }}</span>
+      </div>
+    }
+  </section>
+
+  <section class="seccion">
+    <label class="seccion-titulo" for="hoja-notas">Notas</label>
+    <textarea
+      id="hoja-notas"
+      class="notas"
+      rows="3"
+      [value]="textoNotas()"
+      (input)="textoNotas.set($any($event.target).value)"
+      placeholder="Sin notas"
+    ></textarea>
+    @if (notasCambiadas()) {
+      <button type="button" class="boton principal" [disabled]="guardando()" (click)="guardarNotas.emit(textoNotas())">
+        {{ guardando() ? 'Guardando...' : 'Guardar notas' }}
+      </button>
+    }
+  </section>
+
+  <section class="seccion">
+    <div class="seccion-titulo">Acciones</div>
+    <div class="acciones">
+      @if (l.cliente_telefono) {
+        <button type="button" class="boton principal" (click)="avisar.emit()">
+          <app-icono nombre="avisar" /> Avisar
+        </button>
+      }
+      <button type="button" class="boton" [disabled]="cargandoPiezas()" (click)="ticket.emit()">
+        <app-icono nombre="ticket" /> Ticket
+      </button>
+      <button type="button" class="boton" (click)="ticketSimple.emit()">
+        <app-icono nombre="ticket" /> Ticket simple
+      </button>
+      <button type="button" class="boton" (click)="etiqueta.emit()">
+        <app-icono nombre="etiqueta" /> Etiqueta
+      </button>
+      @if (l.taller) {
+        <button type="button" class="boton" (click)="etiquetaEnvio.emit()">
+          <app-icono nombre="envio" /> Etiqueta envío
+        </button>
+      }
+    </div>
+  </section>
+
+  <a class="ver-ficha" [routerLink]="['/linea', l.id]">Ver ficha completa →</a>
+</app-hoja>

@@ -1,9 +1,8 @@
-<nav class="navbar navbar-dark bg-dark px-3 py-2">
-  <span class="navbar-brand fw-bold">
-    {{ modoEdicion() ? 'Editar línea' : 'Nueva línea' }}
-  </span>
-  <button class="btn btn-sm btn-outline-light" (click)="volver()">← Volver</button>
-</nav>
+<header class="cabecera-pagina">
+  <div class="cabecera-titulo">
+    <h1>{{ modoEdicion() ? 'Editar línea' : 'Nueva línea' }}</h1>
+  </div>
+</header>
 
 @if (!modoEdicion()) {
 <div class="estados-banda" [style.--tinte]="tinte()">

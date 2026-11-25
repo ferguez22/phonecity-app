@@ -1,15 +1,15 @@
-<nav class="navbar navbar-dark bg-dark px-3 py-2 sticky-top">
-    <div class="d-flex align-items-center gap-3">
-        <a routerLink="/tablero" class="btn btn-sm btn-outline-light">← Tablero</a>
-        <span class="navbar-brand fw-bold mb-0">👥 Clientes</span>
+<header class="cabecera-pagina">
+    <div class="cabecera-titulo">
+        <h1>Clientes</h1>
+        <span class="cabecera-detalle">{{ total() }} clientes</span>
     </div>
-    <span class="text-white-50 small">{{ total() }} clientes</span>
-</nav>
+</header>
 
 <div class="clientes-container container py-3">
 
     <input type="text" class="form-control mb-3" placeholder="Buscar por nombre o teléfono..." [ngModel]="busqueda()"
         (ngModelChange)="busqueda.set($event)" />
+    <div class="contador-contenido mb-2">{{ total() }} clientes</div>
 
     @if (error()) {
     <div class="alert alert-danger py-2">{{ error() }}</div>

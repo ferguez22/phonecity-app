@@ -1,0 +1,70 @@
+@for (g of grupos(); track g.clave) {
+  <section class="dia">
+    @if (g.titulo) {
+      <div class="dia-titulo">{{ g.titulo }}</div>
+    }
+    @for (l of g.lineas; track l.id) {
+      <article
+        class="tarjeta"
+        role="button"
+        tabindex="0"
+        [style.--color-estado]="getColor(l)"
+        (click)="abrir.emit(l)"
+        (keydown.enter)="abrir.emit(l)"
+      >
+        <div class="fila fila-1">
+          <strong class="lid">L-{{ l.id }}</strong>
+          <span class="estado">{{ getEtiqueta(l) }}</span>
+          @if (l.fecha_entrada) {
+            <span class="dias">{{ diasDesde(l.fecha_entrada) }}d</span>
+          }
+        </div>
+        @if (l.es_historico) {
+          <span class="historico">Histórico</span>
+        }
+        <div class="fila modelo">{{ l.modelo ?? '—' }}</div>
+        <div class="fila fila-3">
+          <span class="pieza">
+            @if (l.num_piezas && l.num_piezas > 1) {
+              <span class="multi">×{{ l.num_piezas }}</span>
+            }
+            {{ l.problema_o_pieza ?? '—' }}
+          </span>
+          @if (l.importe != null) {
+            <span class="importe">{{ l.importe | number: '1.0-0' }} €</span>
+          }
+        </div>
+        <div class="fila fila-4">
+          <span class="cliente">{{ l.cliente_nombre ?? 'TIENDA' }}</span>
+          @if (l.cliente_telefono) {
+            <span class="sep">·</span>
+            <button type="button" class="telefono" (click)="abrirMenuTelefono($event, l.cliente_telefono)">
+              {{ l.cliente_telefono }}
+            </button>
+          }
+        </div>
+      </article>
+    }
+  </section>
+}
+
+@if (menu(); as m) {
+  <div class="menu-fondo" (click)="cerrarMenu()"></div>
+  <div class="menu-telefono" role="menu" [style.top.px]="m.top" [style.left.px]="m.left">
+    <a role="menuitem" class="menu-item" [href]="'tel:' + (m.internacional ? '+' + m.internacional : m.telefono)" (click)="cerrarMenu()">
+      Llamar
+    </a>
+    @if (m.internacional) {
+      <a
+        role="menuitem"
+        class="menu-item"
+        [href]="'https://wa.me/' + m.internacional"
+        target="_blank"
+        rel="noopener"
+        (click)="cerrarMenu()"
+      >
+        WhatsApp
+      </a>
+    }
+  </div>
+}

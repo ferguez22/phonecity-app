@@ -1,28 +1,22 @@
-<nav class="navbar navbar-dark bg-dark px-3 py-2">
-  <div class="d-flex align-items-center gap-3">
-    <a routerLink="/tablero" class="btn btn-sm btn-outline-light">← Tablero</a>
-    <span class="navbar-brand fw-bold mb-0">Temporizadores de reparación</span>
+<header class="cabecera-pagina">
+  <div class="cabecera-titulo">
+    <h1>Temporizadores de reparación</h1>
+    <span class="cabecera-detalle">{{ cards().length }} activos</span>
   </div>
-  <div class="d-flex align-items-center gap-3">
-    <span class="text-white-50 small">{{ cards().length }} activos</span>
-    <button
-      class="btn btn-sm btn-outline-light"
-      type="button"
-      (click)="cargar()"
-    >
-      ↻ Refrescar
-    </button>
-    <button
-      class="btn btn-sm btn-outline-light"
-      type="button"
-      (click)="togglePanel()"
-    >
-      {{ panelVisible() ? "▶ Ocultar panel" : "◀ Mostrar panel" }}
-    </button>
-  </div>
-</nav>
+  @if (pantalla.esMovil()) {
+    <div class="cabecera-acciones">
+      <ng-container *ngTemplateOutlet="acciones" />
+    </div>
+  }
+</header>
 
 <div class="container-fluid py-3">
+  @if (!pantalla.esMovil()) {
+    <div class="acciones-contenido mb-3">
+      <span class="contador-contenido me-auto">{{ cards().length }} activos</span>
+      <ng-container *ngTemplateOutlet="acciones" />
+    </div>
+  }
   <div class="layout-2col" [class.sin-panel]="!panelVisible()">
     <div class="col-izq">
       <section class="iniciar-box mb-4">
@@ -267,3 +261,20 @@
         </div>
     </div>
     }
+
+<ng-template #acciones>
+  <button class="boton-accion" type="button" (click)="cargar()" aria-label="Refrescar" title="Refrescar">
+    <app-icono nombre="refrescar" />
+    <span class="accion-texto">Refrescar</span>
+  </button>
+  <button
+    class="boton-accion"
+    type="button"
+    (click)="togglePanel()"
+    [attr.aria-label]="panelVisible() ? 'Ocultar panel' : 'Mostrar panel'"
+    [title]="panelVisible() ? 'Ocultar panel' : 'Mostrar panel'"
+  >
+    <app-icono nombre="panel" />
+    <span class="accion-texto">{{ panelVisible() ? "Ocultar panel" : "Mostrar panel" }}</span>
+  </button>
+</ng-template>

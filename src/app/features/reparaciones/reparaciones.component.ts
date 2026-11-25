@@ -1,11 +1,12 @@
 import { Component, OnInit, OnDestroy, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
 
 import { LineaService, LineaPayload } from '../../core/services/linea.service';
 import { Linea } from '../../core/models/linea.model';
 import { getEtiqueta, estadoActualDef } from '../../core/estados/estados';
+import { IconoComponent } from '../../core/layout/icono/icono.component';
+import { PantallaService } from '../../core/layout/pantalla.service';
 
 interface TimerCard {
   linea: Linea;
@@ -37,12 +38,13 @@ const ESTADO_TIMER_LABEL: Record<string, string> = {
 @Component({
   selector: 'app-reparaciones',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, IconoComponent],
   templateUrl: './reparaciones.component.html',
   styleUrl: './reparaciones.component.scss',
 })
   
 export class ReparacionesComponent implements OnInit, OnDestroy {
+  readonly pantalla = inject(PantallaService);
   private readonly lineaSvc = inject(LineaService);
   private intervalId: ReturnType<typeof setInterval> | null = null;
 

@@ -1,7 +1,6 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
 import { ClienteService } from '../../core/services/cliente.service';
 import { Cliente } from '../../core/models/cliente.model';
 import { normalizar, soloDigitos, terminosDe, casaTodos } from '../../core/utils/texto.util';
@@ -9,7 +8,7 @@ import { normalizar, soloDigitos, terminosDe, casaTodos } from '../../core/utils
 @Component({
   selector: 'app-clientes',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule],
   templateUrl: './clientes.component.html',
   styleUrl: './clientes.component.scss',
 })

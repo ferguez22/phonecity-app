@@ -5,4 +5,14 @@
 </div>
 }
 
-<router-outlet />
+@if (!esLogin()) {
+<app-barra-superior class="armazon-barra" />
+}
+
+<main class="armazon-main">
+    <router-outlet />
+</main>
+
+@if (!esLogin()) {
+<app-pestanas class="armazon-pestanas" />
+}

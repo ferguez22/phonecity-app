@@ -1,3 +1,29 @@
+:host {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+        "barra"
+        "main"
+        "pestanas";
+    height: 100%;
+}
+
+.armazon-barra {
+    grid-area: barra;
+}
+
+.armazon-main {
+    grid-area: main;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+.armazon-pestanas {
+    grid-area: pestanas;
+}
+
 .banda-offline {
     position: fixed;
     top: 0;
@@ -8,7 +34,7 @@
     align-items: center;
     justify-content: center;
     gap: 12px;
-    padding: 8px 16px;
+    padding: calc(8px + env(safe-area-inset-top)) 16px 8px;
     background: #b02a37;
     color: #fff;
     font-size: 0.85rem;

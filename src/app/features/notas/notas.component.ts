@@ -2,14 +2,13 @@ import { Component, OnInit, inject, signal, computed } from '@angular/core';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
 import { NotaService } from '../../core/services/nota.service';
 import { Nota } from '../../core/models/nota.model';
 
 @Component({
   selector: 'app-notas',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule],
   templateUrl: './notas.component.html',
   styleUrl: './notas.component.scss',
   animations: [

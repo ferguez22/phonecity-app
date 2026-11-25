@@ -1,0 +1,29 @@
+<nav class="pestanas" aria-label="Navegación principal">
+  @for (e of pestanas; track e.ruta) {
+    <a [routerLink]="e.ruta" routerLinkActive="activa" class="pestana">
+      <app-icono [nombre]="e.icono" />
+      <span class="etiqueta">{{ e.corto }}</span>
+    </a>
+  }
+  <button type="button" class="pestana" [class.activa]="masActiva()" (click)="abrirMas()" aria-haspopup="dialog">
+    <app-icono nombre="mas" />
+    <span class="etiqueta">Más</span>
+  </button>
+</nav>
+
+@if (masAbierto()) {
+  <div class="hoja-fondo" (click)="cerrarMas()"></div>
+  <div class="hoja" role="dialog" aria-modal="true" aria-label="Más opciones">
+    <div class="hoja-asa"></div>
+    @for (e of enMas; track e.ruta) {
+      <a [routerLink]="e.ruta" routerLinkActive="activa" class="hoja-item" (click)="cerrarMas()">
+        <app-icono [nombre]="e.icono" />
+        {{ e.texto }}
+      </a>
+    }
+    <button type="button" class="hoja-item peligro" (click)="cerrarSesion()">
+      <app-icono nombre="salir" />
+      Cerrar sesión
+    </button>
+  </div>
+}

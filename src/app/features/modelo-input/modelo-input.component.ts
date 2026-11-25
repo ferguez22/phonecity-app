@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, Input, ViewChild, computed, forwardRef, signal } from '@angular/core';
+import { Component, DestroyRef, ElementRef, HostListener, Input, ViewChild, computed, forwardRef, inject, signal } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import { ModeloDef } from '../../core/modelos/modelos';
@@ -30,6 +30,12 @@ export class ModeloInputComponent implements ControlValueAccessor {
 
   private onChange: (valor: string) => void = () => {};
   private onTouched: () => void = () => {};
+
+  constructor() {
+    const alScroll = () => this.onReposicionar();
+    window.addEventListener('scroll', alScroll, true);
+    inject(DestroyRef).onDestroy(() => window.removeEventListener('scroll', alScroll, true));
+  }
 
   writeValue(valor: string | null): void {
     this.texto.set(valor ?? '');
@@ -97,7 +103,6 @@ export class ModeloInputComponent implements ControlValueAccessor {
   }
 
   @HostListener('window:resize')
-  @HostListener('window:scroll')
   onReposicionar(): void {
     if (this.abierto()) this.calcularPosicion();
   }
