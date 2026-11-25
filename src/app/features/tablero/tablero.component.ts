@@ -210,7 +210,7 @@ export class TableroComponent implements OnInit {
   });
 
   readonly gruposMovil = computed<GrupoDia[]>(() => {
-    const ls = [...this.lineasFiltradas()].reverse();
+    const ls = this.lineasFiltradas();
     if (!this.mostrarDivisor()) return [{ clave: 'todas', titulo: null, lineas: ls }];
     const grupos: GrupoDia[] = [];
     for (const l of ls) {
@@ -300,7 +300,7 @@ export class TableroComponent implements OnInit {
         this.cargando.set(false);
         setTimeout(() => {
           const area = this.tablaArea.nativeElement;
-          area.scrollTo({ top: this.pantalla.esMovil() ? 0 : area.scrollHeight, behavior: 'instant' });
+          area.scrollTo({ top: area.scrollHeight, behavior: 'instant' });
         }, 80);
       },
       error: () => { this.error.set('Error al cargar'); this.cargando.set(false); },
