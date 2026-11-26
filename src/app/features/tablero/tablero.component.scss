@@ -51,6 +51,12 @@
   flex-shrink: 0;
 }
 
+@include movil {
+  .cabecera-pagina:has(.accion-taller):has(.accion-avisar) .cabecera-detalle {
+    display: none;
+  }
+}
+
 @mixin acciones-solo-icono {
   .boton-accion {
     width: 32px;

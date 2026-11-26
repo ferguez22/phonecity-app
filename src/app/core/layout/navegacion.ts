@@ -7,7 +7,6 @@ export interface EnlaceNav {
   icono: NombreIcono;
   barra: boolean;
   movil: 'pestana' | 'mas';
-  destacado?: boolean;
 }
 
 export const ENLACES: EnlaceNav[] = [
@@ -18,15 +17,6 @@ export const ENLACES: EnlaceNav[] = [
     icono: 'tablero',
     barra: true,
     movil: 'pestana',
-  },
-  {
-    ruta: '/linea/nueva',
-    texto: 'Nueva línea',
-    corto: 'Nueva',
-    icono: 'crear',
-    barra: false,
-    movil: 'pestana',
-    destacado: true,
   },
   {
     ruta: '/reparaciones',

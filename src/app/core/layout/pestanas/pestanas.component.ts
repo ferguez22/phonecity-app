@@ -33,6 +33,7 @@ export class PestanasComponent {
   );
 
   readonly masActiva = computed(() => this.enMas.some((e) => this.url().startsWith(e.ruta)));
+  readonly enAlta = computed(() => this.url().startsWith('/linea/nueva'));
 
   abrirMas(): void {
     this.masAbierto.set(true);

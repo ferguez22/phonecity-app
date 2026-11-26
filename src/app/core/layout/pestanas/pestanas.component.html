@@ -1,13 +1,8 @@
 <nav class="pestanas" aria-label="Navegación principal">
   @for (e of pestanas; track e.ruta) {
-    <a [routerLink]="e.ruta" routerLinkActive="activa" class="pestana">
-      @if (e.destacado) {
-        <span class="crear-circulo accion-crear">
-          <app-icono [nombre]="e.icono" />
-        </span>
-      } @else {
-        <app-icono [nombre]="e.icono" />
-      }
+    <a [routerLink]="e.ruta" routerLinkActive #rla="routerLinkActive" class="pestana"
+      [class.activa]="rla.isActive || (e.ruta === '/tablero' && enAlta())">
+      <app-icono [nombre]="e.icono" />
       <span class="etiqueta">{{ e.corto }}</span>
     </a>
   }

@@ -11,7 +11,8 @@
 
 .pestanas {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
   padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   background: var(--fondo-translucido);
   -webkit-backdrop-filter: var(--desenfoque);
@@ -54,22 +55,6 @@
   app-icono {
     width: 24px;
     height: 24px;
-  }
-
-  .crear-circulo {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: var(--accion);
-    color: var(--accion-texto);
-
-    app-icono {
-      width: 16px;
-      height: 16px;
-    }
   }
 }
 

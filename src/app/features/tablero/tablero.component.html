@@ -509,10 +509,8 @@
     <app-icono nombre="pedido" />
     <span class="accion-texto">Generar pedido</span>
   </button>
-  @if (!pantalla.esMovil()) {
-    <a class="boton-accion accion-crear" routerLink="/linea/nueva" aria-label="Nueva línea" title="Nueva línea">
-      <app-icono nombre="crear" />
-      <span class="accion-texto">Nueva línea</span>
-    </a>
-  }
+  <a class="boton-accion accion-crear" routerLink="/linea/nueva" aria-label="Nueva línea" title="Nueva línea">
+    <app-icono nombre="crear" />
+    <span class="accion-texto">Nueva línea</span>
+  </a>
 </ng-template>

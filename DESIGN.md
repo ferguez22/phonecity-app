@@ -57,8 +57,9 @@ Plegables: hoy se diseña **por ancho**. La Viewport Segments API (`@media (hori
 - "Nueva línea" no va en la barra: es un botón verde en las acciones del tablero.
 
 **Móvil:** barra de pestañas abajo, estilo iOS:
-- Máximo 5 pestañas, con icono y texto corto debajo: **Tablero · Nueva · Reparaciones · Clientes · Más**.
-- "Nueva" lleva su + dentro de un círculo verde (`accion-crear`).
+- Máximo 5 pestañas, con icono y texto corto debajo: **Tablero · Reparaciones · Clientes · Más**.
+- **La barra inferior no lleva acciones, solo secciones.** "Nueva línea" va en la cabecera del tablero: botón verde `accion-crear`, solo icono "+", 44 px, después de Generar pedido. Si salen los cuatro botones (Taller, Avisar, Pedido, Nueva), la cabecera oculta "N líneas".
+- En `/linea/nueva` se marca la pestaña Tablero.
 - "Más" abre una hoja (bottom sheet) con Notas, Etiquetas y las mismas opciones del menú Ajustes: Divisor de fecha · Importar · Cerrar sesión.
 - Pestaña activa con el color de acento; las demás en gris.
 - Fondo translúcido con desenfoque.
