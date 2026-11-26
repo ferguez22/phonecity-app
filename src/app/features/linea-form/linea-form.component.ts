@@ -173,8 +173,8 @@ export class LineaFormComponent implements OnInit, DoCheck, ConCambiosPendientes
     let hay = false;
     let suma = 0;
     for (const p of this.piezas) {
-      const n = Number(p.importe);
-      if (p.importe !== null && p.importe !== undefined && String(p.importe) !== '' && !Number.isNaN(n)) {
+      const n = this.aImporte(p.importe);
+      if (n !== null) {
         hay = true;
         suma += n;
       }
@@ -205,6 +205,20 @@ export class LineaFormComponent implements OnInit, DoCheck, ConCambiosPendientes
     this.anadirPieza();
   }
 
+  subirCampo(ev: FocusEvent): void {
+    if (!this.pantalla.esMovil()) return;
+    const campo = ev.currentTarget as HTMLElement;
+    setTimeout(() => campo.scrollIntoView({ block: 'start' }), 300);
+  }
+
+  private aImporte(valor: unknown): number | null {
+    if (valor === null || valor === undefined) return null;
+    const texto = String(valor).trim().replace(',', '.');
+    if (texto === '') return null;
+    const n = Number(texto);
+    return Number.isNaN(n) ? null : n;
+  }
+
   private focoEnPieza(i: number): void {
     setTimeout(() => {
       document.querySelector<HTMLInputElement>(`[data-pieza-alta="${i}"]`)?.focus();
@@ -215,9 +229,7 @@ export class LineaFormComponent implements OnInit, DoCheck, ConCambiosPendientes
     return this.piezas
       .map((p, i) => ({
         descripcion: (p.descripcion ?? '').trim(),
-        importe: p.importe === null || p.importe === undefined || String(p.importe) === ''
-          ? null
-          : Number(p.importe),
+        importe: this.aImporte(p.importe),
         orden: i,
       }))
       .filter((p) => p.descripcion !== '');

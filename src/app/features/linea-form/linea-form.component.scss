@@ -1,3 +1,5 @@
+@use 'breakpoints' as *;
+
 // ── BANDA DE ESTADOS ───────────────────────────────────────────
 .estados-banda {
   --tinte: #ffffff;
@@ -293,5 +295,64 @@
   .estado-card {
     min-height: 56px;
     font-size: 0.72rem;
+  }
+}
+@include movil {
+  .estado-card {
+    font-size: 12px;
+  }
+
+  .form-alta {
+    --margen-scroll-arriba: calc(var(--cabecera-h) + env(safe-area-inset-top) + var(--esp-2));
+    --reserva-inferior: calc(44px + 2 * var(--esp-2) + 1px);
+
+    input,
+    select,
+    textarea,
+    app-modelo-input {
+      scroll-margin-top: var(--margen-scroll-arriba);
+      scroll-margin-bottom: calc(var(--reserva-inferior) + var(--esp-2));
+    }
+
+    .btn-primary {
+      min-height: 44px;
+    }
+  }
+
+  .campo-recogida {
+    width: 100%;
+
+    input {
+      min-width: 0;
+    }
+  }
+
+  .pieza-fila {
+    grid-template-columns: 1fr 88px 44px;
+  }
+
+  .pieza-quitar {
+    width: 44px;
+    height: 44px;
+  }
+
+  .pieza-anadir {
+    min-height: 44px;
+  }
+
+  .barra-alta {
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+    margin-inline: calc(var(--bs-gutter-x, 1.5rem) * -0.5);
+    padding: var(--esp-2) calc(var(--bs-gutter-x, 1.5rem) * 0.5);
+    background: var(--fondo-translucido);
+    -webkit-backdrop-filter: var(--desenfoque);
+    backdrop-filter: var(--desenfoque);
+    border-top: 1px solid var(--color-borde);
+
+    > * {
+      flex: 1;
+    }
   }
 }

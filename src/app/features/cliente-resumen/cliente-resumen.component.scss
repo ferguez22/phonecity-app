@@ -1,3 +1,5 @@
+@use 'breakpoints' as *;
+
 .cr-wrap {
     margin-top: 8px;
     font-size: 0.8rem;
@@ -125,4 +127,10 @@
     .cr-detalle { grid-area: detalle; }
     .cr-estado { grid-area: estado; justify-self: start; }
     .cr-fecha { grid-area: fecha; }
+}
+
+@include movil {
+    .cr-mas {
+        min-height: 44px;
+    }
 }

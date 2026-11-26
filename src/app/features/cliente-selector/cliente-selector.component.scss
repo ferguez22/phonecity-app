@@ -1,3 +1,5 @@
+@use 'breakpoints' as *;
+
 .cs-wrap {
     position: relative;
     font-size: 0.85rem;
@@ -214,4 +216,27 @@
     border: 1px solid #f5c2c7;
     border-radius: 6px;
     padding: 6px 10px;
+}
+@include movil {
+    .cs-input {
+        scroll-margin-top: var(--margen-scroll-arriba, 0px);
+        scroll-margin-bottom: calc(var(--reserva-inferior, 0px) + 8px);
+    }
+
+    .cs-lista {
+        max-height: max(44px, min(240px, calc(var(--alto-disponible, 240px) - var(--reserva-inferior, 0px))));
+    }
+
+    .cs-fila,
+    .cs-btn {
+        min-height: 44px;
+    }
+
+    .cs-quitar {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 44px;
+        min-height: 44px;
+    }
 }

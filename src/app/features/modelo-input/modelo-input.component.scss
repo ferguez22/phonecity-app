@@ -20,6 +20,11 @@
         color: #a1a1a6;
     }
 
+    @include movil {
+        scroll-margin-top: var(--margen-scroll-arriba, 0px);
+        scroll-margin-bottom: calc(var(--reserva-inferior, 0px) + 8px);
+    }
+
     &:focus {
         outline: none;
         border-color: #0071e3;
@@ -64,6 +69,7 @@
 
     @include movil {
         --fila-h: 44px;
+        max-height: max(var(--fila-h), min(calc(var(--fila-h) * 5.5 + 8px), calc(var(--alto-disponible, 100vh) - var(--reserva-inferior, 0px))));
     }
 }
 

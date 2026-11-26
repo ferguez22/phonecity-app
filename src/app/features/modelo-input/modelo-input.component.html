@@ -8,6 +8,7 @@
     [disabled]="deshabilitado()"
     autocomplete="off"
     autocapitalize="off"
+    autocorrect="off"
     spellcheck="false"
     (input)="onInput(campo.value)"
     (keydown)="onTecla($event)"
@@ -21,6 +22,7 @@
     [style.top.px]="posicion().top"
     [style.left.px]="posicion().left"
     [style.width.px]="posicion().width"
+    [style.--alto-disponible]="posicion().alto + 'px'"
 >
     @for (m of sugerencias(); track m.nombre; let i = $index) {
     <li

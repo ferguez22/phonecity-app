@@ -18,7 +18,7 @@
         <input #inputNombre type="text" class="cs-input" placeholder="Nombre"[(ngModel)]="nuevoNombre" name="csNuevoNombre" autocomplete="off"
         (keydown.enter)="$event.preventDefault(); crear()" />
 
-        <input #inputTel type="tel" class="cs-input" placeholder="Telefono" [(ngModel)]="nuevoTel"
+        <input #inputTel type="tel" inputmode="tel" class="cs-input" placeholder="Telefono" [(ngModel)]="nuevoTel"
             name="csNuevoTel" autocomplete="off" (keydown.enter)="$event.preventDefault(); crear()" />
 
         @if (conflicto()) {
@@ -46,11 +46,11 @@
     </div>
     } @else {
     <div class="cs-buscar">
-        <input type="text" class="cs-input" placeholder="Buscar nombre o teléfono..." [ngModel]="texto()"
+        <input #inputBuscar type="text" class="cs-input" placeholder="Buscar nombre o teléfono..." [ngModel]="texto()"
             (ngModelChange)="onTexto($event)" name="csBusqueda" autocomplete="off" />
 
         @if (abierto()) {
-        <ul class="cs-lista">
+        <ul class="cs-lista" [style.--alto-disponible]="altoLista() + 'px'">
             @if (buscando()) {
             <li class="cs-estado">Buscando...</li>
             } @else {

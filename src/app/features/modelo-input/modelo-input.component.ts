@@ -3,6 +3,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 import { ModeloDef } from '../../core/modelos/modelos';
 import { buscarModelos, nombreExacto } from '../../core/modelos/buscar-modelo';
+import { alCambiarVista, altoVisibleDebajo } from '../../core/utils/viewport.util';
 
 @Component({
   selector: 'app-modelo-input',
@@ -23,7 +24,7 @@ export class ModeloInputComponent implements ControlValueAccessor {
   readonly abierto = signal(false);
   readonly activo = signal(0);
   readonly deshabilitado = signal(false);
-  readonly posicion = signal({ top: 0, left: 0, width: 0 });
+  readonly posicion = signal({ top: 0, left: 0, width: 0, alto: 9999 });
 
   readonly sugerencias = computed(() => buscarModelos(this.texto()));
   readonly visible = computed(() => this.abierto() && this.sugerencias().length > 0);
@@ -34,14 +35,13 @@ export class ModeloInputComponent implements ControlValueAccessor {
   private readonly host = inject(ElementRef<HTMLElement>);
 
   constructor() {
-    const alScroll = () => this.onReposicionar();
     const alPulsarFuera = (e: PointerEvent) => {
       if (this.abierto() && !this.host.nativeElement.contains(e.target as Node)) this.abierto.set(false);
     };
-    window.addEventListener('scroll', alScroll, true);
+    const destroyRef = inject(DestroyRef);
+    alCambiarVista(() => this.onReposicionar(), destroyRef);
     document.addEventListener('pointerdown', alPulsarFuera, true);
-    inject(DestroyRef).onDestroy(() => {
-      window.removeEventListener('scroll', alScroll, true);
+    destroyRef.onDestroy(() => {
       document.removeEventListener('pointerdown', alPulsarFuera, true);
     });
   }
@@ -149,6 +149,7 @@ export class ModeloInputComponent implements ControlValueAccessor {
 
   private calcularPosicion(): void {
     const r = this.campo.nativeElement.getBoundingClientRect();
-    this.posicion.set({ top: r.bottom + 4, left: r.left, width: r.width });
+    const top = r.bottom + 4;
+    this.posicion.set({ top, left: r.left, width: r.width, alto: altoVisibleDebajo(top) });
   }
 }

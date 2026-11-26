@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, ViewChild, ElementRef, inject, signal, computed } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, Input, Output, ViewChild, ElementRef, inject, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, Subject, switchMap, catchError, of } from 'rxjs';
@@ -6,6 +6,7 @@ import { debounceTime, distinctUntilChanged, Subject, switchMap, catchError, of 
 import { ClienteService } from '../../core/services/cliente.service';
 import { Cliente } from '../../core/models/cliente.model';
 import { soloDigitos } from '../../core/utils/texto.util';
+import { alCambiarVista, altoVisibleDebajo } from '../../core/utils/viewport.util';
 
 @Component({
   selector: 'app-cliente-selector',
@@ -28,6 +29,7 @@ export class ClienteSelectorComponent {
 
   @ViewChild('inputNombre') inputNombre?: ElementRef<HTMLInputElement>;
   @ViewChild('inputTel') inputTel?: ElementRef<HTMLInputElement>;
+  @ViewChild('inputBuscar') inputBuscar?: ElementRef<HTMLInputElement>;
 
   private readonly clienteSvc = inject(ClienteService);
   private readonly busq$ = new Subject<string>();
@@ -41,6 +43,7 @@ export class ClienteSelectorComponent {
   readonly guardando = signal(false);
   readonly error = signal<string | null>(null);
   readonly conflicto = signal<Cliente | null>(null);
+  readonly altoLista = signal(9999);
 
   nuevoNombre = '';
   nuevoTel = '';
@@ -52,6 +55,7 @@ export class ClienteSelectorComponent {
   );
 
   constructor() {
+    alCambiarVista(() => this.medirLista(), inject(DestroyRef));
     this.busq$
       .pipe(
         debounceTime(250),
@@ -73,6 +77,7 @@ export class ClienteSelectorComponent {
       this.seleccionado.set(null);
       this.clienteChange.emit(null);
     }
+    this.medirLista();
     const limpio = q.trim();
     if (limpio.length >= 2) {
       this.buscando.set(true);
@@ -81,6 +86,12 @@ export class ClienteSelectorComponent {
       this.resultados.set([]);
       this.buscando.set(false);
     }
+  }
+
+  private medirLista(): void {
+    if (!this.abierto() || !this.inputBuscar) return;
+    const r = this.inputBuscar.nativeElement.getBoundingClientRect();
+    this.altoLista.set(altoVisibleDebajo(r.bottom + 4));
   }
 
   onTecla(ev: KeyboardEvent): void {
