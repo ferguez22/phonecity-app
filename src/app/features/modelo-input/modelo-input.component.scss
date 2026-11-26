@@ -1,3 +1,5 @@
+@use 'breakpoints' as *;
+
 :host {
     display: block;
     width: 100%;
@@ -45,15 +47,24 @@
 }
 
 .mi-lista {
+    --fila-h: 38px;
     position: fixed;
     z-index: 1080;
+    max-height: calc(var(--fila-h) * 5.5 + 8px);
     margin: 0;
     padding: 4px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
     list-style: none;
     background: #fff;
     border: 1px solid rgba(0, 0, 0, 0.06);
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+
+    @include movil {
+        --fila-h: 44px;
+    }
 }
 
 .mi-fila {
@@ -69,6 +80,11 @@
 
     &.activa {
         background: rgba(0, 113, 227, 0.1);
+    }
+
+    @include movil {
+        align-items: center;
+        min-height: var(--fila-h);
     }
 }
 

@@ -1,7 +1,13 @@
 <nav class="pestanas" aria-label="Navegación principal">
   @for (e of pestanas; track e.ruta) {
     <a [routerLink]="e.ruta" routerLinkActive="activa" class="pestana">
-      <app-icono [nombre]="e.icono" />
+      @if (e.destacado) {
+        <span class="crear-circulo accion-crear">
+          <app-icono [nombre]="e.icono" />
+        </span>
+      } @else {
+        <app-icono [nombre]="e.icono" />
+      }
       <span class="etiqueta">{{ e.corto }}</span>
     </a>
   }
@@ -15,6 +21,10 @@
   <div class="hoja-fondo" (click)="cerrarMas()"></div>
   <div class="hoja" role="dialog" aria-modal="true" aria-label="Más opciones">
     <div class="hoja-asa"></div>
+    <div class="hoja-seccion">
+      <span class="hoja-titulo">Divisor de fecha</span>
+      <app-selector-divisor />
+    </div>
     @for (e of enMas; track e.ruta) {
       <a [routerLink]="e.ruta" routerLinkActive="activa" class="hoja-item" (click)="cerrarMas()">
         <app-icono [nombre]="e.icono" />

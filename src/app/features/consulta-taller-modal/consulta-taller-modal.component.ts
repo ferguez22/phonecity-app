@@ -1,6 +1,8 @@
 import { Component, OnInit, EventEmitter, Output, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TallerService, LineaTaller } from '../../core/services/taller.service';
+import { IconoComponent } from '../../core/layout/icono/icono.component';
+import { VentanaComponent } from '../../core/layout/ventana/ventana.component';
 
 interface BloqueTaller {
   taller: string;
@@ -11,7 +13,7 @@ interface BloqueTaller {
 @Component({
   selector: 'app-consulta-taller-modal',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, IconoComponent, VentanaComponent],
   templateUrl: './consulta-taller-modal.component.html',
   styleUrl: './consulta-taller-modal.component.scss',
 })

@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { ClienteService } from '../../core/services/cliente.service';
 import { Cliente } from '../../core/models/cliente.model';
 import { normalizar, soloDigitos, terminosDe, casaTodos } from '../../core/utils/texto.util';
+import { IconoComponent } from '../../core/layout/icono/icono.component';
 
 @Component({
   selector: 'app-clientes',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, IconoComponent],
   templateUrl: './clientes.component.html',
   styleUrl: './clientes.component.scss',
 })

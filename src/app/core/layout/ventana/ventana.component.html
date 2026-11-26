@@ -1,0 +1,41 @@
+@if (pantalla.esMovil()) {
+  <app-hoja [etiqueta]="titulo()" (cerrar)="cerrar.emit()">
+    <h2 hoja-cabecera class="ventana-titulo">{{ titulo() }}</h2>
+    <ng-container *ngTemplateOutlet="cuerpo" />
+    @if (conPie()) {
+      <div class="ventana-pie ventana-pie-movil">
+        <ng-container *ngTemplateOutlet="pie" />
+      </div>
+    }
+  </app-hoja>
+} @else {
+  <div class="ventana-capa" (click)="solicitarCierre()">
+    <div
+      class="ventana"
+      [class.ajustada]="ajustada()"
+      [style.--ventana-ancho]="ancho()"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-label]="titulo()"
+      (click)="$event.stopPropagation()"
+    >
+      <header class="ventana-cabecera">
+        <h2 class="ventana-titulo">{{ titulo() }}</h2>
+        <button type="button" class="ventana-cerrar" (click)="solicitarCierre()" aria-label="Cerrar">
+          <app-icono nombre="cerrar" />
+        </button>
+      </header>
+      <div class="ventana-cuerpo">
+        <ng-container *ngTemplateOutlet="cuerpo" />
+      </div>
+      @if (conPie()) {
+        <footer class="ventana-pie">
+          <ng-container *ngTemplateOutlet="pie" />
+        </footer>
+      }
+    </div>
+  </div>
+}
+
+<ng-template #cuerpo><ng-content /></ng-template>
+<ng-template #pie><ng-content select="[ventana-pie]" /></ng-template>

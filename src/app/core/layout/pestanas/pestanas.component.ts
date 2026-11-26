@@ -6,11 +6,12 @@ import { filter, map } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { IconoComponent } from '../icono/icono.component';
 import { ENLACES } from '../navegacion';
+import { SelectorDivisorComponent } from '../selector-divisor/selector-divisor.component';
 
 @Component({
   selector: 'app-pestanas',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, IconoComponent],
+  imports: [RouterLink, RouterLinkActive, IconoComponent, SelectorDivisorComponent],
   templateUrl: './pestanas.component.html',
   styleUrl: './pestanas.component.scss',
 })

@@ -1,6 +1,8 @@
 /* Estilos globales. Bootstrap se carga desde angular.json. */
 @use 'breakpoints' as *;
 @use 'cabecera-pagina';
+@use 'acciones';
+@use 'ventana';
 
 :root {
   --color-fondo: #f5f5f7;
@@ -11,6 +13,20 @@
   --color-acento: #0071e3;
   --color-peligro: #d70015;
   --color-exito: #1a7f37;
+
+  --color-crear: #1a7f37;
+  --color-crear-texto: #ffffff;
+  --color-pedido: #e8590c;
+  --color-pedido-texto: #ffffff;
+  --color-avisar: #25d366;
+  --color-avisar-texto: #1d1d1f;
+  --color-taller: #7048e8;
+  --color-taller-texto: #ffffff;
+  --color-editar: #f59f00;
+  --color-editar-texto: #1d1d1f;
+  --color-imprimir: #343a40;
+  --color-imprimir-texto: #ffffff;
+  --color-peligro-texto: #ffffff;
 
   --fuente: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
 

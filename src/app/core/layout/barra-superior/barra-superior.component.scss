@@ -9,6 +9,8 @@
 }
 
 .barra {
+  position: relative;
+  z-index: 300;
   display: flex;
   align-items: center;
   gap: var(--esp-4);
@@ -25,6 +27,8 @@
 }
 
 .marca {
+  display: flex;
+  align-items: center;
   flex-shrink: 0;
   font-size: 16px;
   font-weight: 600;
@@ -32,37 +36,32 @@
   text-decoration: none;
 }
 
+.marca-icono {
+  display: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+}
+
 .enlaces {
   display: flex;
   align-items: center;
-  gap: var(--esp-1);
-  flex: 1;
+  gap: 2px;
   min-width: 0;
-  overflow-x: auto;
-  scrollbar-width: none;
-
-  &::-webkit-scrollbar {
-    display: none;
-  }
-}
-
-.acciones {
-  display: flex;
-  align-items: center;
-  gap: var(--esp-1);
-  flex-shrink: 0;
+  padding: 2px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.04);
 }
 
 .enlace {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--esp-2);
-  min-height: 44px;
-  min-width: 44px;
-  padding: 0 var(--esp-3);
+  gap: 6px;
+  min-height: 40px;
+  padding: 0 14px;
   border: 0;
-  border-radius: var(--radio-s);
+  border-radius: 999px;
   background: transparent;
   color: var(--color-texto-2);
   font: inherit;
@@ -73,7 +72,7 @@
 
   &:hover {
     color: var(--color-texto);
-    background: rgba(0, 0, 0, 0.04);
+    background: rgba(0, 0, 0, 0.05);
   }
 
   &:active {
@@ -87,43 +86,129 @@
 
   &.activo {
     color: var(--color-acento);
-    background: rgba(0, 113, 227, 0.08);
+    background: rgba(0, 113, 227, 0.12);
+    font-weight: 600;
   }
 
-  &.salir:hover {
+  app-icono {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.ajustes {
+  position: relative;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.boton-ajustes {
+  min-width: 44px;
+
+  &.abierto {
+    color: var(--color-texto);
+    background: rgba(0, 0, 0, 0.06);
+  }
+}
+
+.menu {
+  position: absolute;
+  top: calc(100% + var(--esp-2));
+  right: 0;
+  z-index: 1;
+  width: 280px;
+  padding: var(--esp-2);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-m);
+  background: var(--color-superficie);
+  box-shadow: var(--sombra-2);
+  transform-origin: top right;
+  animation: menu-entra 150ms var(--curva-ios);
+}
+
+.menu-seccion {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-2);
+  padding: var(--esp-2) var(--esp-2) var(--esp-3);
+  margin-bottom: var(--esp-1);
+  border-bottom: 1px solid var(--color-borde);
+}
+
+.menu-titulo {
+  color: var(--color-texto-2);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-3);
+  width: 100%;
+  min-height: 40px;
+  padding: 0 var(--esp-2);
+  border: 0;
+  border-radius: var(--radio-s);
+  background: transparent;
+  color: var(--color-texto);
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 150ms, transform 150ms;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.04);
+    color: var(--color-texto);
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--color-acento);
+    outline-offset: -3px;
+  }
+
+  &.peligro,
+  &.peligro:hover {
     color: var(--color-peligro);
   }
-}
 
-app-icono {
-  width: 18px;
-  height: 18px;
-}
-
-.texto-corto {
-  display: none;
-}
-
-@include escritorio {
-  .acciones app-icono {
-    display: none;
+  app-icono {
+    width: 18px;
+    height: 18px;
   }
 }
 
 @include medio {
+  .barra {
+    gap: var(--esp-3);
+  }
+
+  .marca-texto,
+  .texto-ajustes {
+    display: none;
+  }
+
+  .marca-icono {
+    display: block;
+  }
+
   .enlace {
-    padding: 0 var(--esp-2);
+    padding: 0 var(--esp-3);
   }
+}
 
-  .enlaces .texto-largo {
-    display: none;
+@keyframes menu-entra {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
   }
-
-  .enlaces .texto-corto {
-    display: inline;
-  }
-
-  .acciones .texto-largo {
-    display: none;
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
 }

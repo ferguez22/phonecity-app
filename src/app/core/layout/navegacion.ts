@@ -5,8 +5,9 @@ export interface EnlaceNav {
   texto: string;
   corto: string;
   icono: NombreIcono;
-  barra: 'izquierda' | 'derecha';
+  barra: boolean;
   movil: 'pestana' | 'mas';
+  destacado?: boolean;
 }
 
 export const ENLACES: EnlaceNav[] = [
@@ -15,23 +16,24 @@ export const ENLACES: EnlaceNav[] = [
     texto: 'Tablero',
     corto: 'Tablero',
     icono: 'tablero',
-    barra: 'izquierda',
+    barra: true,
     movil: 'pestana',
   },
   {
     ruta: '/linea/nueva',
     texto: 'Nueva línea',
     corto: 'Nueva',
-    icono: 'nueva',
-    barra: 'izquierda',
+    icono: 'crear',
+    barra: false,
     movil: 'pestana',
+    destacado: true,
   },
   {
     ruta: '/reparaciones',
     texto: 'Reparaciones',
     corto: 'Reparaciones',
     icono: 'reparaciones',
-    barra: 'izquierda',
+    barra: true,
     movil: 'pestana',
   },
   {
@@ -39,7 +41,7 @@ export const ENLACES: EnlaceNav[] = [
     texto: 'Clientes',
     corto: 'Clientes',
     icono: 'clientes',
-    barra: 'izquierda',
+    barra: true,
     movil: 'pestana',
   },
   {
@@ -47,7 +49,7 @@ export const ENLACES: EnlaceNav[] = [
     texto: 'Notas',
     corto: 'Notas',
     icono: 'notas',
-    barra: 'izquierda',
+    barra: true,
     movil: 'mas',
   },
   {
@@ -55,7 +57,7 @@ export const ENLACES: EnlaceNav[] = [
     texto: 'Importar',
     corto: 'Importar',
     icono: 'importar',
-    barra: 'derecha',
+    barra: false,
     movil: 'mas',
   },
 ];

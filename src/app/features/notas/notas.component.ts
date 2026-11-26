@@ -4,11 +4,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NotaService } from '../../core/services/nota.service';
 import { Nota } from '../../core/models/nota.model';
+import { IconoComponent } from '../../core/layout/icono/icono.component';
 
 @Component({
   selector: 'app-notas',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, IconoComponent],
   templateUrl: './notas.component.html',
   styleUrl: './notas.component.scss',
   animations: [

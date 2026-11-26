@@ -43,16 +43,6 @@
     white-space: nowrap;
 }
 
-.nota-editar {
-    padding: 0 4px;
-    text-decoration: none;
-    opacity: 0.5;
-
-    &:hover {
-        opacity: 1;
-    }
-}
-
 .nota-edit-input {
     flex: 1;
 }

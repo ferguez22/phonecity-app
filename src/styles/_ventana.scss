@@ -1,0 +1,132 @@
+@use 'breakpoints' as *;
+
+.boton-app {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--esp-2);
+  min-height: 40px;
+  padding: 0 var(--esp-4);
+  border: 0;
+  border-radius: var(--radio-s);
+  background: var(--accion, rgba(0, 0, 0, 0.05));
+  color: var(--accion-texto, var(--color-texto));
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 150ms, transform 150ms;
+
+  &:hover:not(:disabled) {
+    background: var(--accion-hover, rgba(0, 0, 0, 0.08));
+    color: var(--accion-texto, var(--color-texto));
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--color-acento);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  app-icono {
+    width: 18px;
+    height: 18px;
+  }
+
+  &.pequeno {
+    min-height: 32px;
+    padding: 0 var(--esp-3);
+
+    app-icono {
+      width: 16px;
+      height: 16px;
+    }
+  }
+
+  @include movil {
+    min-height: 44px;
+
+    &.pequeno {
+      min-height: 44px;
+    }
+  }
+}
+
+.boton-icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radio-s);
+  background: var(--accion, rgba(0, 0, 0, 0.05));
+  color: var(--accion-texto, var(--color-texto));
+  cursor: pointer;
+  transition: background-color 150ms, transform 150ms;
+
+  &:hover {
+    background: var(--accion-hover, rgba(0, 0, 0, 0.08));
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--color-acento);
+    outline-offset: 2px;
+  }
+
+  app-icono {
+    width: 16px;
+    height: 16px;
+  }
+
+  @include movil {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+.ventana-aviso {
+  margin: 0;
+  padding: var(--esp-5) 0;
+  color: var(--color-texto-2);
+  font-size: 14px;
+  text-align: center;
+}
+
+.ventana-error {
+  margin: 0 0 var(--esp-4);
+  color: var(--color-peligro);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.pildora {
+  flex-shrink: 0;
+  padding: 2px var(--esp-2);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--color-texto-2);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+
+  &.hecho {
+    background: rgba(26, 127, 55, 0.12);
+    color: var(--color-exito);
+  }
+}

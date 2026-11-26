@@ -1,95 +1,60 @@
-<div class="pm-overlay" (click)="cerrar()">
-    <div class="pm-modal" (click)="$event.stopPropagation()">
-
-        <div class="pm-header">
-            <h5>Generar pedido</h5>
-            <button type="button" class="pm-close" (click)="cerrar()">✕</button>
-        </div>
-
-        @if (cargando()) {
-        <div class="pm-body text-center text-muted py-4">Cargando pendientes...</div>
-        } @else {
-        <div class="pm-body">
-
-            @if (error()) { <div class="alert alert-danger py-2">{{ error() }}</div> }
-
-            <div class="pm-bloque">
-                <div class="pm-bloque-head">
-                    <span>Wephone Infotec</span>
-                    <button type="button" class="btn btn-sm btn-outline-primary"
-                        (click)="copiar(txtWephone, 'wephone')">
-                        {{ copiado() === 'wephone' ? '✓ Copiado' : 'Copiar' }}
-                    </button>
-                </div>
-                <textarea [(ngModel)]="txtWephone" rows="5"></textarea>
-                <div class="pm-bloque-accion">
-                    <button type="button" class="btn btn-sm btn-success"
-                        [disabled]="marcados().wephone !== null || conteos().wephone === 0 || guardando() !== null"
-                        (click)="marcar('wephone')">
-                        {{ guardando() === 'wephone' ? 'Marcando...' : 'Marcar Wephone como pedido' }}
-                    </button>
-                    @if (marcados().wephone !== null) {
-                    <span class="pm-badge">✓ Pedido ({{ marcados().wephone }})</span>
-                    } @else {
-                    <span class="pm-pend">{{ conteos().wephone }} pend.</span>
-                    }
-                </div>
-            </div>
-
-            <div class="pm-bloque">
-                <div class="pm-bloque-head">
-                    <span>Apokin</span>
-                    <button type="button" class="btn btn-sm btn-outline-primary" (click)="copiar(txtApokin, 'apokin')">
-                        {{ copiado() === 'apokin' ? '✓ Copiado' : 'Copiar' }}
-                    </button>
-                </div>
-                <textarea [(ngModel)]="txtApokin" rows="5"></textarea>
-                <div class="pm-bloque-accion">
-                    <button type="button" class="btn btn-sm btn-success"
-                        [disabled]="marcados().apokin !== null || conteos().apokin === 0 || guardando() !== null"
-                        (click)="marcar('apokin')">
-                        {{ guardando() === 'apokin' ? 'Marcando...' : 'Marcar Apokin como pedido' }}
-                    </button>
-                    @if (marcados().apokin !== null) {
-                    <span class="pm-badge">✓ Pedido ({{ marcados().apokin }})</span>
-                    } @else {
-                    <span class="pm-pend">{{ conteos().apokin }} pend.</span>
-                    }
-                </div>
-            </div>
-
-            <div class="pm-bloque">
-                <div class="pm-bloque-head">
-                    <span>Piezas</span>
-                    <button type="button" class="btn btn-sm btn-outline-primary" (click)="copiar(txtPiezas, 'piezas')">
-                        {{ copiado() === 'piezas' ? '✓ Copiado' : 'Copiar' }}
-                    </button>
-                </div>
-                <textarea [(ngModel)]="txtPiezas" rows="6"></textarea>
-                <div class="pm-bloque-accion">
-                    <button type="button" class="btn btn-sm btn-success"
-                        [disabled]="marcados().piezas !== null || conteos().piezas === 0 || guardando() !== null"
-                        (click)="marcar('piezas')">
-                        {{ guardando() === 'piezas' ? 'Marcando...' : 'Marcar Piezas como pedido' }}
-                    </button>
-                    @if (marcados().piezas !== null) {
-                    <span class="pm-badge">✓ Pedido ({{ marcados().piezas }})</span>
-                    } @else {
-                    <span class="pm-pend">{{ conteos().piezas }} pend.</span>
-                    }
-                </div>
-            </div>
-
-        </div>
-
-        <div class="pm-footer">
-            <button type="button" class="btn btn-success" [disabled]="nadaQueMarcar() || guardando() !== null"
-                (click)="marcarTodo()">
-                {{ guardando() === 'todos' ? 'Marcando...' : '✓ Marcar todo como pedido' }}
+<app-ventana #v titulo="Generar pedido" ancho="1100px" [conPie]="!cargando()" (cerrar)="cerrar()">
+  @if (cargando()) {
+    <p class="ventana-aviso">Cargando pendientes...</p>
+  } @else {
+    @if (error(); as e) {
+      <p class="ventana-error" role="alert">{{ e }}</p>
+    }
+    <div class="pm-bloques">
+      @for (g of grupos; track g.id) {
+        @let marcado = marcados()[g.id];
+        @let pendientes = conteos()[g.id];
+        @let vacio = marcado === null && pendientes === 0;
+        <section class="pm-bloque">
+          <div class="pm-bloque-cab">
+            <h3 class="pm-bloque-titulo">{{ g.nombre }}</h3>
+            @if (marcado !== null) {
+              <span class="pildora hecho">✓ Pedido ({{ marcado }})</span>
+            } @else if (vacio) {
+              <span class="pildora">Sin pendientes</span>
+            } @else {
+              <span class="pildora">{{ pendientes }} {{ pendientes === 1 ? 'pendiente' : 'pendientes' }}</span>
+            }
+            @if (!vacio) {
+              <button type="button" class="boton-app pequeno pm-copiar" (click)="copiar(textos[g.id], g.id)">
+                <app-icono [nombre]="copiado() === g.id ? 'check' : 'copiar'" />
+                {{ copiado() === g.id ? 'Copiado' : 'Copiar' }}
+              </button>
+            }
+          </div>
+          @if (!vacio) {
+            <textarea class="pm-texto" [(ngModel)]="textos[g.id]" [rows]="g.filas" [attr.aria-label]="'Pedido ' + g.nombre"></textarea>
+            <button
+              type="button"
+              class="boton-app accion-pedido pm-marcar"
+              [disabled]="marcado !== null || guardando() !== null"
+              (click)="marcar(g.id)"
+            >
+              {{ marcado !== null ? 'Marcado' : guardando() === g.id ? 'Marcando...' : 'Marcar como pedido' }}
             </button>
-            <button type="button" class="btn btn-outline-secondary" (click)="cerrar()">Cerrar Pedidos</button>
-        </div>
-        }
-
+          }
+        </section>
+      }
     </div>
-</div>
+  }
+
+  <ng-container ngProjectAs="[ventana-pie]">
+    @if (!pantalla.esMovil()) {
+      <button type="button" class="boton-app" (click)="v.solicitarCierre()">Cerrar</button>
+    }
+    <button
+      type="button"
+      class="boton-app accion-pedido pm-todo"
+      [disabled]="nadaQueMarcar() || guardando() !== null"
+      (click)="marcarTodo()"
+    >
+      <app-icono nombre="check" />
+      {{ guardando() === 'todos' ? 'Marcando...' : 'Marcar todo como pedido' }}
+    </button>
+  </ng-container>
+</app-ventana>

@@ -63,7 +63,9 @@
                 <td>{{ formatoFecha(c.primera_visita) }}</td>
                 <td class="text-center">{{ c.num_lineas ?? 0 }}</td>
                 <td class="td-acciones">
-                    <button type="button" class="btn btn-sm btn-link btn-editar" (click)="empezarEdicion(c)">✏️</button>
+                    <button type="button" class="boton-icono accion-editar" (click)="empezarEdicion(c)" aria-label="Editar cliente" title="Editar">
+                        <app-icono nombre="editar" />
+                    </button>
                 </td>
                 }
             </tr>

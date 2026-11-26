@@ -1,10 +1,12 @@
 import {Component, OnInit, ViewChild, ElementRef, inject, signal, computed, effect, HostListener} from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { IconoComponent } from '../../core/layout/icono/icono.component';
 import { PantallaService } from '../../core/layout/pantalla.service';
+import { PreferenciasService } from '../../core/preferencias/preferencias.service';
 import { LineaService, LineaFiltros, LineaPayload } from '../../core/services/linea.service';
 import { HistorialService, EntradaHistorial } from '../../core/services/historial.service';
 import { ClienteSelectorComponent } from '../cliente-selector/cliente-selector.component';
@@ -22,9 +24,9 @@ import { Cliente } from '../../core/models/cliente.model';
 import { normalizar, soloDigitos, casaTodos, separarBusqueda, casaFrases } from '../../core/utils/texto.util';
 import { limpiarTelefono } from '../../core/utils/telefono.util';
 import { diasDesde } from '../../core/utils/fecha.util';
-import { ESTADO_OPTIONS, EstadoDef, esEstadoActual, getColor, getEtiqueta, etiquetaHistorialCompleta, estadoActualDef, siguientesDe, mensajeWhatsapp, tieneMensajeEspecifico} from '../../core/estados/estados';
+import { ESTADO_OPTIONS, EstadoDef, colorEstado, esEstadoActual, getColor, getEtiqueta, etiquetaHistorialCompleta, estadoActualDef, siguientesDe, mensajeWhatsapp, tieneMensajeEspecifico} from '../../core/estados/estados';
 
-interface Boton { label: string; filtros: LineaFiltros; filtroClient?: (l: Linea) => boolean; aplicaHistorial?: boolean; fasesHistorial?: string[];}
+interface Boton { label: string; color?: string; texto?: string; filtros: LineaFiltros; filtroClient?: (l: Linea) => boolean; aplicaHistorial?: boolean; fasesHistorial?: string[];}
 
 type FilaTablero =
   | { tipo: 'divisor'; fecha: string; key: string }
@@ -33,7 +35,7 @@ type FilaTablero =
 @Component({
   selector: 'app-tablero',
   standalone: true,
-  imports: [CommonModule, FormsModule, IconoComponent, PedidoModalComponent, ConsultaTallerModalComponent, AvisarModalComponent, ClienteSelectorComponent, ModeloInputComponent, TarjetasLineasComponent, HojaLineaComponent],
+  imports: [CommonModule, FormsModule, RouterLink, IconoComponent, PedidoModalComponent, ConsultaTallerModalComponent, AvisarModalComponent, ClienteSelectorComponent, ModeloInputComponent, TarjetasLineasComponent, HojaLineaComponent],
   templateUrl: './tablero.component.html',
   styleUrl: './tablero.component.scss',
   animations: [
@@ -110,14 +112,14 @@ export class TableroComponent implements OnInit {
   readonly expandedId = signal<number | null>(null);
   readonly verTodos = signal(false);
   readonly estadoActivo = signal<EstadoDef | null>(null);
-  readonly filtrosExpandidos = signal(false); readonly ajustesAbierto = signal(false);
+  readonly filtrosExpandidos = signal(false);
   readonly incluirHistorial = signal(false);
   readonly pedidoAbierto = signal(false);
   readonly tallerAbierto = signal(false);
   readonly avisarAbierto = signal(false);
   readonly modoAvisar = signal<ModoAvisar>('todos');
   readonly toastWa = signal<Linea | null>(null);
-  readonly divisorModo = signal<'todos' | 'solo_todo' | 'off'>(this.leerDivisorModo());
+  readonly divisorModo = inject(PreferenciasService).divisorModo;
   readonly panelHistorial = signal<EntradaHistorial[]>([]);
   readonly panelCargando = signal(false);
   readonly edPiezasCargando = signal(false);
@@ -127,34 +129,38 @@ export class TableroComponent implements OnInit {
   readonly botonActivo = signal('Todo');
 
   readonly botones: Boton[] = [
-    { label: 'Todo', filtros: {} },
-    { label: 'Móviles en tienda', filtros: { vista: 'moviles_en_tienda' } },
+    { label: 'Todo', color: '#212529', texto: '#ffffff', filtros: {} },
+    { label: 'Móviles en tienda', color: colorEstado('reparado_avisado'), filtros: { vista: 'moviles_en_tienda' } },
     {
       label: 'Reparar + Avisado',
+      color: colorEstado('reparar'),
       filtros: { flujo: 'reparacion' },
       filtroClient: (l) => l.fase === 'por_reparar' || (l.fase === 'reparado' && !!l.avisado),
     },
     {
       label: 'Piezas',
+      color: colorEstado('pieza_pedida_movil'),
       filtros: { flujo: 'pieza' },
       filtroClient: (l) => !!l.es_historico || (l.fase !== 'entregado' && l.fase !== 'cancelado'),
       aplicaHistorial: true,
     },
     {
       label: 'Accesorios',
+      color: colorEstado('acc_en_tienda_wephone'),
       filtros: { flujo: 'accesorio' },
       filtroClient: (l) => !!l.es_historico || (l.fase !== 'entregado' && l.fase !== 'cancelado'),
       aplicaHistorial: true,
     },
-    { label: 'No reparable', filtros: { flujo: 'reparacion', fase: 'no_reparable' }, aplicaHistorial: true, fasesHistorial: ['no_reparable'] },
+    { label: 'No reparable', color: colorEstado('no_reparable_entregado'), filtros: { flujo: 'reparacion', fase: 'no_reparable' }, aplicaHistorial: true, fasesHistorial: ['no_reparable'] },
     {
       label: 'Taller',
+      color: colorEstado('enviado_taller_phonestorm'),
       filtros: { flujo: 'reparacion' },
       filtroClient: (l) => !!l.es_historico || l.fase === 'por_enviar_taller' || l.fase === 'en_taller',
       aplicaHistorial: true,
       fasesHistorial: ['por_enviar_taller', 'en_taller'],
     },
-    { label: 'Venta/Compra', filtros: { flujo: 'venta' } },
+    { label: 'Venta/Compra', color: colorEstado('compra'), filtros: { flujo: 'venta' } },
   ];
 
   readonly mostrarToggleHistorial = computed(() => {
@@ -531,10 +537,6 @@ export class TableroComponent implements OnInit {
     this.verTodos.update((v) => !v);
   }
 
-  toggleAjustes(): void {
-    this.ajustesAbierto.update((v) => !v);
-  }
-
   abrirPedido(): void {
     this.pedidoAbierto.set(true);
   }
@@ -614,19 +616,6 @@ export class TableroComponent implements OnInit {
     if (recargar) this.cargar();
   }
 
-  setDivisorModo(modo: 'todos' | 'solo_todo' | 'off'): void {
-    this.divisorModo.set(modo);
-    try { localStorage.setItem('phonecity_divisor_modo', modo); } catch {}
-  }
-
-  private leerDivisorModo(): 'todos' | 'solo_todo' | 'off' {
-    try {
-      const v = localStorage.getItem('phonecity_divisor_modo');
-      if (v === 'todos' || v === 'solo_todo' || v === 'off') return v;
-    } catch {}
-    return 'solo_todo';
-  }
-
   formatoDivisor(fecha: string): string {
     let d: Date;
     if (/^\d{4}-\d{2}-\d{2}/.test(fecha)) d = new Date(fecha);
@@ -651,17 +640,9 @@ export class TableroComponent implements OnInit {
       this.busquedaInput?.nativeElement?.focus();
     }
     if (e.key === 'Escape') {
-      if (this.ajustesAbierto()) this.ajustesAbierto.set(false);
-      else if (this.expandedId() !== null) this.expandedId.set(null);
+      if (this.expandedId() !== null) this.expandedId.set(null);
       else if (this.busqueda()) this.limpiarBusqueda();
     }
-  }
-
-  @HostListener('document:click', ['$event'])
-  onDocClick(e: MouseEvent): void {
-    if (!this.ajustesAbierto()) return;
-    const t = e.target as HTMLElement;
-    if (t && !t.closest('.ajustes-wrap')) this.ajustesAbierto.set(false);
   }
 
   private proveedorIdPorNombre(nombre?: string | null): number | null {

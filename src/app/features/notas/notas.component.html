@@ -34,12 +34,18 @@
             <input type="text" class="form-control form-control-sm nota-edit-input" [ngModel]="textoEdicion()"
                 (ngModelChange)="textoEdicion.set($event)" (keydown.enter)="guardarEdicion(nota)"
                 (keydown.escape)="cancelarEdicion()" />
-            <button type="button" class="btn btn-sm btn-success" (click)="guardarEdicion(nota)">✓</button>
-            <button type="button" class="btn btn-sm btn-link text-muted" (click)="cancelarEdicion()">✕</button>
+            <button type="button" class="boton-app pequeno accion-crear" (click)="guardarEdicion(nota)" aria-label="Guardar nota" title="Guardar">
+                <app-icono nombre="check" />
+            </button>
+            <button type="button" class="boton-app pequeno" (click)="cancelarEdicion()" aria-label="Cancelar edición" title="Cancelar">
+                <app-icono nombre="cerrar" />
+            </button>
             } @else {
             <span class="nota-texto">{{ nota.texto }}</span>
             <span class="nota-fecha">{{ formatoFecha(nota.creado_en) }}</span>
-            <button type="button" class="btn btn-sm btn-link nota-editar" (click)="empezarEdicion(nota)">✏️</button>
+            <button type="button" class="boton-icono accion-editar" (click)="empezarEdicion(nota)" aria-label="Editar nota" title="Editar">
+                <app-icono nombre="editar" />
+            </button>
             }
         </div>
         }

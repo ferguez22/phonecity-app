@@ -1,0 +1,9 @@
+$acciones: crear, pedido, avisar, taller, editar, imprimir, peligro;
+
+@each $accion in $acciones {
+  .accion-#{$accion} {
+    --accion: var(--color-#{$accion});
+    --accion-texto: var(--color-#{$accion}-texto);
+    --accion-hover: color-mix(in srgb, var(--color-#{$accion}) 88%, #000);
+  }
+}

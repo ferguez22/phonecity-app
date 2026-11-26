@@ -82,21 +82,21 @@
     <div class="seccion-titulo">Acciones</div>
     <div class="acciones">
       @if (l.cliente_telefono) {
-        <button type="button" class="boton principal" (click)="avisar.emit()">
+        <button type="button" class="boton accion-avisar" (click)="avisar.emit()">
           <app-icono nombre="avisar" /> Avisar
         </button>
       }
-      <button type="button" class="boton" [disabled]="cargandoPiezas()" (click)="ticket.emit()">
+      <button type="button" class="boton accion-imprimir" [disabled]="cargandoPiezas()" (click)="ticket.emit()">
         <app-icono nombre="ticket" /> Ticket
       </button>
-      <button type="button" class="boton" (click)="ticketSimple.emit()">
+      <button type="button" class="boton accion-imprimir" (click)="ticketSimple.emit()">
         <app-icono nombre="ticket" /> Ticket simple
       </button>
-      <button type="button" class="boton" (click)="etiqueta.emit()">
+      <button type="button" class="boton accion-imprimir" (click)="etiqueta.emit()">
         <app-icono nombre="etiqueta" /> Etiqueta
       </button>
       @if (l.taller) {
-        <button type="button" class="boton" (click)="etiquetaEnvio.emit()">
+        <button type="button" class="boton accion-imprimir" (click)="etiquetaEnvio.emit()">
           <app-icono nombre="envio" /> Etiqueta envío
         </button>
       }

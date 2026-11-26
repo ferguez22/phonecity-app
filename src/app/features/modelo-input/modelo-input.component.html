@@ -29,7 +29,9 @@
         [class.activa]="activo() === i"
         [attr.aria-selected]="activo() === i"
         (mouseenter)="activo.set(i)"
-        (pointerdown)="onPulsar($event, m)"
+        (pointerdown)="onPulsar($event)"
+        (pointerup)="onSoltar($event, m)"
+        (pointercancel)="onCancelar()"
     >
         <span class="mi-nombre">{{ m.nombre }}</span>
         <span class="mi-marca">{{ m.marca }}</span>

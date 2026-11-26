@@ -153,12 +153,14 @@
     border-radius: 9px;
     padding: 8px 22px;
     font-weight: 600;
-    color: #1f2328;
-    background: var(--color-activo);
+    color: var(--accion-texto);
+    background: var(--accion);
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.14);
     transition: background 300ms ease, transform 120ms ease, box-shadow 160ms ease;
 
     &:hover:not(:disabled) {
+      color: var(--accion-texto);
+      background: var(--accion-hover);
       transform: translateY(-1px);
       box-shadow: 0 5px 14px rgba(0, 0, 0, 0.18);
     }
@@ -174,15 +176,6 @@
         }
         }
     
-    .btn-outline-secondary {
-      border-radius: 9px;
-      padding: 8px 18px;
-  
-      &:focus-visible {
-        outline: 3px solid #1f2328;
-        outline-offset: 3px;
-      }
-    }
   }
 
  // ── EDITOR DE PIEZAS ───────────────────────────────────────────

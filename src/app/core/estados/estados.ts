@@ -54,6 +54,10 @@ export const ESTADOS: EstadoDef[] = [
 
 export const ESTADO_OPTIONS = ESTADOS;
 
+export function colorEstado(id: string): string | undefined {
+  return ESTADOS.find((e) => e.id === id)?.color;
+}
+
 function coincide(def: EstadoDef, l: Linea): boolean {
   if (def.flujo !== l.flujo) return false;
   if (def.fase !== l.fase) return false;
@@ -213,8 +217,8 @@ export function siguientesDe(l: Linea): EstadoDef[] {
 const PLANTILLAS_WA: Record<string, (l: Linea) => string> = {
   reparado: (l) =>`Hola ${l.cliente_nombre || ''}! Soy Fernando de PhoneCity. Ya hemos reparado tu ${l.modelo || 'dispositivo'}, puedes pasarte por la tienda a recogerlo cuando quieras!`,
   no_reparable: (l) =>`Hola ${l.cliente_nombre || ''}! Soy Fernando de PhoneCity. Lamentablemente no hemos podido reparar tu ${l.modelo || 'dispositivo'} con problema ${l.problema_o_pieza || ''}, puedes pasarte por la tienda a recogerlo cuando quieras! Esperamos poder ayudarte en otra ocasión!`,
-  pieza_en_tienda: (l) =>`Hola ${l.cliente_nombre || ''}! Soy Fernando de PhoneCity. Ya tenemos la ${l.problema_o_pieza || 'pieza'} de tu ${l.modelo || 'dispositivo'}, puedes pasarte por la tienda cuando quieras.`,
-  acc_en_tienda: (l) =>`Hola ${l.cliente_nombre || ''}! Soy Fernando de PhoneCity. Ya tenemos el ${l.problema_o_pieza || 'accesorio'} de tu ${l.modelo || 'dispositivo'} en tienda, puedes pasarte por la tienda a recogerlo cuando quieras!`,
+  pieza_en_tienda: (l) =>`Hola ${l.cliente_nombre || ''}! Soy Fernando de PhoneCity. Ya tenemos ${l.problema_o_pieza ? `la pieza: ${l.problema_o_pieza}` : 'la pieza'} de tu ${l.modelo || 'dispositivo'}, puedes pasarte por la tienda cuando quieras.`,
+  acc_en_tienda: (l) =>`Hola ${l.cliente_nombre || ''}! Soy Fernando de PhoneCity. Ya tenemos ${l.problema_o_pieza ? `el accesorio: ${l.problema_o_pieza}` : 'el accesorio'} de tu ${l.modelo || 'dispositivo'} en tienda, puedes pasarte por la tienda a recogerlo cuando quieras!`,
 };
 
 // Devuelve la clave de plantilla específica si el estado actual la tiene

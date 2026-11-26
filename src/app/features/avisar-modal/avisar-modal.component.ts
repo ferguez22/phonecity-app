@@ -3,13 +3,16 @@ import { CommonModule } from '@angular/common';
 import { LineaService } from '../../core/services/linea.service';
 import { Linea } from '../../core/models/linea.model';
 import { ESTADOS, mensajeWhatsapp } from '../../core/estados/estados';
+import { IconoComponent } from '../../core/layout/icono/icono.component';
+import { PantallaService } from '../../core/layout/pantalla.service';
+import { VentanaComponent } from '../../core/layout/ventana/ventana.component';
 
 export type ModoAvisar = 'todos' | 'reparado' | 'no_reparable';
 
 @Component({
   selector: 'app-avisar-modal',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, IconoComponent, VentanaComponent],
   templateUrl: './avisar-modal.component.html',
   styleUrl: './avisar-modal.component.scss',
 })
@@ -18,9 +21,11 @@ export class AvisarModalComponent implements OnInit {
   @Output() cerrado = new EventEmitter<boolean>();
 
   private readonly lineaSvc = inject(LineaService);
+  readonly pantalla = inject(PantallaService);
 
   readonly cargando = signal(true);
   readonly error = signal<string | null>(null);
+  readonly aviso = signal<string | null>(null);
   readonly lineas = signal<Linea[]>([]);
   readonly marcados = signal<Set<number>>(new Set());
   private huboEnvio = false;
@@ -69,9 +74,10 @@ export class AvisarModalComponent implements OnInit {
   }
 
   avisar(l: Linea): void {
+    this.aviso.set(null);
     const tel = this.limpiarTelefono(l.cliente_telefono);
     if (!tel) {
-      this.error.set(`L-${l.id} sin teléfono válido`);
+      this.aviso.set(`L-${l.id} sin teléfono válido`);
       return;
     }
     this.lineaSvc.update(l.id, { fecha_ultimo_aviso: this.fmtEscritura(new Date()), avisado: 1 }).subscribe({
@@ -86,7 +92,7 @@ export class AvisarModalComponent implements OnInit {
         window.open(`https://wa.me/${tel}?text=${encodeURIComponent(mensajeWhatsapp(l))}`, '_blank');
       },
       error: () => {
-        this.error.set(`Error al marcar L-${l.id}`);
+        this.aviso.set(`Error al marcar L-${l.id}`);
       },
     });
   }

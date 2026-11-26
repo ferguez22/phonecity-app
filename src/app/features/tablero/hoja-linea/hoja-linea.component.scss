@@ -192,8 +192,8 @@
   padding: 0 var(--esp-3);
   border: 0;
   border-radius: var(--radio-s);
-  background: rgba(0, 0, 0, 0.05);
-  color: var(--color-texto);
+  background: var(--accion, rgba(0, 0, 0, 0.05));
+  color: var(--accion-texto, var(--color-texto));
   font: inherit;
   font-size: 14px;
   font-weight: 600;

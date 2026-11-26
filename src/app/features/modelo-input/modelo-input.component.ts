@@ -30,11 +30,20 @@ export class ModeloInputComponent implements ControlValueAccessor {
 
   private onChange: (valor: string) => void = () => {};
   private onTouched: () => void = () => {};
+  private toque: { id: number; x: number; y: number } | null = null;
+  private readonly host = inject(ElementRef<HTMLElement>);
 
   constructor() {
     const alScroll = () => this.onReposicionar();
+    const alPulsarFuera = (e: PointerEvent) => {
+      if (this.abierto() && !this.host.nativeElement.contains(e.target as Node)) this.abierto.set(false);
+    };
     window.addEventListener('scroll', alScroll, true);
-    inject(DestroyRef).onDestroy(() => window.removeEventListener('scroll', alScroll, true));
+    document.addEventListener('pointerdown', alPulsarFuera, true);
+    inject(DestroyRef).onDestroy(() => {
+      window.removeEventListener('scroll', alScroll, true);
+      document.removeEventListener('pointerdown', alPulsarFuera, true);
+    });
   }
 
   writeValue(valor: string | null): void {
@@ -72,9 +81,11 @@ export class ModeloInputComponent implements ControlValueAccessor {
     if (ev.key === 'ArrowDown') {
       ev.preventDefault();
       this.activo.update((i) => (i + 1) % total);
+      this.mostrarActiva();
     } else if (ev.key === 'ArrowUp') {
       ev.preventDefault();
       this.activo.update((i) => (i - 1 + total) % total);
+      this.mostrarActiva();
     } else if (ev.key === 'Enter') {
       ev.preventDefault();
       this.elegir(this.sugerencias()[this.activo()]);
@@ -87,13 +98,25 @@ export class ModeloInputComponent implements ControlValueAccessor {
     }
   }
 
-  onPulsar(ev: PointerEvent, modelo: ModeloDef): void {
-    ev.preventDefault();
+  onPulsar(ev: PointerEvent): void {
+    if (ev.pointerType === 'mouse') ev.preventDefault();
+    this.toque = { id: ev.pointerId, x: ev.clientX, y: ev.clientY };
+  }
+
+  onSoltar(ev: PointerEvent, modelo: ModeloDef): void {
+    const t = this.toque;
+    this.toque = null;
+    if (!t || t.id !== ev.pointerId) return;
+    if (Math.hypot(ev.clientX - t.x, ev.clientY - t.y) > 10) return;
     this.elegir(modelo);
   }
 
+  onCancelar(): void {
+    this.toque = null;
+  }
+
   onBlur(): void {
-    this.abierto.set(false);
+    if (!this.toque) this.abierto.set(false);
     const canonico = nombreExacto(this.texto());
     if (canonico && canonico !== this.texto()) {
       this.texto.set(canonico);
@@ -112,6 +135,11 @@ export class ModeloInputComponent implements ControlValueAccessor {
     this.texto.set(modelo.nombre);
     this.onChange(modelo.nombre);
     this.abierto.set(false);
+  }
+
+  private mostrarActiva(): void {
+    const filas = this.host.nativeElement.querySelectorAll('.mi-fila');
+    filas[this.activo()]?.scrollIntoView({ block: 'nearest' });
   }
 
   private abrir(): void {

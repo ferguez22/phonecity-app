@@ -10,7 +10,7 @@ Estas reglas se aplican a toda pantalla nueva o que se toque. No se rediseña na
 
 1. **Haz que funcione, luego hazlo bonito.** Ningún cambio visual rompe un flujo que ya funciona.
 2. **La página nunca hace scroll.** Lo que se mueve es el contenido dentro de su contenedor; las barras quedan fijas.
-3. **Menos es más.** Sin sombras duras, sin bordes gruesos, sin colores saturados de fondo. El color se reserva para los estados y las acciones.
+3. **Menos es más.** Sin sombras duras, sin bordes gruesos, sin colores saturados de fondo. El minimalismo es para la estructura: el color se reserva para los estados y las acciones (ver *Colores de acción*).
 4. **Táctil primero.** Todo lo pulsable mide al menos 44 × 44 px.
 5. **Nada decorativo se mueve.** Las animaciones solo acompañan una acción del usuario.
 
@@ -50,11 +50,16 @@ Plegables: hoy se diseña **por ancho**. La Viewport Segments API (`@media (hori
 
 ## 4. Navegación
 
-**Escritorio y medio:** barra superior en una sola fila (logo · enlaces · acciones a la derecha). Enlace activo resaltado.
+**Escritorio y medio:** barra superior en una sola fila, sin scroll lateral:
+- Izquierda: "PhoneCity" en escritorio; en medio, solo el icono de la app (28 px).
+- Centro: **Tablero · Reparaciones · Clientes · Notas** como control segmentado: icono + texto en píldoras dentro de un carril gris suave. La activa, con fondo acento suave, texto `--color-acento` y peso 600. Hover y `scale(0.97)` al pulsar.
+- Derecha: un único botón ⚙ **Ajustes** con menú desplegable: Divisor de fecha · Importar · Cerrar sesión (rojo). Se cierra con clic fuera, Escape o al navegar.
+- "Nueva línea" no va en la barra: es un botón verde en las acciones del tablero.
 
 **Móvil:** barra de pestañas abajo, estilo iOS:
 - Máximo 5 pestañas, con icono y texto corto debajo: **Tablero · Nueva · Reparaciones · Clientes · Más**.
-- "Más" abre una hoja (bottom sheet) con el resto: Notas, Importar, Cerrar sesión.
+- "Nueva" lleva su + dentro de un círculo verde (`accion-crear`).
+- "Más" abre una hoja (bottom sheet) con Notas y las mismas opciones del menú Ajustes: Divisor de fecha · Importar · Cerrar sesión.
 - Pestaña activa con el color de acento; las demás en gris.
 - Fondo translúcido con desenfoque.
 
@@ -76,6 +81,26 @@ Se definen como variables CSS en `:root` (en `styles.scss`) y se usan siempre a 
 | `--color-exito` | Confirmaciones | `#1a7f37` |
 
 Los colores de los **estados de línea** siguen saliendo de `estados.ts`; no se duplican aquí.
+
+### Colores de acción
+
+Es una herramienta interna de trabajo: cada acción lleva un color con significado para reconocerla de un vistazo. **Misma acción, mismo color e icono en toda la app** (barra, cabeceras, hoja de detalle, tarjetas, modales).
+
+| Acción | Dónde | Fondo | Texto | Contraste | Icono |
+|---|---|---|---|---|---|
+| Crear | Nueva línea | `--color-crear` `#1a7f37` | blanco | 5,1 : 1 | `crear` (+) |
+| Pedido | Generar pedido | `--color-pedido` `#e8590c` | blanco | 3,6 : 1 | `pedido` (portapapeles con lista) |
+| Avisar | WhatsApp, Avisar clientes | `--color-avisar` `#25d366` | `#1d1d1f` | 8,5 : 1 | `avisar` (bocadillo) |
+| Taller | Consulta de taller | `--color-taller` `#7048e8` | blanco | 5,5 : 1 | `taller` (llave inglesa) |
+| Editar | Editar línea | `--color-editar` `#f59f00` | `#1d1d1f` | 7,9 : 1 | `editar` (lápiz) |
+| Imprimir | Tickets, etiquetas | `--color-imprimir` `#343a40` | blanco | 11,6 : 1 | `ticket` / `etiqueta` / `envio` |
+| Peligro | Cerrar sesión, borrar | `--color-peligro` `#d70015` | blanco | 5,4 : 1 | `salir` |
+
+- Avisar usa `#25d366` con texto oscuro y no `#128c7e` con blanco (4,1 : 1): es más legible.
+- Cada color tiene su pareja `--color-<accion>-texto`.
+- En el HTML se pone la clase global `accion-<accion>` en el botón (`accion-crear`, `accion-pedido`, …). La clase solo define `--accion`, `--accion-texto` y `--accion-hover`; el estilo del botón los usa (`background: var(--accion, <gris>)`). Sin clase, el botón queda gris.
+- Cerrar sesión en la barra va como texto rojo, no como botón relleno.
+- Las clases están en `src/styles/_acciones.scss`; los colores, en `:root` de `styles.scss`.
 
 ### Tipografía
 
@@ -102,6 +127,8 @@ Los colores de los **estados de línea** siguen saliendo de `estados.ts`; no se 
 - **Inputs:** fondo blanco, borde 1 px `--color-borde`, radio 8 px; al enfocar, borde acento + halo suave. Sin sombra interior de Bootstrap.
 - **Tarjetas y paneles:** fondo superficie, radio 12 px, `--sombra-1`.
 - **Modales:** en escritorio, centrados con radio 16 px. **En móvil, hoja que sube desde abajo** (bottom sheet) a ancho completo.
+  - Se usa siempre `<app-ventana titulo="…" ancho="…">` (`core/layout/ventana`): en escritorio, ventana con cabecera y pie fijos y cuerpo con scroll; en móvil, `<app-hoja>`. Escape y clic fuera cierran. El pie se proyecta con `ngProjectAs="[ventana-pie]"` y `[conPie]="true"`.
+  - Botones dentro: clase global `.boton-app` (+ `.pequeno`), con color de acción si aplica. Botón solo icono en filas: `.boton-icono`.
 - **Tablas en móvil:** se muestran como **tarjetas apiladas**, no como tabla. Cada tarjeta enseña lo esencial (L-ID, modelo, estado, cliente) y se abre al pulsar.
 - **Bootstrap:** se puede seguir usando la rejilla y las utilidades. Botones, inputs y modales nuevos usan estas reglas, no el aspecto Bootstrap.
 

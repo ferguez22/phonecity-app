@@ -1,0 +1,125 @@
+:host {
+  font-family: var(--fuente);
+  color: var(--color-texto);
+}
+
+.ventana-capa {
+  position: fixed;
+  inset: 0;
+  z-index: 1090;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--esp-5);
+  background: rgba(0, 0, 0, 0.3);
+  animation: ventana-fondo-entra 250ms var(--curva-ios);
+}
+
+.ventana {
+  display: flex;
+  flex-direction: column;
+  width: min(var(--ventana-ancho), 100%);
+  max-height: 100%;
+  overflow: hidden;
+  border-radius: var(--radio-l);
+  background: var(--color-superficie);
+  box-shadow: var(--sombra-2);
+  animation: ventana-entra 250ms var(--curva-ios);
+
+  &.ajustada {
+    width: max-content;
+    min-width: min(420px, 100%);
+    max-width: min(var(--ventana-ancho), 100%);
+  }
+}
+
+.ventana-cabecera {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--esp-3);
+  padding: var(--esp-3) var(--esp-3) var(--esp-3) var(--esp-5);
+  border-bottom: 1px solid var(--color-borde);
+}
+
+.ventana-titulo {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.ventana-cerrar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-texto-2);
+  cursor: pointer;
+  transition: background-color 150ms, transform 150ms;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.05);
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--color-acento);
+    outline-offset: -3px;
+  }
+}
+
+.ventana-cuerpo {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--esp-5);
+  background: var(--color-fondo);
+}
+
+.ventana-pie {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--esp-2);
+  padding: var(--esp-3) var(--esp-5);
+  border-top: 1px solid var(--color-borde);
+  background: var(--color-superficie);
+}
+
+.ventana-pie-movil {
+  position: sticky;
+  bottom: 0;
+  margin: var(--esp-4) calc(-1 * var(--esp-4)) calc(-1 * (var(--esp-5) + env(safe-area-inset-bottom)));
+  padding: var(--esp-3) var(--esp-4) calc(var(--esp-3) + env(safe-area-inset-bottom));
+}
+
+@keyframes ventana-fondo-entra {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes ventana-entra {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

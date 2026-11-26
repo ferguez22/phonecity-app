@@ -156,7 +156,7 @@
 
 <ng-template #editar>
   @if (linea()) {
-    <a [routerLink]="['/linea', linea()!.id, 'editar']" class="boton-accion" aria-label="Editar" title="Editar">
+    <a [routerLink]="['/linea', linea()!.id, 'editar']" class="boton-accion accion-editar" aria-label="Editar" title="Editar">
       <app-icono nombre="editar" />
       <span class="accion-texto">Editar</span>
     </a>

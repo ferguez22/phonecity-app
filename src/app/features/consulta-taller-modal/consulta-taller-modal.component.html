@@ -1,33 +1,30 @@
-<div class="modal-overlay" (click)="cerrar()">
-  <div class="modal-box" (click)="$event.stopPropagation()">
-
-    <div class="modal-header">
-      <span class="modal-title">Consulta de taller</span>
-      <button type="button" class="btn-close-x" (click)="cerrar()">✕</button>
-    </div>
-
-    @if (cargando()) {
-    <div class="modal-estado">Cargando...</div>
-    } @else if (error()) {
-    <div class="modal-estado modal-error">{{ error() }}</div>
-    } @else if (bloques().length === 0) {
-    <div class="modal-estado">No hay móviles en taller ahora mismo.</div>
-    } @else {
+<app-ventana titulo="Consulta de taller" ancho="1100px" [ajustada]="true" (cerrar)="cerrar()">
+  @if (cargando()) {
+    <p class="ventana-aviso">Cargando...</p>
+  } @else if (error()) {
+    <p class="ventana-error" role="alert">{{ error() }}</p>
+  } @else if (bloques().length === 0) {
+    <p class="ventana-aviso">No hay móviles en taller ahora mismo.</p>
+  } @else {
     <div class="bloques">
       @for (b of bloques(); track b.taller) {
-      <div class="bloque">
-        <div class="bloque-head">
-          <span class="bloque-taller">{{ b.taller }}</span>
-          <span class="bloque-count">{{ b.count }} {{ b.count === 1 ? 'móvil' : 'móviles' }}</span>
-          <button type="button" class="btn-copiar" [class.ok]="copiado() === b.taller" (click)="copiar(b)">
-            {{ copiado() === b.taller ? '✓ Copiado' : 'Copiar' }}
-          </button>
-        </div>
-        <pre class="bloque-texto">{{ b.texto }}</pre>
-      </div>
+        <section class="bloque">
+          <div class="bloque-cab">
+            <h3 class="bloque-taller">{{ b.taller }}</h3>
+            <span class="pildora">{{ b.count }} {{ b.count === 1 ? 'móvil' : 'móviles' }}</span>
+            <button
+              type="button"
+              class="boton-app pequeno bloque-copiar"
+              [class.hecho]="copiado() === b.taller"
+              (click)="copiar(b)"
+            >
+              <app-icono [nombre]="copiado() === b.taller ? 'check' : 'copiar'" />
+              {{ copiado() === b.taller ? 'Copiado' : 'Copiar' }}
+            </button>
+          </div>
+          <pre class="bloque-texto">{{ b.texto }}</pre>
+        </section>
       }
     </div>
-    }
-
-  </div>
-</div>
+  }
+</app-ventana>

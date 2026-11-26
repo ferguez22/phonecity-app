@@ -2,13 +2,16 @@ import { Component, EventEmitter, Output, inject, signal, computed, OnInit } fro
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PedidosService, GrupoPedido } from '../../core/services/pedidos.service';
+import { IconoComponent } from '../../core/layout/icono/icono.component';
+import { PantallaService } from '../../core/layout/pantalla.service';
+import { VentanaComponent } from '../../core/layout/ventana/ventana.component';
 
 const GRUPOS: GrupoPedido[] = ['wephone', 'apokin', 'piezas'];
 
 @Component({
   selector: 'app-pedido-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, IconoComponent, VentanaComponent],
   templateUrl: './pedido-modal.component.html',
   styleUrl: './pedido-modal.component.scss',
 })
@@ -16,6 +19,13 @@ export class PedidoModalComponent implements OnInit {
   @Output() cerrado = new EventEmitter<boolean>();
 
   private readonly pedidosSvc = inject(PedidosService);
+  readonly pantalla = inject(PantallaService);
+
+  readonly grupos: { id: GrupoPedido; nombre: string; filas: number }[] = [
+    { id: 'wephone', nombre: 'Wephone Infotec', filas: 5 },
+    { id: 'apokin', nombre: 'Apokin', filas: 5 },
+    { id: 'piezas', nombre: 'Piezas', filas: 6 },
+  ];
 
   readonly cargando = signal(true);
   readonly error = signal<string | null>(null);
@@ -30,16 +40,12 @@ export class PedidoModalComponent implements OnInit {
     GRUPOS.every((g) => this.marcados()[g] !== null || this.conteos()[g] === 0)
   );
 
-  txtWephone = '';
-  txtApokin = '';
-  txtPiezas = '';
+  textos: Record<GrupoPedido, string> = { wephone: '', apokin: '', piezas: '' };
 
   ngOnInit(): void {
     this.pedidosSvc.pendientes().subscribe({
       next: (d) => {
-        this.txtWephone = d.bloques.wephone;
-        this.txtApokin = d.bloques.apokin;
-        this.txtPiezas = d.bloques.piezas;
+        this.textos = { ...d.bloques };
         this.conteos.set(d.conteos);
         this.cargando.set(false);
       },
