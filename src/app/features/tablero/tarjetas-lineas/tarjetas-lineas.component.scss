@@ -164,6 +164,7 @@
 .menu-item {
   display: flex;
   align-items: center;
+  gap: var(--esp-3);
   min-height: 44px;
   padding: 0 var(--esp-4);
   border-bottom: 1px solid var(--color-borde);
@@ -178,4 +179,9 @@
   &:active {
     background: rgba(0, 0, 0, 0.05);
   }
+}
+
+.menu-item app-icono {
+  width: 20px;
+  height: 20px;
 }

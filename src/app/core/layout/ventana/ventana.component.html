@@ -1,5 +1,5 @@
 @if (pantalla.esMovil()) {
-  <app-hoja [etiqueta]="titulo()" (cerrar)="cerrar.emit()">
+  <app-hoja [etiqueta]="titulo()" [compacta]="compacta()" (cerrar)="cerrar.emit()">
     <h2 hoja-cabecera class="ventana-titulo">{{ titulo() }}</h2>
     <ng-container *ngTemplateOutlet="cuerpo" />
     @if (conPie()) {

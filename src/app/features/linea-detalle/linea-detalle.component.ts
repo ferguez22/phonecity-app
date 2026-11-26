@@ -24,6 +24,7 @@ export class LineaDetalleComponent implements OnInit {
   private readonly histSvc   = inject(HistorialService);
 
   readonly linea       = signal<Linea | null>(null);
+  readonly idRuta = Number(this.route.snapshot.paramMap.get('id'));
   readonly historial   = signal<EntradaHistorial[]>([]);
   readonly cargando    = signal(true);
   readonly error       = signal<string | null>(null);

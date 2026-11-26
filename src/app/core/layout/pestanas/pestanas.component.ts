@@ -45,7 +45,8 @@ export class PestanasComponent {
 
   cerrarSesion(): void {
     this.cerrarMas();
-    this.auth.logout();
-    this.router.navigate(['/login']);
+    this.router.navigate(['/login']).then((ok) => {
+      if (ok) this.auth.logout();
+    });
   }
 }

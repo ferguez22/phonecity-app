@@ -19,9 +19,6 @@ export const ICONOS = {
   taller: [
     'M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z',
   ],
-  avisar: [
-    'M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z',
-  ],
   pedido: [
     'M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2',
     'M9 2h6v4H9z',
@@ -59,4 +56,9 @@ export const ICONOS = {
   ],
 } satisfies Record<string, string[]>;
 
-export type NombreIcono = keyof typeof ICONOS;
+export const IMAGENES = {
+  whatsapp: 'iconos/whatsappWhite.svg',
+  'whatsapp-verde': 'iconos/whatsappGreen.svg',
+} as const;
+
+export type NombreIcono = keyof typeof ICONOS | keyof typeof IMAGENES;

@@ -15,6 +15,7 @@ const DURACION_MS = 250;
 })
 export class HojaComponent {
   readonly etiqueta = input('');
+  readonly compacta = input(false);
   readonly cerrar = output<void>();
 
   readonly saliendo = signal(false);

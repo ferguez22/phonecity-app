@@ -6,11 +6,12 @@ import { filter, map } from 'rxjs';
 import { ConexionService } from './core/services/conexion.service';
 import { BarraSuperiorComponent } from './core/layout/barra-superior/barra-superior.component';
 import { PestanasComponent } from './core/layout/pestanas/pestanas.component';
+import { ConfirmacionComponent } from './core/layout/confirmacion/confirmacion.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, BarraSuperiorComponent, PestanasComponent],
+  imports: [CommonModule, RouterOutlet, BarraSuperiorComponent, PestanasComponent, ConfirmacionComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })

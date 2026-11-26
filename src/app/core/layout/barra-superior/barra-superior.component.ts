@@ -59,7 +59,8 @@ export class BarraSuperiorComponent {
 
   cerrarSesion(): void {
     this.cerrarMenu();
-    this.auth.logout();
-    this.router.navigate(['/login']);
+    this.router.navigate(['/login']).then((ok) => {
+      if (ok) this.auth.logout();
+    });
   }
 }

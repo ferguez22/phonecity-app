@@ -1,0 +1,20 @@
+@if (svc.peticion(); as p) {
+  <app-ventana [titulo]="p.titulo" ancho="420px" [conPie]="true" [compacta]="true" (cerrar)="alCerrar()">
+    @if (p.mensaje) {
+      <p class="confirmacion-mensaje">{{ p.mensaje }}</p>
+    }
+    <ng-container ngProjectAs="[ventana-pie]">
+      <button #cancelar type="button" class="boton-app confirmacion-boton" (click)="elegir(false)">
+        {{ p.cancelar }}
+      </button>
+      <button
+        type="button"
+        class="boton-app confirmacion-boton"
+        [class.accion-peligro]="p.peligro"
+        (click)="elegir(true)"
+      >
+        {{ p.aceptar }}
+      </button>
+    </ng-container>
+  </app-ventana>
+}

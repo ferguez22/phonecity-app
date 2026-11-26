@@ -1,5 +1,8 @@
 <header class="cabecera-pagina">
   <div class="cabecera-titulo">
+    @if (pantalla.esMovil()) {
+      <a class="cabecera-atras" routerLink="/tablero" [queryParams]="{ abrir: idRuta }">‹ Atrás</a>
+    }
     <h1>{{ linea() ? 'L-' + linea()!.id : 'Ficha de línea' }}</h1>
   </div>
   @if (pantalla.esMovil()) {

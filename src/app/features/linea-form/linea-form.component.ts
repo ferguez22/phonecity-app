@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, DestroyRef, DoCheck, OnInit, inject, signal, computed } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -13,6 +13,9 @@ import { ModeloInputComponent } from '../modelo-input/modelo-input.component';
 import { Linea, Flujo, Fase, TipoCobro, Pieza } from '../../core/models/linea.model';
 import { Cliente } from '../../core/models/cliente.model';
 import { normalizar } from '../../core/utils/texto.util';
+import { ConCambiosPendientes } from '../../core/guards/sin-cambios.guard';
+import { ConfirmacionService } from '../../core/layout/confirmacion/confirmacion.service';
+import { PantallaService } from '../../core/layout/pantalla.service';
 
 @Component({
   selector: 'app-linea-form',
@@ -21,11 +24,25 @@ import { normalizar } from '../../core/utils/texto.util';
   templateUrl: './linea-form.component.html',
   styleUrl: './linea-form.component.scss',
 })
-export class LineaFormComponent implements OnInit {
+export class LineaFormComponent implements OnInit, DoCheck, ConCambiosPendientes {
   private readonly route     = inject(ActivatedRoute);
   private readonly router    = inject(Router);
   private readonly lineaSvc  = inject(LineaService);
   private readonly proveedorSvc = inject(ProveedorService);
+  private readonly confirmacion = inject(ConfirmacionService);
+  readonly pantalla = inject(PantallaService);
+
+  private fotoInicial: string | null = null;
+  private guardado = false;
+  private avisoSalidaActivo = false;
+  private readonly alSalirPagina = (e: BeforeUnloadEvent) => {
+    e.preventDefault();
+    e.returnValue = '';
+  };
+
+  constructor() {
+    inject(DestroyRef).onDestroy(() => this.activarAvisoSalida(false));
+  }
 
   // Modo
   readonly modoEdicion = signal(false);
@@ -215,7 +232,45 @@ export class LineaFormComponent implements OnInit {
       this.cargarLinea(this.lineaId);
     } else {
       this.aplicarEstadoEntrada();
+      this.fotoInicial = this.foto();
     }
+  }
+
+  ngDoCheck(): void {
+    this.activarAvisoSalida(this.hayCambios());
+  }
+
+  puedeSalir(): boolean | Promise<boolean> {
+    if (!this.hayCambios()) return true;
+    return this.confirmacion.pedir({
+      titulo: '¿Descartar la línea sin guardar?',
+      mensaje: 'Se perderá lo que has rellenado.',
+      aceptar: 'Descartar',
+      cancelar: 'Seguir editando',
+      peligro: true,
+    });
+  }
+
+  private hayCambios(): boolean {
+    return !this.modoEdicion() && !this.guardado && this.fotoInicial !== null && this.foto() !== this.fotoInicial;
+  }
+
+  private foto(): string {
+    return JSON.stringify({
+      estado: this.estadoEntradaId(),
+      modelo: this.modelo,
+      piezas: this.piezas.map((p) => [p.descripcion ?? '', p.importe ?? null]),
+      cliente: this.clienteSelec()?.id ?? null,
+      recogida: this.fecha_recogida_prevista,
+      notas: this.notas,
+    });
+  }
+
+  private activarAvisoSalida(activo: boolean): void {
+    if (activo === this.avisoSalidaActivo) return;
+    this.avisoSalidaActivo = activo;
+    if (activo) window.addEventListener('beforeunload', this.alSalirPagina);
+    else window.removeEventListener('beforeunload', this.alSalirPagina);
   }
 
   private hoy(): string {
@@ -331,6 +386,8 @@ export class LineaFormComponent implements OnInit {
     op$.subscribe({
       next: () => {
         this.guardando.set(false);
+        this.guardado = true;
+        this.activarAvisoSalida(false);
         this.router.navigate(['/tablero']);
       },
       error: (err) => {

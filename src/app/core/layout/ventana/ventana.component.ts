@@ -17,6 +17,7 @@ export class VentanaComponent {
   readonly ancho = input('620px');
   readonly ajustada = input(false);
   readonly conPie = input(false);
+  readonly compacta = input(false);
   readonly cerrar = output<void>();
 
   readonly pantalla = inject(PantallaService);

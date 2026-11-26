@@ -1,0 +1,14 @@
+@use 'breakpoints' as *;
+
+.confirmacion-mensaje {
+  margin: 0;
+  color: var(--color-texto);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.confirmacion-boton {
+  @include movil {
+    flex: 1;
+  }
+}

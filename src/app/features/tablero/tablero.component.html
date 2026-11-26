@@ -12,7 +12,7 @@
   </header>
 
   <div
-    class="controles-bar px-3 py-2 d-flex flex-wrap gap-2 align-items-center"
+    class="controles-bar px-3 py-2 d-flex flex-nowrap gap-2 align-items-center"
   >
     <input
       #busquedaInput
@@ -383,7 +383,7 @@
                         class="btn btn-sm btn-wa accion-avisar"
                         (click)="enviarWhatsapp(linea)"
                       >
-                        <app-icono nombre="avisar" />
+                        <app-icono nombre="whatsapp" />
                         WhatsApp
                       </button>
                       <button
@@ -462,9 +462,10 @@
     <div class="toast-wa-actions">
       <button
         type="button"
-        class="btn btn-sm btn-success"
+        class="btn btn-sm btn-wa accion-avisar"
         (click)="enviarDesdeToast()"
       >
+        <app-icono nombre="whatsapp" />
         Enviar
       </button>
       <button
@@ -500,7 +501,7 @@
   }
   @if (mostrarBotonAvisar()) {
     <button class="boton-accion accion-avisar" type="button" (click)="abrirAvisar()" aria-label="Avisar clientes" title="Avisar clientes">
-      <app-icono nombre="avisar" />
+      <app-icono nombre="whatsapp" />
       <span class="accion-texto">Avisar clientes</span>
     </button>
   }

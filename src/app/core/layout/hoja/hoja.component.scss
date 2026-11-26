@@ -33,6 +33,11 @@
   &.arrastrando {
     transition: none;
   }
+
+  &.compacta {
+    top: auto;
+    max-height: calc(100dvh - env(safe-area-inset-top) - 12px);
+  }
 }
 
 .hoja-arrastre {

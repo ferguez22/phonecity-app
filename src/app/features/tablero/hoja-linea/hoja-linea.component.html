@@ -83,7 +83,7 @@
     <div class="acciones">
       @if (l.cliente_telefono) {
         <button type="button" class="boton accion-avisar" (click)="avisar.emit()">
-          <app-icono nombre="avisar" /> Avisar
+          <app-icono nombre="whatsapp" /> Avisar
         </button>
       }
       <button type="button" class="boton accion-imprimir" [disabled]="cargandoPiezas()" (click)="ticket.emit()">

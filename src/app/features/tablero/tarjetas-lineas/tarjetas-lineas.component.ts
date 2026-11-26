@@ -1,6 +1,7 @@
 import { Component, DestroyRef, inject, input, output, signal } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 
+import { IconoComponent } from '../../../core/layout/icono/icono.component';
 import { Linea } from '../../../core/models/linea.model';
 import { getColor, getEtiqueta } from '../../../core/estados/estados';
 import { limpiarTelefono } from '../../../core/utils/telefono.util';
@@ -22,7 +23,7 @@ interface MenuTelefono {
 @Component({
   selector: 'app-tarjetas-lineas',
   standalone: true,
-  imports: [DecimalPipe],
+  imports: [DecimalPipe, IconoComponent],
   templateUrl: './tarjetas-lineas.component.html',
   styleUrl: './tarjetas-lineas.component.scss',
 })

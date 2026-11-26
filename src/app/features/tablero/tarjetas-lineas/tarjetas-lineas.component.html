@@ -5,6 +5,7 @@
     }
     @for (l of g.lineas; track l.id) {
       <article
+        [attr.data-linea]="l.id"
         class="tarjeta"
         role="button"
         tabindex="0"
@@ -63,6 +64,7 @@
         rel="noopener"
         (click)="cerrarMenu()"
       >
+        <app-icono nombre="whatsapp-verde" />
         WhatsApp
       </a>
     }

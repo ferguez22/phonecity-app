@@ -90,13 +90,14 @@ Es una herramienta interna de trabajo: cada acción lleva un color con significa
 |---|---|---|---|---|---|
 | Crear | Nueva línea | `--color-crear` `#1a7f37` | blanco | 5,1 : 1 | `crear` (+) |
 | Pedido | Generar pedido | `--color-pedido` `#e8590c` | blanco | 3,6 : 1 | `pedido` (portapapeles con lista) |
-| Avisar | WhatsApp, Avisar clientes | `--color-avisar` `#25d366` | `#1d1d1f` | 8,5 : 1 | `avisar` (bocadillo) |
+| Avisar | WhatsApp, Avisar clientes, Enviar | `--color-avisar` `#25d366` | `#1d1d1f` | 8,5 : 1 | `whatsapp` (logo oficial blanco) |
 | Taller | Consulta de taller | `--color-taller` `#7048e8` | blanco | 5,5 : 1 | `taller` (llave inglesa) |
 | Editar | Editar línea | `--color-editar` `#f59f00` | `#1d1d1f` | 7,9 : 1 | `editar` (lápiz) |
 | Imprimir | Tickets, etiquetas | `--color-imprimir` `#343a40` | blanco | 11,6 : 1 | `ticket` / `etiqueta` / `envio` |
 | Peligro | Cerrar sesión, borrar | `--color-peligro` `#d70015` | blanco | 5,4 : 1 | `salir` |
 
 - Avisar usa `#25d366` con texto oscuro y no `#128c7e` con blanco (4,1 : 1): es más legible.
+- **Logo de WhatsApp:** siempre los SVG oficiales de `public/iconos/`, con `<img>` y sin tocar trazos ni colores (Meta no lo permite; nada de máscaras ni variantes dibujadas). `<app-icono nombre="whatsapp">` (blanco) en botones verdes; `nombre="whatsapp-verde"` sobre fondo blanco. `alt=""`; el texto o el `aria-label` va en el botón.
 - Cada color tiene su pareja `--color-<accion>-texto`.
 - En el HTML se pone la clase global `accion-<accion>` en el botón (`accion-crear`, `accion-pedido`, …). La clase solo define `--accion`, `--accion-texto` y `--accion-hover`; el estilo del botón los usa (`background: var(--accion, <gris>)`). Sin clase, el botón queda gris.
 - Cerrar sesión en la barra va como texto rojo, no como botón relleno.

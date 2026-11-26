@@ -19,6 +19,7 @@
 .sticky-controls {
   position: relative;
   z-index: 200;
+  container: controles / inline-size;
   flex-shrink: 0;
   background: #fff;
   box-shadow: var(--sombra-1);
@@ -35,12 +36,65 @@
 }
 
 .busqueda {
+  flex: 0 1 300px;
   max-width: 300px;
-  min-width: 180px;
+  min-width: 160px;
 
   @include movil {
     flex: 1;
     max-width: none;
+  }
+}
+
+.contador-contenido,
+.acciones-contenido {
+  flex-shrink: 0;
+}
+
+@mixin acciones-solo-icono {
+  .boton-accion {
+    width: 32px;
+    padding: 0;
+  }
+
+  .accion-texto {
+    display: none;
+  }
+}
+
+@container controles (width < 1056px) {
+  .controles-bar:has(.accion-taller):has(.accion-avisar) .contador-contenido {
+    display: none;
+  }
+}
+
+@container controles (width < 978px) {
+  .acciones-contenido:has(.accion-taller):has(.accion-avisar) {
+    @include acciones-solo-icono;
+  }
+}
+
+@container controles (width < 900px) {
+  .controles-bar:has(.accion-taller, .accion-avisar) .contador-contenido {
+    display: none;
+  }
+}
+
+@container controles (width < 814px) {
+  .acciones-contenido:has(.accion-taller, .accion-avisar) {
+    @include acciones-solo-icono;
+  }
+}
+
+@container controles (width < 724px) {
+  .contador-contenido {
+    display: none;
+  }
+}
+
+@container controles (width < 638px) {
+  .acciones-contenido {
+    @include acciones-solo-icono;
   }
 }
 

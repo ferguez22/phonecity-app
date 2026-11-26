@@ -2,6 +2,7 @@ import {Component, OnInit, ViewChild, ElementRef, inject, signal, computed, effe
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { IconoComponent } from '../../core/layout/icono/icono.component';
@@ -65,6 +66,9 @@ export class TableroComponent implements OnInit {
   edNotas = '';
 
   readonly pantalla = inject(PantallaService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private abrirPendiente: number | null = null;
   private readonly lineas$ = inject(LineaService);
   private readonly histSvc = inject(HistorialService);
   private readonly proveedorSvc = inject(ProveedorService);
@@ -248,6 +252,8 @@ export class TableroComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    const abrir = Number(this.route.snapshot.queryParamMap.get('abrir'));
+    if (abrir) this.abrirPendiente = abrir;
     this.cargar();
     this.proveedorSvc.list().subscribe({ next: (p) => this.proveedores.set(p), error: () => {} });
     this.busqueda$
@@ -306,11 +312,29 @@ export class TableroComponent implements OnInit {
         this.cargando.set(false);
         setTimeout(() => {
           const area = this.tablaArea.nativeElement;
+          if (this.abrirPendiente !== null && this.abrirLineaPendiente(area)) return;
           area.scrollTo({ top: area.scrollHeight, behavior: 'instant' });
         }, 80);
       },
       error: () => { this.error.set('Error al cargar'); this.cargando.set(false); },
     });
+  }
+
+  private abrirLineaPendiente(area: HTMLElement): boolean {
+    const id = this.abrirPendiente;
+    this.abrirPendiente = null;
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { abrir: null },
+      queryParamsHandling: 'merge',
+      replaceUrl: true,
+    });
+    const linea = this.lineas().find((l) => l.id === id);
+    const tarjeta = area.querySelector<HTMLElement>(`[data-linea="${id}"]`);
+    if (!linea || !tarjeta) return false;
+    tarjeta.scrollIntoView({ block: 'center', behavior: 'instant' });
+    this.toggleExpand(linea);
+    return true;
   }
 
   toggleExpand(linea: Linea): void {
