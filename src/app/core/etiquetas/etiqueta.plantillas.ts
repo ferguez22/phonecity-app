@@ -3,11 +3,32 @@ import { ESTILOS_ETIQUETA } from './etiqueta.estilos';
 
 export type TipoEtiqueta = 'dispositivo' | 'envio';
 
+export type AlineacionLinea = 'izquierda' | 'centro' | 'derecha';
+
+export interface LineaEtiqueta {
+  texto: string;
+  negrita: boolean;
+  tamanoPt: number;
+  alineacion: AlineacionLinea;
+  ajustar: boolean;
+}
+
+export interface EtiquetaLibre {
+  lineas: LineaEtiqueta[];
+  interlineado: number;
+  repartir: boolean;
+  vista?: boolean;
+}
+
 const CODIGO_POSTAL = '24400';
 const TIENDA_ID = '319';
 
 function esc(valor: string | null | undefined): string {
   return (valor ?? '-').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function escTexto(valor: string): string {
+  return valor.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 function hoy(): string {
@@ -53,4 +74,17 @@ export function construirEtiqueta(linea: Linea, tipo: TipoEtiqueta): string {
 <html><head><meta charset="utf-8"><title>Etiqueta-${linea.id}</title>
 <style>${ESTILOS_ETIQUETA}</style></head>
 <body>${cuerpo}</body></html>`;
+}
+
+export function construirEtiquetaLibre(e: EtiquetaLibre): string {
+  const filas = e.lineas
+    .map((l) => {
+      const clases = ['linea', l.alineacion, l.negrita ? 'negrita' : '', l.ajustar ? 'ajustar' : ''].filter(Boolean).join(' ');
+      return `<div class="${clases}" style="font-size:${l.tamanoPt}pt">${escTexto(l.texto)}</div>`;
+    })
+    .join('');
+  return `<!DOCTYPE html>
+<html${e.vista ? ' class="vista"' : ''}><head><meta charset="utf-8"><title>Etiqueta</title>
+<style>${ESTILOS_ETIQUETA}</style></head>
+<body><div class="libre${e.repartir ? ' repartir' : ''}" style="--interlineado:${e.interlineado}">${filas}</div></body></html>`;
 }

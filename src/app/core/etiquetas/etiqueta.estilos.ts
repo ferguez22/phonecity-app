@@ -59,4 +59,25 @@ export const ESTILOS_ETIQUETA = `
   .modelo { font-size: 12pt; font-weight: 700; line-height: 1.05; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .problema { font-size: 9.5pt; line-height: 1.15; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
   .problema.tres { -webkit-line-clamp: 3; }
+  .vista body { transform: none; }
+  .libre {
+    flex: 1;
+    padding: 1.4mm 1.8mm;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .libre.repartir { justify-content: space-evenly; }
+  .libre .linea {
+    min-height: calc(var(--interlineado, 1.15) * 1em);
+    line-height: var(--interlineado, 1.15);
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  .libre .linea.ajustar { white-space: pre; overflow: hidden; }
+  .libre .linea.negrita { font-weight: 700; }
+  .libre .linea.izquierda { text-align: left; }
+  .libre .linea.centro { text-align: center; }
+  .libre .linea.derecha { text-align: right; }
 `;

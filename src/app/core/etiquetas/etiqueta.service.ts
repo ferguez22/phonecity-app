@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { Linea } from '../models/linea.model';
-import { construirEtiqueta, TipoEtiqueta } from './etiqueta.plantillas';
+import { construirEtiqueta, construirEtiquetaLibre, EtiquetaLibre, TipoEtiqueta } from './etiqueta.plantillas';
 import { ANCHO_MM, ALTO_MM } from './etiqueta.estilos';
 import { puente } from '../impresion/puente';
 
@@ -16,9 +16,15 @@ export class EtiquetaService {
     return this.imprimir(linea, 'envio');
   }
 
-  private async imprimir(linea: Linea, tipo: TipoEtiqueta): Promise<string | null> {
-    const html = construirEtiqueta(linea, tipo);
+  imprimirLibre(etiqueta: EtiquetaLibre): Promise<string | null> {
+    return this.imprimirHtml(construirEtiquetaLibre({ ...etiqueta, vista: false }));
+  }
 
+  private imprimir(linea: Linea, tipo: TipoEtiqueta): Promise<string | null> {
+    return this.imprimirHtml(construirEtiqueta(linea, tipo));
+  }
+
+  private async imprimirHtml(html: string): Promise<string | null> {
     const p = puente();
     if (p) {
       try {

@@ -53,6 +53,14 @@ export const ENLACES: EnlaceNav[] = [
     movil: 'mas',
   },
   {
+    ruta: '/etiquetas',
+    texto: 'Etiquetas',
+    corto: 'Etiquetas',
+    icono: 'etiqueta',
+    barra: true,
+    movil: 'mas',
+  },
+  {
     ruta: '/importar',
     texto: 'Importar',
     corto: 'Importar',

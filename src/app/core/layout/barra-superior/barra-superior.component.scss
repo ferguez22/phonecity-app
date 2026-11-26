@@ -1,7 +1,10 @@
 @use 'breakpoints' as *;
 
 :host {
+  position: relative;
+  z-index: 300;
   display: block;
+  container: barra / inline-size;
 
   @include movil {
     display: none;
@@ -199,6 +202,17 @@
 
   .enlace {
     padding: 0 var(--esp-3);
+  }
+}
+
+@container barra (width < 720px) {
+  .enlaces .enlace {
+    width: 40px;
+    padding: 0;
+  }
+
+  .enlace-texto {
+    display: none;
   }
 }
 

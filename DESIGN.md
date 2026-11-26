@@ -52,14 +52,14 @@ Plegables: hoy se diseña **por ancho**. La Viewport Segments API (`@media (hori
 
 **Escritorio y medio:** barra superior en una sola fila, sin scroll lateral:
 - Izquierda: "PhoneCity" en escritorio; en medio, solo el icono de la app (28 px).
-- Centro: **Tablero · Reparaciones · Clientes · Notas** como control segmentado: icono + texto en píldoras dentro de un carril gris suave. La activa, con fondo acento suave, texto `--color-acento` y peso 600. Hover y `scale(0.97)` al pulsar.
+- Centro: **Tablero · Reparaciones · Clientes · Notas · Etiquetas** como control segmentado: icono + texto en píldoras dentro de un carril gris suave. La activa, con fondo acento suave, texto `--color-acento` y peso 600. Hover y `scale(0.97)` al pulsar. Si la barra mide menos de 720 px (container query), el segmentado pasa a solo iconos con `title`.
 - Derecha: un único botón ⚙ **Ajustes** con menú desplegable: Divisor de fecha · Importar · Cerrar sesión (rojo). Se cierra con clic fuera, Escape o al navegar.
 - "Nueva línea" no va en la barra: es un botón verde en las acciones del tablero.
 
 **Móvil:** barra de pestañas abajo, estilo iOS:
 - Máximo 5 pestañas, con icono y texto corto debajo: **Tablero · Nueva · Reparaciones · Clientes · Más**.
 - "Nueva" lleva su + dentro de un círculo verde (`accion-crear`).
-- "Más" abre una hoja (bottom sheet) con Notas y las mismas opciones del menú Ajustes: Divisor de fecha · Importar · Cerrar sesión.
+- "Más" abre una hoja (bottom sheet) con Notas, Etiquetas y las mismas opciones del menú Ajustes: Divisor de fecha · Importar · Cerrar sesión.
 - Pestaña activa con el color de acento; las demás en gris.
 - Fondo translúcido con desenfoque.
 

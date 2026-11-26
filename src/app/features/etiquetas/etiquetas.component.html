@@ -1,0 +1,142 @@
+<header class="cabecera-pagina">
+  <div class="cabecera-titulo">
+    <h1>Etiquetas</h1>
+  </div>
+</header>
+
+<div class="etiquetas">
+  <section class="panel editor">
+    <label class="titulo" for="etiqueta-texto">Texto</label>
+    <textarea
+      id="etiqueta-texto"
+      class="texto"
+      rows="5"
+      [value]="texto()"
+      (input)="onTexto($any($event.target).value)"
+      placeholder="Cada línea del texto es una línea de la etiqueta"
+      spellcheck="false"
+    ></textarea>
+
+    <div class="globales">
+      <div class="opcion">
+        <span class="titulo">Interlineado</span>
+        <div class="segmentado interlineados" role="radiogroup" aria-label="Interlineado">
+          @for (i of interlineados; track i.valor) {
+            <button
+              type="button"
+              role="radio"
+              class="segmento"
+              [class.activo]="interlineado() === i.valor"
+              [attr.aria-checked]="interlineado() === i.valor"
+              (click)="interlineado.set(i.valor)"
+            >
+              {{ i.texto }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <label class="interruptor">
+        <span class="titulo">Repartir en alto</span>
+        <button
+          type="button"
+          role="switch"
+          class="switch"
+          [class.activo]="repartir()"
+          [attr.aria-checked]="repartir()"
+          aria-label="Repartir en alto"
+          (click)="repartir.set(!repartir())"
+        >
+          <span class="switch-bola"></span>
+        </button>
+      </label>
+    </div>
+
+    @if (hayTexto()) {
+      <div class="opcion">
+        <span class="titulo">Formato por línea</span>
+        <ul class="lineas">
+          @for (l of lineasEscritas(); track l.indice) {
+            @let f = l.formato;
+            @let pt = ptDe(l.indice, f);
+            <li class="linea">
+              <div class="linea-cab">
+                <button
+                  type="button"
+                  class="negrita"
+                  [class.activo]="f.negrita"
+                  [attr.aria-pressed]="f.negrita"
+                  [attr.aria-label]="'Negrita en la línea ' + (l.indice + 1)"
+                  title="Negrita"
+                  (click)="cambiarFormato(l.indice, { negrita: !f.negrita })"
+                >
+                  B
+                </button>
+                <span class="linea-texto" [class.en-negrita]="f.negrita">{{ l.texto }}</span>
+                @if (pt !== null) {
+                  <span class="linea-pt">{{ pt }} pt</span>
+                }
+              </div>
+              <div class="linea-controles">
+                <div class="segmentado tamanos" role="radiogroup" [attr.aria-label]="'Tamaño de la línea ' + (l.indice + 1)">
+                  @for (t of tamanos; track t.valor) {
+                    <button
+                      type="button"
+                      role="radio"
+                      class="segmento"
+                      [class.activo]="f.tamano === t.valor"
+                      [attr.aria-checked]="f.tamano === t.valor"
+                      [title]="t.titulo"
+                      (click)="cambiarFormato(l.indice, { tamano: t.valor })"
+                    >
+                      {{ t.texto }}
+                    </button>
+                  }
+                </div>
+                <div class="segmentado alineaciones" role="radiogroup" [attr.aria-label]="'Alineación de la línea ' + (l.indice + 1)">
+                  @for (a of alineaciones; track a.valor) {
+                    <button
+                      type="button"
+                      role="radio"
+                      class="segmento"
+                      [class.activo]="f.alineacion === a.valor"
+                      [attr.aria-checked]="f.alineacion === a.valor"
+                      [attr.aria-label]="a.titulo"
+                      [title]="a.titulo"
+                      (click)="cambiarFormato(l.indice, { alineacion: a.valor })"
+                    >
+                      <app-icono [nombre]="a.icono" />
+                    </button>
+                  }
+                </div>
+              </div>
+            </li>
+          }
+        </ul>
+      </div>
+    }
+  </section>
+
+  <section class="panel previa">
+    <span class="titulo">Vista previa</span>
+    <div class="papel">
+      <iframe #vista class="etiqueta" title="Vista previa de la etiqueta" tabindex="-1"></iframe>
+    </div>
+    <span class="medida">48 × 28 mm</span>
+    @if (aviso(); as a) {
+      <p class="aviso" role="status">{{ a }}</p>
+    }
+    <button
+      type="button"
+      class="boton-app accion-imprimir imprimir"
+      [disabled]="!hayTexto() || imprimiendo()"
+      (click)="imprimir()"
+    >
+      <app-icono nombre="ticket" />
+      {{ imprimiendo() ? 'Imprimiendo...' : 'Imprimir' }}
+    </button>
+    @if (error(); as e) {
+      <p class="error" role="alert">{{ e }}</p>
+    }
+  </section>
+</div>
