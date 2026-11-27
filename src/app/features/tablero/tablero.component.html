@@ -144,8 +144,8 @@
               </td>
               <td class="col-fecha">{{ linea.fecha_entrada ? fechaCorta(linea.fecha_entrada) : "—" }}</td>
               <td class="col-modelo" [title]="linea.modelo ?? ''">{{ linea.modelo ?? '—' }}</td>
-              <td class="col-cliente" [title]="linea.cliente_nombre ?? 'TIENDA'">{{ linea.cliente_nombre ?? "TIENDA" }}</td>
-              <td class="col-tel">{{ linea.cliente_telefono ?? "—" }}</td>
+              <td class="col-cliente" [title]="nombreCorto(linea.cliente_nombre) ?? 'TIENDA'">{{ nombreCorto(linea.cliente_nombre) ?? "TIENDA" }}</td>
+              <td class="col-tel">{{ telefonoCorto(linea.cliente_telefono) ?? "—" }}</td>
               <td class="col-importe">
                 {{
                   linea.importe != null
@@ -456,7 +456,7 @@
 @if (toastWa(); as l) {
   <div class="toast-wa">
     <div class="toast-wa-msg">
-      ¿Enviar WhatsApp a <strong>{{ l.cliente_nombre || "cliente" }}</strong
+      ¿Enviar WhatsApp a <strong>{{ nombreCorto(l.cliente_nombre) || "cliente" }}</strong
       >?
     </div>
     <div class="toast-wa-actions">

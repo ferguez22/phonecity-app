@@ -31,7 +31,7 @@
           <div class="info">
             <div class="linea1">
               <span class="lid">L-{{ l.id }}</span>
-              <span class="nombre">{{ l.cliente_nombre ?? 'TIENDA' }}</span>
+              <span class="nombre">{{ nombreCorto(l.cliente_nombre) ?? 'TIENDA' }}</span>
               @if (etiquetaAviso(l); as et) {
                 <span class="aviso-tag">{{ et }}</span>
               }
@@ -39,7 +39,7 @@
                 <span class="aviso-tag primer">{{ et1 }}</span>
               }
             </div>
-            <div class="linea2">{{ l.modelo ?? '—' }} · {{ l.cliente_telefono ?? 'sin tel.' }}</div>
+            <div class="linea2">{{ l.modelo ?? '—' }} · {{ telefonoCorto(l.cliente_telefono) ?? 'sin tel.' }}</div>
           </div>
           <button type="button" class="boton-app pequeno accion-avisar" (click)="avisar(l)">
             <app-icono nombre="whatsapp" />

@@ -27,7 +27,7 @@ const COLOR_FINALIZADO = '#5fe366';
 const COLOR_TALLER = '#DCE2F6';
 
 export const ESTADOS: EstadoDef[] = [
-  { id: 'reparar', label: 'Reparar', flujo: 'reparacion', fase: 'por_reparar', avisado: false, movil_en_tienda: true, color: '#CFE8AE',esEntrada: true, ordenEntrada: 1,siguientes: ['pedir_pieza_movil','enviar_taller_infotec', 'enviar_taller_phonestorm', 'reparado_avisado', 'no_reparable_avisado', 'no_reparable_entregado', 'cancelado', 'finalizado'] },
+  { id: 'reparar', label: 'Reparar', flujo: 'reparacion', fase: 'por_reparar', avisado: false, movil_en_tienda: true, color: '#CFE8AE',esEntrada: true, ordenEntrada: 1,siguientes: ['pedir_pieza_movil','enviar_taller_infotec', 'enviar_taller_phonestorm', 'reparado_avisado', 'no_reparable_avisado', 'no_reparable_entregado', 'cancelado'] },
   { id: 'reparado_avisado', label: 'Reparado - Avisado', flujo: 'reparacion', fase: 'reparado', avisado: true, movil_en_tienda: true, color: '#A7D479',siguientes: ['finalizado', 'cancelado'] },
   { id: 'pedir_pieza_movil', label: 'Pedir Pieza Movil en tienda', flujo: 'pieza', fase: 'por_pedir', avisado: false, movil_en_tienda: true, color: '#F7E08F', esEntrada: true, ordenEntrada: 2, siguientes: ['pieza_pedida_movil', 'cancelado', 'finalizado'] },
   { id: 'pedir_pieza', label: 'Pedir Pieza', flujo: 'pieza', fase: 'por_pedir', avisado: false, movil_en_tienda: false, color: '#FBEFA8', esEntrada: true, ordenEntrada: 3, siguientes: ['pieza_pedida', 'cancelado', 'finalizado'] },

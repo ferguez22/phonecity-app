@@ -6,6 +6,7 @@ import { Linea } from '../../../core/models/linea.model';
 import { getColor, getEtiqueta } from '../../../core/estados/estados';
 import { limpiarTelefono } from '../../../core/utils/telefono.util';
 import { diasDesde } from '../../../core/utils/fecha.util';
+import { nombreCorto, telefonoCorto } from '../../../core/utils/privacidad.util';
 
 export interface GrupoDia {
   clave: string;
@@ -46,6 +47,8 @@ export class TarjetasLineasComponent {
   getColor = getColor;
   getEtiqueta = getEtiqueta;
   diasDesde = diasDesde;
+  nombreCorto = nombreCorto;
+  telefonoCorto = telefonoCorto;
 
   abrirMenuTelefono(ev: MouseEvent, telefono: string): void {
     ev.stopPropagation();

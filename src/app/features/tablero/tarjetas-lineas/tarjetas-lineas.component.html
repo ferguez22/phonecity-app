@@ -36,11 +36,11 @@
           }
         </div>
         <div class="fila fila-4">
-          <span class="cliente">{{ l.cliente_nombre ?? 'TIENDA' }}</span>
+          <span class="cliente">{{ nombreCorto(l.cliente_nombre) ?? 'TIENDA' }}</span>
           @if (l.cliente_telefono) {
             <span class="sep">·</span>
             <button type="button" class="telefono" (click)="abrirMenuTelefono($event, l.cliente_telefono)">
-              {{ l.cliente_telefono }}
+              {{ telefonoCorto(l.cliente_telefono) }}
             </button>
           }
         </div>

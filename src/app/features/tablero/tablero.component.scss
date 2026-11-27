@@ -142,14 +142,14 @@
   font-size: 0.82rem;
   border-collapse: collapse;
   table-layout: fixed;
-  min-width: 550px;
+  min-width: 654px;
 
   .th-id {
     width: 80px;
   }
 
   .col-estado {
-    width: 160px;
+    width: 264px;
   }
 
   .col-modelo {
@@ -198,37 +198,37 @@
   visibility: hidden;
 }
 
-@container tabla (width < 1066px) {
-  .tabla-lineas .col-fecha {
-    @include columna-oculta;
-  }
-}
-
-@container tabla (width < 1010px) {
+@container tabla (width < 1170px) {
   .tabla-lineas .col-notas {
     @include columna-oculta;
   }
 }
 
-@container tabla (width < 890px) {
+@container tabla (width < 1050px) {
+  .tabla-lineas .col-fecha {
+    @include columna-oculta;
+  }
+}
+
+@container tabla (width < 994px) {
   .tabla-lineas .col-dias {
     @include columna-oculta;
   }
 }
 
-@container tabla (width < 838px) {
+@container tabla (width < 942px) {
   .tabla-lineas .col-tel {
     @include columna-oculta;
   }
 }
 
-@container tabla (width < 738px) {
+@container tabla (width < 842px) {
   .tabla-lineas .col-importe {
     @include columna-oculta;
   }
 }
 
-@container tabla (width < 670px) {
+@container tabla (width < 774px) {
   .tabla-lineas .col-cliente {
     @include columna-oculta;
   }

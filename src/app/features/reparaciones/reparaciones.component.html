@@ -131,7 +131,7 @@
                 <span class="tc-estado-badge" [style.background-color]="card.estadoColor">{{ card.estadoLabel }}</span>
                 <div class="tc-id">L-{{ card.linea.id }}</div>
               <div class="tc-cliente">
-                {{ card.linea.cliente_nombre ?? "TIENDA" }}
+                {{ nombreCorto(card.linea.cliente_nombre) ?? "TIENDA" }}
               </div>
               <div class="tc-modelo">{{ card.linea.modelo ?? "—" }}</div>
               <div class="tc-problema">
@@ -199,9 +199,9 @@
                       </td>
                       <td
                         class="pr-trunc"
-                        [title]="l.cliente_nombre ?? 'TIENDA'"
+                        [title]="nombreCorto(l.cliente_nombre) ?? 'TIENDA'"
                       >
-                        {{ l.cliente_nombre ?? "TIENDA" }}
+                        {{ nombreCorto(l.cliente_nombre) ?? "TIENDA" }}
                       </td>
                       <td class="pr-trunc" [title]="l.problema_o_pieza ?? ''">
                         {{ l.problema_o_pieza ?? "—" }}

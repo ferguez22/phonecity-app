@@ -25,6 +25,7 @@ import { Cliente } from '../../core/models/cliente.model';
 import { normalizar, soloDigitos, casaTodos, separarBusqueda, casaFrases } from '../../core/utils/texto.util';
 import { limpiarTelefono } from '../../core/utils/telefono.util';
 import { diasDesde } from '../../core/utils/fecha.util';
+import { nombreCorto, telefonoCorto } from '../../core/utils/privacidad.util';
 import { ESTADO_OPTIONS, EstadoDef, colorEstado, esEstadoActual, getColor, getEtiqueta, etiquetaHistorialCompleta, estadoActualDef, siguientesDe, mensajeWhatsapp, tieneMensajeEspecifico} from '../../core/estados/estados';
 
 interface Boton { label: string; color?: string; texto?: string; filtros: LineaFiltros; filtroClient?: (l: Linea) => boolean; aplicaHistorial?: boolean; fasesHistorial?: string[];}
@@ -239,6 +240,8 @@ export class TableroComponent implements OnInit {
 
   getColor = getColor;
   getEtiqueta = getEtiqueta;
+  nombreCorto = nombreCorto;
+  telefonoCorto = telefonoCorto;
 
   onBuscar(q: string): void {
     this.busqueda.set(q);

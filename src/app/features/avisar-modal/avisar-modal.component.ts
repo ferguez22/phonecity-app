@@ -6,6 +6,7 @@ import { ESTADOS, mensajeWhatsapp } from '../../core/estados/estados';
 import { IconoComponent } from '../../core/layout/icono/icono.component';
 import { PantallaService } from '../../core/layout/pantalla.service';
 import { VentanaComponent } from '../../core/layout/ventana/ventana.component';
+import { nombreCorto, telefonoCorto } from '../../core/utils/privacidad.util';
 
 export type ModoAvisar = 'todos' | 'reparado' | 'no_reparable';
 
@@ -22,6 +23,8 @@ export class AvisarModalComponent implements OnInit {
 
   private readonly lineaSvc = inject(LineaService);
   readonly pantalla = inject(PantallaService);
+  readonly nombreCorto = nombreCorto;
+  readonly telefonoCorto = telefonoCorto;
 
   readonly cargando = signal(true);
   readonly error = signal<string | null>(null);

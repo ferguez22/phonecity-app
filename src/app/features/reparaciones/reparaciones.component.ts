@@ -7,6 +7,7 @@ import { Linea } from '../../core/models/linea.model';
 import { getEtiqueta, estadoActualDef } from '../../core/estados/estados';
 import { IconoComponent } from '../../core/layout/icono/icono.component';
 import { PantallaService } from '../../core/layout/pantalla.service';
+import { nombreCorto } from '../../core/utils/privacidad.util';
 
 interface TimerCard {
   linea: Linea;
@@ -59,6 +60,7 @@ export class ReparacionesComponent implements OnInit, OnDestroy {
   readonly mostrarFechaManual = signal(false);
   readonly panelVisible = signal(true);
   readonly getEtiqueta = getEtiqueta;
+  readonly nombreCorto = nombreCorto;
 
 
   nuevoLineaId: string = '';
