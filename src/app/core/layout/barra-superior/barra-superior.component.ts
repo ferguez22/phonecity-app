@@ -22,6 +22,7 @@ export class BarraSuperiorComponent {
 
   readonly enlaces = ENLACES.filter((e) => e.barra);
   readonly menuAbierto = signal(false);
+  readonly esAdmin = this.auth.esAdmin;
 
   constructor() {
     const alPulsarTecla = (e: KeyboardEvent) => {

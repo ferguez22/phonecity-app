@@ -20,7 +20,7 @@ export class PestanasComponent {
   private readonly router = inject(Router);
 
   readonly pestanas = ENLACES.filter((e) => e.movil === 'pestana');
-  readonly enMas = ENLACES.filter((e) => e.movil === 'mas');
+  readonly enMas = computed(() => ENLACES.filter((e) => e.movil === 'mas' && (!e.admin || this.auth.esAdmin())));
 
   readonly masAbierto = signal(false);
 
@@ -32,7 +32,7 @@ export class PestanasComponent {
     { initialValue: this.router.url },
   );
 
-  readonly masActiva = computed(() => this.enMas.some((e) => this.url().startsWith(e.ruta)));
+  readonly masActiva = computed(() => this.enMas().some((e) => this.url().startsWith(e.ruta)));
   readonly enAlta = computed(() => this.url().startsWith('/linea/nueva'));
 
   abrirMas(): void {

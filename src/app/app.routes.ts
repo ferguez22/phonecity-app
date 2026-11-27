@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { sinCambiosGuard } from './core/guards/sin-cambios.guard';
+import { adminGuard } from './core/guards/admin.guard';
 
 export const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'tablero' },
@@ -14,6 +15,7 @@ export const routes: Routes = [
   {path: 'linea/:id/editar', canActivate: [authGuard], loadComponent: () => import('./features/linea-form/linea-form.component').then((m) => m.LineaFormComponent)},
   {path: 'etiquetas', loadComponent: () => import('./features/etiquetas/etiquetas.component').then((m) => m.EtiquetasComponent), canActivate: [authGuard]},
   {path: 'importar', loadComponent: () => import('./features/import/import.component').then((m) => m.ImportComponent), canActivate: [authGuard]},  
+  {path: 'modelos/limpiar', canActivate: [authGuard, adminGuard], loadComponent: () => import('./features/limpiar-modelos/limpiar-modelos.component').then((m) => m.LimpiarModelosComponent)},
   {path: 'linea/:id', canActivate: [authGuard], loadComponent: () => import('./features/linea-detalle/linea-detalle.component').then((m) => m.LineaDetalleComponent)},
   
   { path: '**', redirectTo: 'tablero' },

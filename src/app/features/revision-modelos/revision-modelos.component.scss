@@ -1,0 +1,369 @@
+@use 'breakpoints' as *;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-4);
+  min-width: 0;
+}
+
+.rm-resumen {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--esp-3);
+}
+
+.rm-cifras {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-2) var(--esp-4);
+  color: var(--color-texto-2);
+  font-size: 14px;
+
+  strong {
+    color: var(--color-texto);
+    font-weight: 600;
+  }
+}
+
+.rm-cifra::before {
+  content: '';
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 6px;
+  border-radius: 50%;
+  background: var(--punto);
+  vertical-align: 1px;
+}
+
+.correcto {
+  --punto: #c7c7cc;
+}
+
+.seguro {
+  --punto: var(--color-exito);
+}
+
+.dudoso {
+  --punto: var(--color-editar);
+}
+
+.desconocido {
+  --punto: var(--color-texto-2);
+}
+
+.cantidad {
+  --punto: var(--color-acento);
+}
+
+.rm-grupo {
+  overflow: hidden;
+  border-radius: var(--radio-m);
+  background: var(--color-superficie);
+  box-shadow: var(--sombra-1);
+}
+
+.rm-grupo-cabecera {
+  display: flex;
+  align-items: center;
+  padding-left: var(--esp-1);
+  border-bottom: 1px solid var(--color-borde);
+}
+
+.rm-grupo-titulo {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--esp-2);
+  min-width: 0;
+  min-height: 48px;
+  padding: 0 var(--esp-4) 0 var(--esp-1);
+  border: 0;
+  background: transparent;
+  color: var(--color-texto);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 3px solid var(--color-acento);
+    outline-offset: -3px;
+    border-radius: var(--radio-s);
+  }
+}
+
+.rm-punto {
+  width: 10px;
+  height: 10px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--punto);
+}
+
+.rm-grupo-nombre {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.rm-grupo-cuenta {
+  margin-left: auto;
+  color: var(--color-texto-2);
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.rm-chevron {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  fill: none;
+  stroke: var(--color-texto-2);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: transform 150ms;
+
+  &.plegado {
+    transform: rotate(-90deg);
+  }
+}
+
+.rm-casilla {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin: 0;
+  cursor: pointer;
+
+  input {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    accent-color: var(--color-acento);
+    cursor: pointer;
+  }
+
+  input:disabled {
+    cursor: default;
+  }
+}
+
+.rm-vacio {
+  margin: 0;
+  padding: var(--esp-3) var(--esp-4);
+  color: var(--color-texto-2);
+  font-size: 14px;
+}
+
+.rm-nota {
+  margin: 0;
+  padding: var(--esp-2) var(--esp-4);
+  border-bottom: 1px solid var(--color-borde);
+  color: var(--color-texto-2);
+  font-size: 13px;
+}
+
+.rm-propuesta-info {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  padding: 0 var(--esp-2);
+  color: var(--color-texto-2);
+  font-size: 14px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rm-lista {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rm-fila {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 80px minmax(0, 1.4fr);
+  align-items: center;
+  gap: 0 var(--esp-3);
+  padding: var(--esp-1) var(--esp-4) var(--esp-1) var(--esp-1);
+  border-bottom: 1px solid var(--color-borde);
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  &:not(.marcada) .rm-propuesta-texto:not(.vacia) {
+    color: var(--color-texto-2);
+  }
+}
+
+.rm-original {
+  overflow: hidden;
+  color: var(--color-texto);
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 13px;
+  white-space: pre;
+  text-overflow: ellipsis;
+}
+
+.rm-lineas {
+  color: var(--color-texto-2);
+  font-size: 13px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.rm-propuesta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--esp-1);
+  min-width: 0;
+  padding: var(--esp-1) 0;
+}
+
+.rm-propuesta-fila {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-2);
+  min-width: 0;
+}
+
+.rm-flecha {
+  flex-shrink: 0;
+  color: var(--color-texto-2);
+}
+
+.rm-propuesta-texto {
+  flex: 1;
+  min-width: 0;
+  min-height: 36px;
+  overflow: hidden;
+  padding: 0 var(--esp-2);
+  border: 1px solid transparent;
+  border-radius: var(--radio-s);
+  background: transparent;
+  color: var(--color-texto);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: text;
+  transition: background-color 150ms, border-color 150ms;
+
+  &:hover {
+    border-color: var(--color-borde);
+    background: rgba(0, 0, 0, 0.03);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--color-acento);
+    outline-offset: 0;
+  }
+
+  &.vacia {
+    color: var(--color-texto-2);
+    font-weight: 400;
+  }
+}
+
+.rm-editor {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--esp-2);
+  min-width: 0;
+
+  app-modelo-input {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.rm-candidatos {
+  max-width: 100%;
+  min-height: 32px;
+  margin-left: 22px;
+  padding: 0 var(--esp-2);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-s);
+  background: var(--color-superficie);
+  color: var(--color-texto);
+  font: inherit;
+  font-size: 13px;
+
+  &:focus-visible {
+    outline: 3px solid var(--color-acento);
+    outline-offset: 0;
+  }
+}
+
+.rm-motivo {
+  margin-left: 22px;
+  color: var(--color-texto-2);
+  font-size: 12px;
+}
+
+.rm-aviso {
+  margin-left: 22px;
+  color: var(--color-peligro);
+  font-size: 12px;
+}
+
+@include movil {
+  .rm-resumen .boton-app {
+    width: 100%;
+  }
+
+  .rm-fila {
+    grid-template-columns: minmax(0, 1fr) 44px;
+    grid-template-areas:
+      'original casilla'
+      'lineas casilla'
+      'propuesta propuesta';
+    gap: 0 var(--esp-2);
+    padding: var(--esp-3) var(--esp-2) var(--esp-3) var(--esp-4);
+  }
+
+  .rm-casilla-fila {
+    grid-area: casilla;
+    align-self: start;
+  }
+
+  .rm-original {
+    grid-area: original;
+    font-size: 14px;
+  }
+
+  .rm-lineas {
+    grid-area: lineas;
+    text-align: left;
+  }
+
+  .rm-propuesta {
+    grid-area: propuesta;
+    padding-top: var(--esp-2);
+  }
+
+  .rm-propuesta-texto {
+    min-height: 44px;
+    font-size: 16px;
+  }
+
+  .rm-editor .boton-icono {
+    width: 44px;
+    height: 44px;
+  }
+
+  .rm-candidatos {
+    min-height: 44px;
+    font-size: 16px;
+  }
+}

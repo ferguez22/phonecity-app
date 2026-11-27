@@ -1,0 +1,129 @@
+<header class="cabecera-pagina">
+  <div class="cabecera-titulo">
+    <h1>Limpiar modelos</h1>
+  </div>
+</header>
+
+<div class="lm-pagina">
+  <div class="lm-cabecera">
+    <h1 class="lm-titulo">Limpiar modelos</h1>
+    <div class="lm-segmentado" role="tablist" aria-label="Sección">
+      <button
+        type="button"
+        role="tab"
+        class="lm-segmento"
+        [class.activo]="pestana() === 'revisar'"
+        [attr.aria-selected]="pestana() === 'revisar'"
+        (click)="pestana.set('revisar')"
+      >
+        Revisar
+      </button>
+      <button
+        type="button"
+        role="tab"
+        class="lm-segmento"
+        [class.activo]="pestana() === 'historial'"
+        [attr.aria-selected]="pestana() === 'historial'"
+        (click)="pestana.set('historial')"
+      >
+        Historial
+      </button>
+    </div>
+  </div>
+
+  @if (error(); as e) {
+    <div class="lm-error" role="alert">
+      <span>{{ e }}</span>
+      <button type="button" class="boton-icono" (click)="error.set(null)" aria-label="Cerrar aviso de error"><app-icono nombre="cerrar" /></button>
+    </div>
+  }
+
+  @if (pestana() === 'revisar') {
+    @if (distintos(); as d) {
+      <app-revision-modelos [modelos]="d" (cambios)="seleccion.set($event)" />
+
+      <div class="lm-pie">
+        @if (seleccion().length > maximo) {
+          <span class="lm-pie-nota">Máximo {{ maximo }} modelos por lote</span>
+        }
+        <button type="button" class="boton-app lm-aplicar" [disabled]="!puedeAplicar()" (click)="aplicar()">
+          @if (aplicando()) {
+            Aplicando…
+          } @else {
+            Aplicar ({{ seleccion().length }} {{ seleccion().length === 1 ? 'modelo' : 'modelos' }} · {{ totalLineas() }} {{ totalLineas() === 1 ? 'línea' : 'líneas' }})
+          }
+        </button>
+      </div>
+    } @else {
+      <p class="lm-cargando">Cargando modelos…</p>
+    }
+  } @else {
+    @if (lotes(); as ls) {
+      @if (ls.length === 0) {
+        <p class="lm-cargando">Todavía no se ha aplicado ningún lote.</p>
+      } @else {
+        <ul class="lm-lotes">
+          @for (l of ls; track l.lote) {
+            <li>
+              <button
+                type="button"
+                class="lm-lote"
+                [class.deshecho]="l.deshecho"
+                [disabled]="cargandoLote() !== null"
+                (click)="abrirLote(l)"
+              >
+                <span class="lm-lote-num">Lote {{ l.lote }}</span>
+                <span class="lm-lote-fecha">{{ fecha(l.fecha) }}{{ l.usuario ? ' · ' + l.usuario : '' }}</span>
+                <span class="lm-lote-lineas">{{ l.lineas }} {{ l.lineas === 1 ? 'línea' : 'líneas' }}</span>
+                <span class="lm-lote-estado">
+                  {{ cargandoLote() === l.lote ? 'Abriendo…' : estadoDe(l) }}
+                </span>
+              </button>
+            </li>
+          }
+        </ul>
+      }
+    } @else {
+      <p class="lm-cargando">Cargando historial…</p>
+    }
+  }
+</div>
+
+@if (loteAbierto(); as l) {
+  <app-ventana [titulo]="'Lote ' + l.lote" ancho="680px" [conPie]="!l.deshecho" (cerrar)="cerrarLote()">
+    <p class="lm-detalle-resumen">
+      {{ fecha(l.fecha) }}{{ l.usuario ? ' · ' + l.usuario : '' }} · {{ l.lineas }} {{ l.lineas === 1 ? 'línea' : 'líneas' }} ·
+      {{ estadoDe(l) }}{{ l.deshecho_en ? ' el ' + fecha(l.deshecho_en) : '' }}
+    </p>
+    <ul class="lm-cambios">
+      @for (c of l.cambios; track $index) {
+        <li class="lm-cambio">
+          <span class="lm-cambio-de">{{ c.de }}</span>
+          <span class="lm-cambio-flecha" aria-hidden="true">→</span>
+          <span class="lm-cambio-a">{{ c.a }}</span>
+          <span class="lm-cambio-lineas">
+            {{ c.lineas }} {{ c.lineas === 1 ? 'línea' : 'líneas' }}{{ l.deshecho ? ' · ' + c.restauradas + ' restauradas' : '' }}
+          </span>
+        </li>
+      }
+    </ul>
+    @if (!l.deshecho) {
+      <div ngProjectAs="[ventana-pie]" class="lm-detalle-pie">
+        <button type="button" class="boton-app" (click)="cerrarLote()">Cerrar</button>
+        <button type="button" class="boton-app accion-peligro" [disabled]="deshaciendo()" (click)="deshacerLoteAbierto()">
+          {{ deshaciendo() ? 'Deshaciendo…' : 'Deshacer lote' }}
+        </button>
+      </div>
+    }
+  </app-ventana>
+}
+
+@if (aviso(); as a) {
+  <div class="lm-aviso" role="status">
+    <span class="lm-aviso-texto">{{ a.texto }}</span>
+    @if (a.lote) {
+      <button type="button" class="boton-app pequeno" [disabled]="deshaciendo()" (click)="deshacerDesdeAviso()">Deshacer</button>
+    }
+    <button type="button" class="boton-icono" (click)="cerrarAviso()" aria-label="Cerrar aviso"><app-icono nombre="cerrar" /></button>
+  </div>
+}

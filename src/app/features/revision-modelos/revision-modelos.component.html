@@ -1,0 +1,141 @@
+<div class="rm-resumen">
+  <div class="rm-cifras">
+    <span class="rm-cifra correcto"><strong>{{ correctos() }}</strong> correctos</span>
+    @for (g of grupos(); track g.clave) {
+      <span class="rm-cifra" [class]="g.clave"><strong>{{ g.filas.length }}</strong> {{ g.titulo.toLowerCase() }}</span>
+    }
+  </div>
+  <button
+    type="button"
+    class="boton-app pequeno"
+    [disabled]="desconocidos().length === 0"
+    (click)="exportarDesconocidos()"
+  >
+    <app-icono nombre="descargar" />
+    Exportar desconocidos (CSV)
+  </button>
+</div>
+
+@for (g of grupos(); track g.clave) {
+  <section class="rm-grupo" [class]="g.clave">
+    <header class="rm-grupo-cabecera">
+      @if (g.clave === 'cantidad') {
+        <span class="rm-casilla" aria-hidden="true"></span>
+      } @else {
+        <label class="rm-casilla">
+          <input
+            type="checkbox"
+            [checked]="g.filas.length > 0 && marcadosDe(g) === g.filas.length"
+            [indeterminate]="marcadosDe(g) > 0 && marcadosDe(g) < g.filas.length"
+            [disabled]="g.filas.length === 0"
+            (change)="alternarGrupo(g)"
+            [attr.aria-label]="'Marcar todo: ' + g.titulo"
+          />
+        </label>
+      }
+      <button
+        type="button"
+        class="rm-grupo-titulo"
+        [attr.aria-expanded]="!plegados().has(g.clave)"
+        (click)="alternarPlegado(g.clave)"
+      >
+        <span class="rm-punto"></span>
+        @if (g.clave === 'cantidad') {
+          <span class="rm-grupo-nombre">{{ g.titulo }} ({{ g.filas.length }})</span>
+        } @else {
+          <span class="rm-grupo-nombre">{{ g.titulo }}</span>
+          <span class="rm-grupo-cuenta">{{ marcadosDe(g) }} de {{ g.filas.length }}</span>
+        }
+        <svg class="rm-chevron" [class.plegado]="plegados().has(g.clave)" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M6 9l6 6 6-6" />
+        </svg>
+      </button>
+    </header>
+
+    @if (!plegados().has(g.clave)) {
+      @if (g.clave === 'cantidad') {
+        <p class="rm-nota">La cantidad va en la pieza; se corregirá más adelante.</p>
+      }
+      @if (g.filas.length === 0) {
+        <p class="rm-vacio">Ninguno.</p>
+      } @else {
+        <ul class="rm-lista">
+          @for (f of g.filas; track f.modelo) {
+            <li class="rm-fila" [class.marcada]="f.marcado()" [class.con-aviso]="avisoDe(f) !== null">
+              @if (f.estado === 'cantidad') {
+                <span class="rm-casilla rm-casilla-fila" aria-hidden="true"></span>
+              } @else {
+                <label class="rm-casilla rm-casilla-fila">
+                  <input
+                    type="checkbox"
+                    [checked]="f.marcado()"
+                    (change)="f.marcado.set(!f.marcado())"
+                    [attr.aria-label]="'Cambiar ' + f.modelo"
+                  />
+                </label>
+              }
+
+              <span class="rm-original" [title]="f.modelo">{{ f.modelo }}</span>
+
+              <span class="rm-lineas">{{ f.lineas }} {{ f.lineas === 1 ? 'línea' : 'líneas' }}</span>
+
+              <div class="rm-propuesta">
+                <div class="rm-propuesta-fila">
+                  <span class="rm-flecha" aria-hidden="true">→</span>
+                  @if (f.estado === 'cantidad') {
+                    <span class="rm-propuesta-info">{{ f.propuesta() }}</span>
+                  } @else if (editando() === f.modelo) {
+                    <div class="rm-editor" (keydown.enter)="cerrarEdicion()" (keydown.escape)="cerrarEdicion()">
+                      <app-modelo-input
+                        variante="panel"
+                        placeholder="Modelo correcto"
+                        [ngModel]="f.propuesta()"
+                        (ngModelChange)="editar(f, $event)"
+                      />
+                      <button type="button" class="boton-icono" (click)="cerrarEdicion()" aria-label="Listo">
+                        <app-icono nombre="check" />
+                      </button>
+                    </div>
+                  } @else {
+                    <button
+                      type="button"
+                      class="rm-propuesta-texto"
+                      [class.vacia]="!f.propuesta()"
+                      (click)="abrirEdicion(f)"
+                      [attr.aria-label]="'Editar propuesta para ' + f.modelo"
+                    >
+                      {{ f.propuesta() || 'Escribir modelo…' }}
+                    </button>
+                  }
+                </div>
+
+                @if (f.candidatos.length > 1) {
+                  <select
+                    class="rm-candidatos"
+                    [attr.aria-label]="'Candidatos para ' + f.modelo"
+                    (change)="elegirCandidato(f, $any($event.target).value)"
+                  >
+                    @for (c of f.candidatos; track c) {
+                      <option [value]="c" [selected]="c === f.propuesta()">{{ c }}</option>
+                    }
+                    @if (!f.candidatos.includes(f.propuesta())) {
+                      <option value="" disabled [selected]="true">{{ f.propuesta() ? 'Otro' : 'Elegir modelo…' }}</option>
+                    }
+                  </select>
+                }
+
+                @if (f.motivo) {
+                  <span class="rm-motivo">{{ f.motivo }}</span>
+                }
+
+                @if (avisoDe(f); as aviso) {
+                  <span class="rm-aviso">{{ aviso }}</span>
+                }
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    }
+  </section>
+}

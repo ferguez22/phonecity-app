@@ -7,6 +7,7 @@ export interface EnlaceNav {
   icono: NombreIcono;
   barra: boolean;
   movil: 'pestana' | 'mas';
+  admin?: boolean;
 }
 
 export const ENLACES: EnlaceNav[] = [
@@ -57,5 +58,14 @@ export const ENLACES: EnlaceNav[] = [
     icono: 'importar',
     barra: false,
     movil: 'mas',
+  },
+  {
+    ruta: '/modelos/limpiar',
+    texto: 'Limpiar modelos',
+    corto: 'Modelos',
+    icono: 'limpiar',
+    barra: false,
+    movil: 'mas',
+    admin: true,
   },
 ];

@@ -20,7 +20,7 @@
       <span class="hoja-titulo">Divisor de fecha</span>
       <app-selector-divisor />
     </div>
-    @for (e of enMas; track e.ruta) {
+    @for (e of enMas(); track e.ruta) {
       <a [routerLink]="e.ruta" routerLinkActive="activa" class="hoja-item" (click)="cerrarMas()">
         <app-icono [nombre]="e.icono" />
         {{ e.texto }}

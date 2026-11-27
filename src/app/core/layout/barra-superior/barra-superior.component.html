@@ -38,6 +38,12 @@
           <app-icono nombre="importar" />
           Importar
         </a>
+        @if (esAdmin()) {
+          <a routerLink="/modelos/limpiar" class="menu-item" role="menuitem" (click)="cerrarMenu()">
+            <app-icono nombre="limpiar" />
+            Limpiar modelos
+          </a>
+        }
         <button type="button" class="menu-item peligro" role="menuitem" (click)="cerrarSesion()">
           <app-icono nombre="salir" />
           Cerrar sesión

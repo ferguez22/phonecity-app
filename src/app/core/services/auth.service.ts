@@ -16,6 +16,17 @@ interface LoginResponse {
 
 const TOKEN_KEY = 'phonecity_token';
 
+function rolDe(token: string | null): string | null {
+  if (!token) return null;
+  try {
+    const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
+    const payload = JSON.parse(atob(base64.padEnd(Math.ceil(base64.length / 4) * 4, '=')));
+    return typeof payload.rol === 'string' ? payload.rol : null;
+  } catch {
+    return null;
+  }
+}
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly http = inject(HttpClient);
@@ -23,6 +34,7 @@ export class AuthService {
   // signal con el token; se inicializa desde localStorage al arrancar
   private readonly token = signal<string | null>(localStorage.getItem(TOKEN_KEY));
   readonly isLoggedIn = computed(() => this.token() !== null);
+  readonly esAdmin = computed(() => rolDe(this.token()) === 'admin');
 
   login(nombreUsuario: string, password: string): Observable<LoginResponse> {
     return this.http

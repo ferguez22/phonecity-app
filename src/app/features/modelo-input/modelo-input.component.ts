@@ -142,7 +142,7 @@ export class ModeloInputComponent implements ControlValueAccessor {
     filas[this.activo()]?.scrollIntoView({ block: 'nearest' });
   }
 
-  private abrir(): void {
+  abrir(): void {
     this.calcularPosicion();
     this.abierto.set(true);
   }

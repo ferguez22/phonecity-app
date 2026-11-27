@@ -1,4 +1,5 @@
 import { MODELOS, ModeloDef } from './modelos';
+import { MODELOS_ESPECIALES } from './modelos-especiales';
 import { PREFIJOS, SUFIJOS } from './abreviaturas';
 import { casaTodos, normalizar, terminosDe } from '../utils/texto.util';
 
@@ -12,9 +13,17 @@ interface Entrada {
 
 const MAX_COMBINACIONES = 64;
 
+export const CATALOGO: ModeloDef[] = [...MODELOS, ...MODELOS_ESPECIALES];
+
+export interface MarcaSola {
+  nombre: string;
+  modelos: ModeloDef[];
+}
+
 let entradas: Entrada[] | null = null;
 let porCompacto: Map<string, string> | null = null;
 let vocabulario: string[] | null = null;
+let marcas: Map<string, MarcaSola> | null = null;
 
 function compacto(texto: string): string {
   return normalizar(texto).replace(/[^a-z0-9]/g, '');
@@ -29,7 +38,7 @@ function quitarMarca(def: ModeloDef): string {
 
 function indexar(): Entrada[] {
   if (entradas) return entradas;
-  entradas = MODELOS.map((def) => {
+  entradas = CATALOGO.map((def) => {
     const nombre = compacto(def.nombre);
     const sinMarca = compacto(quitarMarca(def));
     const texto = normalizar([def.nombre, ...def.variantes].join(' '));
@@ -127,9 +136,55 @@ function rango(e: Entrada, combos: string[]): number {
   return 2;
 }
 
+export interface ResultadoBusqueda {
+  def: ModeloDef;
+  rango: number;
+}
+
+export interface AnalisisBusqueda {
+  resultados: ResultadoBusqueda[];
+  corregido: boolean;
+}
+
 export function buscarModelos(texto: string, max = 8): ModeloDef[] {
+  const marca = marcaSola(texto);
+  if (marca) return [...marca.modelos].sort((a, b) => b.usos - a.usos || a.nombre.length - b.nombre.length);
+  return analizarBusqueda(texto, max).resultados.map((r) => r.def);
+}
+
+function indexarMarcas(): Map<string, MarcaSola> {
+  if (marcas) return marcas;
+  const mapa = new Map<string, MarcaSola>();
+  const anadir = (palabra: string, def: ModeloDef) => {
+    const clave = normalizar(palabra);
+    let marca = mapa.get(clave);
+    if (!marca) {
+      marca = { nombre: palabra, modelos: [] };
+      mapa.set(clave, marca);
+    }
+    if (!marca.modelos.includes(def)) marca.modelos.push(def);
+  };
+  for (const def of MODELOS) {
+    anadir(def.marca, def);
+    anadir(def.nombre.split(' ')[0], def);
+  }
+  marcas = mapa;
+  return marcas;
+}
+
+export function marcaSola(texto: string): MarcaSola | null {
+  const palabras = new Set<string>();
+  for (const token of terminosDe(texto)) {
+    palabras.add(token.length > 1 && Object.hasOwn(PREFIJOS, token) ? PREFIJOS[token] : token);
+  }
+  if (palabras.size !== 1) return null;
+  const [palabra] = palabras;
+  return indexarMarcas().get(palabra) ?? null;
+}
+
+export function analizarBusqueda(texto: string, max = 8): AnalisisBusqueda {
   const tokens = terminosDe(texto);
-  if (tokens.length === 0) return [];
+  if (tokens.length === 0) return { resultados: [], corregido: false };
   let corregido = false;
   const porToken = tokens.map((token) => {
     const lecturas = lecturasDe(token);
@@ -142,17 +197,18 @@ export function buscarModelos(texto: string, max = 8): ModeloDef[] {
   const combos = combinaciones(porToken);
   const penalizacion = corregido ? 3 : 0;
 
-  return indexar()
+  const resultados = indexar()
     .filter((e) => porToken.every((lecturas) => lecturas.some((l) => casaTodos(e.indice, l))))
     .map((e) => ({ e, r: rango(e, combos) + penalizacion }))
     .sort((a, b) => a.r - b.r || b.e.def.usos - a.e.def.usos || a.e.def.nombre.length - b.e.def.nombre.length)
     .slice(0, max)
-    .map((x) => x.e.def);
+    .map((x) => ({ def: x.e.def, rango: x.r }));
+  return { resultados, corregido };
 }
 
 export function nombreExacto(texto: string): string | null {
   if (!porCompacto) {
-    porCompacto = new Map(MODELOS.map((m) => [compacto(m.nombre), m.nombre]));
+    porCompacto = new Map(CATALOGO.map((m) => [compacto(m.nombre), m.nombre]));
   }
   const c = compacto(texto);
   return c ? porCompacto.get(c) ?? null : null;
