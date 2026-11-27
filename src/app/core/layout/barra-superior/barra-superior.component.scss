@@ -216,6 +216,17 @@
   }
 }
 
+@container barra (width < 880px) {
+  .con-admin .enlaces .enlace {
+    width: 40px;
+    padding: 0;
+  }
+
+  .con-admin .enlace-texto {
+    display: none;
+  }
+}
+
 @keyframes menu-entra {
   from {
     opacity: 0;

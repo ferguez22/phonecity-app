@@ -1,0 +1,427 @@
+<header class="cabecera-pagina">
+  <div class="cabecera-titulo">
+    <h1>Estadísticas</h1>
+  </div>
+</header>
+
+<div class="es-pagina">
+  <div class="es-cabecera">
+    <div class="es-titulos">
+      <h1 class="es-titulo">Estadísticas</h1>
+      <span class="es-etiqueta">≈ Cifras estimadas</span>
+      @if (periodo()) {
+        <span class="es-periodo" [class.cargando]="cargando()">{{ periodo() }}</span>
+      }
+    </div>
+    <div class="es-controles">
+    <button
+      type="button"
+      class="es-importes"
+      [class.activo]="mostrarImportes()"
+      [attr.aria-pressed]="mostrarImportes()"
+      (click)="mostrarImportes.set(!mostrarImportes())"
+    >
+      <span aria-hidden="true">👁</span>
+      {{ mostrarImportes() ? 'Ocultar importes' : 'Mostrar importes' }}
+    </button>
+    <div class="es-segmentado" role="radiogroup" aria-label="Periodo">
+      @for (m of opcionesMeses; track m) {
+        <button
+          type="button"
+          role="radio"
+          class="es-segmento"
+          [class.activo]="meses() === m"
+          [attr.aria-checked]="meses() === m"
+          (click)="elegir(m)"
+        >
+          {{ m }} meses
+        </button>
+      }
+    </div>
+    </div>
+  </div>
+
+  <div class="es-pestanas-carril">
+    <div class="es-pestanas" role="tablist" aria-label="Sección">
+      @for (p of pestanas; track p.id) {
+        <button
+          type="button"
+          role="tab"
+          class="es-segmento"
+          [class.activo]="pestana() === p.id"
+          [attr.aria-selected]="pestana() === p.id"
+          (click)="cambiarPestana(p.id)"
+        >
+          {{ p.texto }}
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (error(); as mensaje) {
+    <div class="es-error" role="alert">
+      <span>{{ mensaje }}</span>
+      <button type="button" class="boton-app pequeno" (click)="reintentar()">Reintentar</button>
+    </div>
+  }
+
+  <ng-template #variacion let-v>
+    <span class="es-variacion">
+      @if (v) {
+        <span [class]="v.clase">{{ v.texto }}</span>
+      } @else {
+        <span class="neutro">—</span>
+      }
+      <span class="vs">{{ textoAnterior() }}</span>
+    </span>
+  </ng-template>
+
+  <ng-template #botonTop let-t>
+    @if (puedeAmpliar(t)) {
+      <button type="button" class="es-mas" [attr.aria-expanded]="estaAmpliado(t)" (click)="alternarTop(t)">
+        {{ textoTop(t) }}
+      </button>
+    }
+  </ng-template>
+
+  <ng-template #recomendaciones let-lista>
+    @if (lista.length) {
+      <section class="es-bloque" aria-label="Recomendaciones">
+        <h2 class="es-subtitulo">Recomendaciones</h2>
+        <div class="es-recomendaciones">
+          @for (r of lista; track r.tipo + r.titulo + r.texto; let i = $index) {
+            <article class="es-recomendacion" [style.--i]="i">
+              <span class="bombilla" aria-hidden="true">💡</span>
+              <div>
+                <h3>{{ r.titulo }}</h3>
+                <p>{{ r.texto }}</p>
+              </div>
+            </article>
+          }
+        </div>
+      </section>
+    }
+  </ng-template>
+
+  @if (datos(); as d) {
+    @if (ver('reparaciones')) {
+      @if (pestana() === 'todo') {
+        <h2 class="es-seccion">Reparaciones</h2>
+      }
+
+      <section class="es-cifras" aria-label="Cifras clave">
+        <div class="es-cifra">
+          <span class="valor">≈ {{ textoCifras().reparaciones }}</span>
+          <span class="rotulo">Reparaciones</span>
+          @if (variaciones(); as v) {
+            <ng-container *ngTemplateOutlet="variacion; context: { $implicit: v.reparaciones }" />
+          }
+        </div>
+        <div class="es-cifra">
+          <span class="valor">≈ {{ textoCifras().ingresos }}</span>
+          <span class="rotulo">Ingresos estimados</span>
+          @if (variaciones(); as v) {
+            <ng-container *ngTemplateOutlet="variacion; context: { $implicit: v.ingresos }" />
+          }
+        </div>
+        <div class="es-cifra">
+          <span class="valor">≈ {{ textoCifras().ticket }}</span>
+          <span class="rotulo">Ticket medio</span>
+          @if (variaciones(); as v) {
+            <ng-container *ngTemplateOutlet="variacion; context: { $implicit: v.ticket }" />
+          }
+        </div>
+        <div class="es-cifra">
+          <span class="valor">
+            @if (textoCifras().dias; as dias) {
+              ≈ {{ dias }}
+            } @else {
+              —
+            }
+          </span>
+          <span class="rotulo">Hasta la entrega</span>
+          @if (variaciones(); as v) {
+            <ng-container *ngTemplateOutlet="variacion; context: { $implicit: v.dias }" />
+          }
+        </div>
+      </section>
+
+      @if (!variaciones()) {
+        <p class="es-sin-comparacion">{{ textoSinComparacion() }}</p>
+      }
+
+      <section class="es-atencion" aria-label="Atención">
+        @if (olvidados().total > 0) {
+          <a class="es-aviso ambar" routerLink="/tablero" [queryParams]="{ filtro: 'moviles-en-tienda' }">
+            <span class="titulo">
+              {{ olvidados().total }} {{ olvidados().total === 1 ? 'móvil olvidado' : 'móviles olvidados' }}
+            </span>
+            <span class="detalle">
+              {{ olvidados().total === 1 ? 'Avisado' : 'Avisados' }} hace más de 30 días
+            </span>
+            @if (olvidados().mas60 > 0) {
+              <span class="detalle">{{ olvidados().mas60 }} de ellos, más de 60</span>
+            }
+            <span class="enlace">Ver móviles en tienda →</span>
+          </a>
+        } @else {
+          <div class="es-aviso">
+            <span class="titulo">Sin móviles olvidados</span>
+            <span class="detalle">Ninguno avisado hace más de 30 días</span>
+          </div>
+        }
+        <div class="es-aviso">
+          <span class="titulo">{{ textoNoReparable() ?? '—' }} no reparable</span>
+          <span class="detalle">De las reparaciones del periodo</span>
+        </div>
+      </section>
+
+      <ng-container *ngTemplateOutlet="recomendaciones; context: { $implicit: recomendacionesReparacion() }" />
+
+      <section class="es-tarjeta">
+        <h2 class="es-subtitulo">Top 10 modelos</h2>
+        <div class="es-grafico">
+          <app-grafico
+            [datos]="graficoModelos()"
+            [opciones]="opcionesModelos"
+            [alto]="altoModelos()"
+            etiqueta="Modelos con más reparaciones"
+          />
+          @if (!d.topModelos.length) {
+            <p class="es-vacio">Sin reparaciones en este periodo</p>
+          }
+        </div>
+        <ng-container *ngTemplateOutlet="botonTop; context: { $implicit: 'modelos' }" />
+      </section>
+
+      <section class="es-tarjeta">
+        <h2 class="es-subtitulo">Por mes <span>· últimos 12 meses</span></h2>
+        <app-grafico
+          [datos]="graficoMeses()"
+          [opciones]="opcionesMesesGrafico"
+          [alto]="300"
+          etiqueta="Entradas por mes y flujo"
+        />
+      </section>
+
+      <div class="es-dos">
+        <section class="es-tarjeta">
+          <div>
+            <h2 class="es-subtitulo">Media de entradas por día de la semana</h2>
+            <p class="es-explicacion">Qué días suele entrar más trabajo, para organizar turnos y pedidos.</p>
+          </div>
+          <app-grafico
+            [datos]="graficoDias()"
+            [opciones]="opcionesDias"
+            [alto]="220"
+            etiqueta="Media de entradas por día de la semana"
+          />
+        </section>
+        <section class="es-tarjeta">
+          <div>
+            <h2 class="es-subtitulo">Media de entradas por día, según la parte del mes</h2>
+            <p class="es-explicacion">Si hay más movimiento a principio, mitad o final de mes.</p>
+          </div>
+          <app-grafico
+            [datos]="graficoSemanas()"
+            [opciones]="opcionesSemanas"
+            [alto]="220"
+            etiqueta="Media de entradas por día según la parte del mes"
+          />
+        </section>
+      </div>
+    }
+
+    @if (ver('accesorios')) {
+      @if (pestana() === 'todo') {
+        <h2 class="es-seccion">Accesorios</h2>
+      }
+
+      <section class="es-tarjeta">
+        <h2 class="es-subtitulo">Accesorios por tipo</h2>
+        <div class="es-grafico">
+          <app-grafico
+            [datos]="graficoTiposAccesorio()"
+            [opciones]="opcionesTiposAccesorio"
+            [alto]="altoTiposAccesorio()"
+            etiqueta="Accesorios pedidos por tipo y proveedor"
+          />
+          @if (!tiposAccesorio().length) {
+            <p class="es-vacio">Sin accesorios pedidos en este periodo</p>
+          }
+        </div>
+      </section>
+
+      <section class="es-tarjeta">
+        <h2 class="es-subtitulo">Top accesorios</h2>
+        @if (topAccesoriosLista().length) {
+          <ol class="es-ranking">
+            @for (a of topAccesoriosLista(); track a.articulo; let i = $index) {
+              <li>
+                <span class="puesto">{{ i + 1 }}</span>
+                <div class="cuerpo">
+                  <div class="fila">
+                    <span class="articulo">{{ a.articulo }}</span>
+                    <span class="unidades">~{{ a.unidades }} uds</span>
+                  </div>
+                  <span class="pista" aria-hidden="true">
+                    <span class="relleno" [style.width.%]="a.proporcion" [style.--i]="i"></span>
+                  </span>
+                  @if (a.modelos) {
+                    <span class="modelos">{{ a.modelos }}</span>
+                  }
+                </div>
+              </li>
+            }
+          </ol>
+        } @else {
+          <p class="es-lista-vacia">Sin accesorios pedidos en este periodo</p>
+        }
+        <ng-container *ngTemplateOutlet="botonTop; context: { $implicit: 'accesorios' }" />
+      </section>
+
+      <ng-container *ngTemplateOutlet="recomendaciones; context: { $implicit: recomendacionesAccesorio() }" />
+
+      <section class="es-atencion" aria-label="Espera por proveedor">
+        <div class="es-aviso">
+          <span class="titulo">Días de espera por proveedor</span>
+          <span class="tiempos">
+            @for (t of tiemposProveedor(); track t.nombre) {
+              <span><span class="detalle">{{ t.nombre }}</span> {{ t.texto }}</span>
+            }
+          </span>
+        </div>
+      </section>
+    }
+
+    @if (ver('compraventa')) {
+      <section class="es-bloque" aria-label="Compraventa de dispositivos">
+        <h2 [class]="pestana() === 'todo' ? 'es-seccion' : 'es-subtitulo'">Compraventa de dispositivos</h2>
+
+        <div class="es-cifras">
+          <div class="es-cifra">
+            <span class="valor">≈ {{ textoCifras().ventas }}</span>
+            <span class="rotulo">Ventas</span>
+          </div>
+          <div class="es-cifra">
+            <span class="valor">≈ {{ textoCifras().compras }}</span>
+            <span class="rotulo">Compras</span>
+          </div>
+          <div class="es-cifra">
+            <span class="valor">≈ {{ textoCifras().ingresoVentas }}</span>
+            <span class="rotulo">Ingreso por ventas</span>
+          </div>
+          <div class="es-cifra">
+            <span class="valor">≈ {{ textoCifras().gastoCompras }}</span>
+            <span class="rotulo">Gasto en compras</span>
+          </div>
+        </div>
+
+        <section class="es-tarjeta">
+          <h3 class="es-subtitulo">Por mes <span>· últimos 12 meses</span></h3>
+          <app-grafico
+            [datos]="graficoCompraventa()"
+            [opciones]="opcionesCompraventa"
+            [alto]="260"
+            etiqueta="Ventas y compras de dispositivos por mes"
+          />
+        </section>
+
+        <div class="es-dos">
+          <section class="es-tarjeta">
+            <h3 class="es-subtitulo">Más vendidos</h3>
+            @if (topVendidos().length) {
+              <ol class="es-lista">
+                @for (m of topVendidos(); track m.modelo) {
+                  <li><span class="modelo">{{ m.modelo }}</span><span class="total">{{ m.total }}</span></li>
+                }
+              </ol>
+            } @else {
+              <p class="es-lista-vacia">Sin ventas en este periodo</p>
+            }
+            <ng-container *ngTemplateOutlet="botonTop; context: { $implicit: 'vendidos' }" />
+          </section>
+          <section class="es-tarjeta">
+            <h3 class="es-subtitulo">Más comprados</h3>
+            @if (topComprados().length) {
+              <ol class="es-lista">
+                @for (m of topComprados(); track m.modelo) {
+                  <li><span class="modelo">{{ m.modelo }}</span><span class="total">{{ m.total }}</span></li>
+                }
+              </ol>
+            } @else {
+              <p class="es-lista-vacia">Sin compras en este periodo</p>
+            }
+            <ng-container *ngTemplateOutlet="botonTop; context: { $implicit: 'comprados' }" />
+          </section>
+        </div>
+      </section>
+    }
+
+    @if (ver('taller')) {
+      <section class="es-bloque" aria-label="Taller">
+        <h2 [class]="pestana() === 'todo' ? 'es-seccion' : 'es-subtitulo'">Taller</h2>
+
+        @if (talleresRetrasados().length) {
+          <div class="es-atencion">
+            @for (t of talleresRetrasados(); track t.taller) {
+              <a class="es-aviso ambar" routerLink="/tablero" [queryParams]="{ filtro: 'taller' }">
+                <span class="titulo">
+                  {{ t.mas15 }} {{ t.mas15 === 1 ? 'móvil lleva' : 'móviles llevan' }} más de 15 días en {{ t.taller }}
+                </span>
+                <span class="detalle">{{ t.total }} en {{ t.taller }} ahora mismo</span>
+                <span class="enlace">Ver taller →</span>
+              </a>
+            }
+          </div>
+        }
+
+        <div class="es-cifras">
+          <div class="es-cifra">
+            <span class="valor">
+              @if (textoCifras().diasEnvio; as dias) {
+                ~{{ dias }}
+              } @else {
+                —
+              }
+            </span>
+            <span class="rotulo">Hasta enviarlo</span>
+          </div>
+        </div>
+
+        @if (talleres().length) {
+          <div class="es-talleres">
+            @for (t of talleres(); track t.taller) {
+              <article class="es-tarjeta es-taller">
+                <h3 class="es-subtitulo">{{ t.taller }}</h3>
+                <span class="detalle">{{ t.envios }} {{ t.envios === 1 ? 'envío' : 'envíos' }} · {{ t.textoDias }}</span>
+                <div class="exito">
+                  <span class="detalle">Éxito</span>
+                  <span class="porcentaje">{{ t.textoExito }}</span>
+                </div>
+                <div
+                  class="barra"
+                  [class.sin-datos]="t.exito === null"
+                  role="img"
+                  [attr.aria-label]="'Éxito ' + t.textoExito"
+                >
+                  <span class="relleno" [style.width.%]="t.exito ?? 0"></span>
+                </div>
+                <span class="detalle">{{ t.reparados }} reparados · {{ t.noReparables }} no reparables</span>
+              </article>
+            }
+          </div>
+        } @else {
+          <p class="es-lista-vacia">Sin envíos a taller en este periodo</p>
+        }
+      </section>
+    }
+  } @else if (!error()) {
+    <p class="es-cargando">Cargando estadísticas…</p>
+  }
+
+  <p class="es-pie">
+    Las cifras de esta pantalla son estimaciones a partir de lo registrado en la app. No sustituyen a la
+    contabilidad ni a la caja de la tienda: no incluyen descuentos, garantías ni cobros hechos fuera de la app.
+  </p>
+</div>

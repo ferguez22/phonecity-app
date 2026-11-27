@@ -1,4 +1,4 @@
-import { Component, DestroyRef, ElementRef, inject, signal } from '@angular/core';
+import { Component, DestroyRef, ElementRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationStart, Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { filter } from 'rxjs';
@@ -20,9 +20,10 @@ export class BarraSuperiorComponent {
   private readonly router = inject(Router);
   private readonly host = inject(ElementRef<HTMLElement>);
 
-  readonly enlaces = ENLACES.filter((e) => e.barra);
   readonly menuAbierto = signal(false);
   readonly esAdmin = this.auth.esAdmin;
+  readonly enlaces = computed(() => ENLACES.filter((e) => e.barra && (!e.admin || this.esAdmin())));
+  readonly conAdmin = computed(() => this.enlaces().some((e) => e.admin));
 
   constructor() {
     const alPulsarTecla = (e: KeyboardEvent) => {

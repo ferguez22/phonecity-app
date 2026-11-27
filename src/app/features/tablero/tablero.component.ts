@@ -30,6 +30,8 @@ import { ESTADO_OPTIONS, EstadoDef, colorEstado, esEstadoActual, getColor, getEt
 
 interface Boton { label: string; color?: string; texto?: string; filtros: LineaFiltros; filtroClient?: (l: Linea) => boolean; aplicaHistorial?: boolean; fasesHistorial?: string[];}
 
+const slugFiltro = (label: string) => normalizar(label).replace(/[^a-z0-9]+/g, '-');
+
 type FilaTablero =
   | { tipo: 'divisor'; fecha: string; key: string }
   | { tipo: 'linea'; linea: Linea };
@@ -257,6 +259,13 @@ export class TableroComponent implements OnInit {
   ngOnInit(): void {
     const abrir = Number(this.route.snapshot.queryParamMap.get('abrir'));
     if (abrir) this.abrirPendiente = abrir;
+    const filtro = this.route.snapshot.queryParamMap.get('filtro');
+    const boton = filtro ? this.botones.find((b) => slugFiltro(b.label) === filtro) : undefined;
+    if (boton) {
+      this.filtrosActivos = boton.filtros;
+      this.botonActivo.set(boton.label);
+      this.router.navigate([], { relativeTo: this.route, queryParams: { filtro: null }, queryParamsHandling: 'merge', replaceUrl: true });
+    }
     this.cargar();
     this.proveedorSvc.list().subscribe({ next: (p) => this.proveedores.set(p), error: () => {} });
     this.busqueda$

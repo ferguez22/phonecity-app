@@ -1,11 +1,11 @@
-<header class="barra">
+<header class="barra" [class.con-admin]="conAdmin()">
   <a routerLink="/tablero" class="marca" aria-label="PhoneCity">
     <img class="marca-icono" src="iconos/icono-192.png" alt="" width="28" height="28" />
     <span class="marca-texto">PhoneCity</span>
   </a>
 
   <nav class="enlaces" aria-label="Navegación principal">
-    @for (e of enlaces; track e.ruta) {
+    @for (e of enlaces(); track e.ruta) {
       <a [routerLink]="e.ruta" routerLinkActive="activo" class="enlace" [title]="e.texto">
         <app-icono [nombre]="e.icono" />
         <span class="enlace-texto">{{ e.texto }}</span>
@@ -42,8 +42,7 @@
           <a routerLink="/modelos/limpiar" class="menu-item" role="menuitem" (click)="cerrarMenu()">
             <app-icono nombre="limpiar" />
             Limpiar modelos
-          </a>
-        }
+          </a>        }
         <button type="button" class="menu-item peligro" role="menuitem" (click)="cerrarSesion()">
           <app-icono nombre="salir" />
           Cerrar sesión

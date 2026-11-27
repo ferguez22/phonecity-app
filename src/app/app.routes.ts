@@ -16,6 +16,7 @@ export const routes: Routes = [
   {path: 'etiquetas', loadComponent: () => import('./features/etiquetas/etiquetas.component').then((m) => m.EtiquetasComponent), canActivate: [authGuard]},
   {path: 'importar', loadComponent: () => import('./features/import/import.component').then((m) => m.ImportComponent), canActivate: [authGuard, adminGuard]},  
   {path: 'modelos/limpiar', canActivate: [authGuard, adminGuard], loadComponent: () => import('./features/limpiar-modelos/limpiar-modelos.component').then((m) => m.LimpiarModelosComponent)},
+  {path: 'estadisticas', canActivate: [authGuard, adminGuard], loadComponent: () => import('./features/estadisticas/estadisticas.component').then((m) => m.EstadisticasComponent)},
   {path: 'linea/:id', canActivate: [authGuard], loadComponent: () => import('./features/linea-detalle/linea-detalle.component').then((m) => m.LineaDetalleComponent)},
   
   { path: '**', redirectTo: 'tablero' },

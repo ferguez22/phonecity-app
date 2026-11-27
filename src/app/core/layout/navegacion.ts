@@ -69,4 +69,13 @@ export const ENLACES: EnlaceNav[] = [
     movil: 'mas',
     admin: true,
   },
+  {
+    ruta: '/estadisticas',
+    texto: 'Estadísticas',
+    corto: 'Estadísticas',
+    icono: 'estadisticas',
+    barra: true,
+    movil: 'mas',
+    admin: true,
+  },
 ];
