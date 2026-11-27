@@ -58,6 +58,7 @@ export const ENLACES: EnlaceNav[] = [
     icono: 'importar',
     barra: false,
     movil: 'mas',
+    admin: true,
   },
   {
     ruta: '/modelos/limpiar',

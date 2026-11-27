@@ -4,145 +4,238 @@
   </div>
 </header>
 
-<div class="import-page">
-  <div class="import-header">
-    <p class="subtitle">Sube el export del Google Sheet para actualizar la base de datos.</p>
+<div class="im-pagina">
+  <div class="im-cabecera">
+    <h1 class="im-titulo">Importar CSV</h1>
+    <p class="im-subtitulo">Sube el export del Google Sheet. "Analizar" no escribe nada en la base de datos.</p>
   </div>
 
-  @if (error()) {
-    <div class="alert-box error">{{ error() }}</div>
-  }
-
-  @if (!result()) {
-    <div
-      class="dropzone"
-      [class.dragover]="dragOver()"
-      (dragover)="onDragOver($event)"
-      (dragleave)="onDragLeave($event)"
-      (drop)="onDrop($event)"
-    >
-      <input type="file" id="csvInput" accept=".csv" hidden (change)="onFileInput($event)" />
-      <label for="csvInput" class="dropzone-label">
-        <div class="dropzone-icon">⬆</div>
-        @if (file(); as f) {
-          <div class="file-name">{{ f.name }}</div>
-          <div class="file-size">{{ formatSize(f.size) }}</div>
-        } @else {
-          <div class="dropzone-text">Arrastra el CSV aquí o haz clic para seleccionar</div>
-          <div class="dropzone-hint">Solo archivos .csv · máx 5 MB</div>
-        }
-      </label>
-    </div>
-
-    <div class="actions">
-      <button class="btn btn-primary" [disabled]="!file() || loading()" (click)="doPreview()">
-        @if (loading() && !preview()) {
-          <span class="spinner"></span> Analizando...
-        } @else {
-          Previsualizar
-        }
-      </button>
-      @if (file()) {
-        <button class="btn btn-link" [disabled]="loading()" (click)="reset()">Quitar archivo</button>
-      }
-    </div>
-  }
-
-  @if (preview(); as p) {
-    <div class="panel">
-      <h3>Previsualización <span class="muted">(no se ha modificado nada)</span></h3>
-
-      <div class="stat-grid">
-        <div class="stat-card ok">
-          <div class="stat-num">{{ p.stats.ok }}</div>
-          <div class="stat-label">Importables</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-num">{{ p.stats.separador }}</div>
-          <div class="stat-label">Separadores</div>
-        </div>
-        <div class="stat-card warn">
-          <div class="stat-num">{{ p.stats.fallback }}</div>
-          <div class="stat-label">Sin estado</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-num">{{ p.stats.vacia }}</div>
-          <div class="stat-label">Vacías</div>
-        </div>
-        <div class="stat-card" [class.err]="p.stats.err > 0">
-          <div class="stat-num">{{ p.stats.err }}</div>
-          <div class="stat-label">Errores</div>
-        </div>
-      </div>
-
-      @if (p.fallbackLog.length) {
-        <button class="btn btn-sm btn-outline" (click)="toggleFallbacks()">
-          {{ showFallbacks() ? 'Ocultar' : 'Ver' }} líneas sin estado ({{ p.fallbackLog.length }})
-        </button>
-        @if (showFallbacks()) {
-          <div class="fallback-list">
-            @for (line of p.fallbackLog; track line) {
-              <div>{{ line }}</div>
-            }
-          </div>
-        }
-      }
-
-      <div class="danger-box">
-        <div class="danger-title">⚠ Acción destructiva</div>
-        <p>
-          Importar <strong>reemplaza TODOS los datos</strong> de líneas, clientes, historial y
-          credenciales por los del CSV. Se crea una copia de seguridad automática
-          (<code>*_backup</code>) y la operación es atómica: si algo falla, no se pierde nada.
-        </p>
-        <label class="confirm-check">
-          <input type="checkbox" [checked]="confirm()" (change)="toggleConfirm()" />
-          Entiendo que se reemplazarán todos los datos por los del CSV.
-        </label>
-      </div>
-
-      <div class="actions">
-        <button class="btn btn-danger" [disabled]="!confirm() || loading()" (click)="doExecute()">
-          @if (loading()) {
-            <span class="spinner"></span> Importando...
-          } @else {
-            Importar (reemplazar todo)
-          }
-        </button>
-        <button class="btn btn-link" [disabled]="loading()" (click)="reset()">Cancelar</button>
-      </div>
+  @if (error(); as e) {
+    <div class="im-error" role="alert">
+      <span>{{ e }}</span>
+      <button type="button" class="boton-icono" (click)="error.set(null)" aria-label="Cerrar aviso de error"><app-icono nombre="cerrar" /></button>
     </div>
   }
 
   @if (result(); as r) {
-    <div class="panel result">
-      <div class="result-icon">✓</div>
-      <h3>Importación completada</h3>
+    <section class="im-tarjeta im-resultado">
+      <div class="im-resultado-icono"><app-icono nombre="check" /></div>
+      <h2 class="im-resultado-titulo">Importación completada</h2>
 
-      <div class="stat-grid">
-        <div class="stat-card ok">
-          <div class="stat-num">{{ r.stats.ok }}</div>
-          <div class="stat-label">Importadas</div>
+      <div class="im-cifras">
+        <div class="im-cifra exito">
+          <span class="im-cifra-num">{{ r.stats.ok }}</span>
+          <span class="im-cifra-etiqueta">Importadas</span>
         </div>
-        <div class="stat-card warn">
-          <div class="stat-num">{{ r.stats.fallback }}</div>
-          <div class="stat-label">Sin estado</div>
+        <div class="im-cifra">
+          <span class="im-cifra-num">{{ r.stats.fallback }}</span>
+          <span class="im-cifra-etiqueta">Sin estado</span>
         </div>
-        <div class="stat-card" [class.err]="r.stats.err > 0">
-          <div class="stat-num">{{ r.stats.err }}</div>
-          <div class="stat-label">Errores</div>
+        <div class="im-cifra" [class.peligro]="r.stats.err > 0">
+          <span class="im-cifra-num">{{ r.stats.err }}</span>
+          <span class="im-cifra-etiqueta">Errores</span>
         </div>
       </div>
 
-      <p class="result-meta">
-        Próximo ID: <strong>{{ r.nextAutoIncrement }}</strong> · Backup creado:
-        {{ r.backup ? 'sí' : 'no' }}
+      <p class="im-resultado-meta">
+        Próximo ID: <strong>{{ r.nextAutoIncrement }}</strong> · Copia de seguridad: {{ r.backup ? 'sí' : 'no' }}
       </p>
 
-      <div class="actions center">
-        <a class="btn btn-primary" routerLink="/tablero">Ver tablero</a>
-        <button class="btn btn-link" (click)="reset()">Importar otro</button>
+      <div class="im-acciones centro">
+        <a class="boton-app im-acento" routerLink="/tablero">Ver tablero</a>
+        <button type="button" class="boton-app" (click)="reset()">Importar otro</button>
       </div>
-    </div>
+    </section>
+  } @else {
+    <section class="im-tarjeta">
+      <div
+        class="im-zona"
+        [class.encima]="dragOver()"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event)"
+      >
+        <input type="file" id="csvInput" accept=".csv" hidden (change)="onFileInput($event)" />
+        <label for="csvInput" class="im-zona-label">
+          <app-icono nombre="importar" class="im-zona-icono" />
+          @if (file(); as f) {
+            <span class="im-archivo">{{ f.name }}</span>
+            <span class="im-pista">{{ formatSize(f.size) }} · pulsa para cambiar</span>
+          } @else {
+            <span class="im-zona-texto">Arrastra el CSV aquí o pulsa para elegirlo</span>
+            <span class="im-pista">Solo .csv · máx. 5 MB</span>
+          }
+        </label>
+      </div>
+
+      <div class="im-acciones">
+        <button type="button" class="boton-app im-acento" [disabled]="!file() || loading()" (click)="doPreview()">
+          {{ loading() && !preview() ? 'Analizando…' : 'Analizar (demo)' }}
+        </button>
+        @if (file()) {
+          <button type="button" class="boton-app" [disabled]="loading()" (click)="reset()">Quitar archivo</button>
+        }
+        <button
+          type="button"
+          class="im-peligro"
+          [disabled]="!puedeImportar()"
+          [title]="puedeImportar() ? '' : 'Analiza primero este archivo'"
+          (click)="abrirConfirmacion()"
+        >
+          Importar de verdad
+        </button>
+      </div>
+    </section>
+
+    @if (preview(); as p) {
+      <section class="im-bloque">
+        <h2 class="im-bloque-titulo">Resumen</h2>
+        <div class="im-cifras">
+          <div class="im-cifra">
+            <span class="im-cifra-num">{{ p.resumen.filas }}</span>
+            <span class="im-cifra-etiqueta">Filas</span>
+          </div>
+          <div class="im-cifra exito">
+            <span class="im-cifra-num">{{ p.resumen.validas }}</span>
+            <span class="im-cifra-etiqueta">Válidas</span>
+          </div>
+          <div class="im-cifra" [class.peligro]="p.resumen.conError > 0">
+            <span class="im-cifra-num">{{ p.resumen.conError }}</span>
+            <span class="im-cifra-etiqueta">Con error</span>
+          </div>
+          <div class="im-cifra">
+            <span class="im-cifra-num">{{ p.resumen.vacias }}</span>
+            <span class="im-cifra-etiqueta">Vacías</span>
+          </div>
+          <div class="im-cifra">
+            <span class="im-cifra-num">{{ p.resumen.separadores }}</span>
+            <span class="im-cifra-etiqueta">Separadores</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="im-bloque">
+        <h2 class="im-bloque-titulo">Clientes</h2>
+        <div class="im-tarjeta">
+          <div class="im-clientes">
+            <span><strong>{{ p.clientes.nuevos }}</strong> nuevos</span>
+            <span><strong>{{ p.clientes.existentes }}</strong> ya existentes</span>
+            <span><strong>{{ p.clientes.sinTelefono }}</strong> sin teléfono</span>
+            <span [class.aviso]="p.clientes.duplicados.length > 0"><strong>{{ p.clientes.duplicados.length }}</strong> duplicados</span>
+          </div>
+          @if (p.clientes.duplicados.length) {
+            <ul class="im-lista im-scroll">
+              @for (d of p.clientes.duplicados; track d.telefono) {
+                <li class="im-duplicado">
+                  <span class="im-mono">{{ d.telefono }}</span>
+                  <span class="im-duplicado-nombres">{{ d.nombres.join(' · ') }}</span>
+                </li>
+              }
+            </ul>
+          }
+        </div>
+      </section>
+
+      <section class="im-bloque">
+        <h2 class="im-bloque-titulo">Estados</h2>
+        <div class="im-tarjeta">
+          @if (p.estados.noReconocidos.length) {
+            <div class="im-no-reconocidos">
+              <span class="im-no-reconocidos-titulo">
+                {{ p.estados.noReconocidos.length }} {{ p.estados.noReconocidos.length === 1 ? 'estado no reconocido' : 'estados no reconocidos' }}
+              </span>
+              <ul class="im-lista">
+                @for (e of p.estados.noReconocidos; track e.estado) {
+                  <li class="im-estado">
+                    <span class="im-mono im-estado-nombre">{{ e.estado || '(vacío)' }}</span>
+                    <span class="im-estado-filas">{{ e.filas }} {{ e.filas === 1 ? 'fila' : 'filas' }}</span>
+                  </li>
+                }
+              </ul>
+            </div>
+          }
+          @if (estadosReconocidos().length) {
+            <ul class="im-lista">
+              @for (e of estadosReconocidos(); track e.etiqueta) {
+                <li class="im-estado">
+                  <span class="im-punto" [style.background]="e.color"></span>
+                  <span class="im-estado-nombre">{{ e.etiqueta }}</span>
+                  <span class="im-estado-filas">{{ e.filas }} {{ e.filas === 1 ? 'fila' : 'filas' }}</span>
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="im-vacio">Ningún estado reconocido.</p>
+          }
+        </div>
+      </section>
+
+      <section class="im-bloque">
+        <h2 class="im-bloque-titulo">Así quedarían los modelos</h2>
+        <app-revision-modelos [modelos]="p.modelos" (cambios)="cambiosModelos.set($event)" />
+        <p class="im-modelos-nota">
+          Se aplicarían {{ cambiosModelos().length }} {{ cambiosModelos().length === 1 ? 'cambio' : 'cambios' }} de modelo
+          ({{ lineasCambiadas() }} {{ lineasCambiadas() === 1 ? 'línea' : 'líneas' }})
+        </p>
+      </section>
+
+      <section class="im-bloque">
+        <h2 class="im-bloque-titulo">
+          Errores
+          @if (p.resumen.errores > p.errores.length) {
+            <span class="im-bloque-nota">se muestran {{ p.errores.length }} de {{ p.resumen.errores }}</span>
+          }
+        </h2>
+        <div class="im-tarjeta">
+          @if (p.errores.length) {
+            <div class="im-errores im-scroll" role="table" aria-label="Errores del CSV">
+              <div class="im-error-fila cabecera" role="row">
+                <span role="columnheader">Fila</span>
+                <span role="columnheader">Motivo</span>
+                <span role="columnheader">Valor</span>
+              </div>
+              @for (e of p.errores; track $index) {
+                <div class="im-error-fila" role="row">
+                  <span class="im-error-num" role="cell">{{ e.fila }}</span>
+                  <span class="im-error-motivo" role="cell">{{ e.motivo }}</span>
+                  <span class="im-mono im-error-valor" role="cell">{{ e.valor || '(vacío)' }}</span>
+                </div>
+              }
+            </div>
+          } @else {
+            <p class="im-vacio">Sin errores.</p>
+          }
+        </div>
+      </section>
+    }
   }
 </div>
+
+@if (confirmando()) {
+  <app-ventana titulo="Importar de verdad" ancho="480px" [conPie]="true" (cerrar)="cerrarConfirmacion()">
+    @if (conteo(); as c) {
+      <p class="im-confirmar-texto">
+        Se borrarán <strong>{{ c.lineas }} líneas</strong> y <strong>{{ c.clientes }} clientes</strong> y se cargarán desde el CSV.
+        Esto no se puede deshacer.
+      </p>
+    }
+    <label class="im-confirmar-label" for="confirmarImportar">Escribe <strong>{{ palabra }}</strong> para continuar</label>
+    <input
+      id="confirmarImportar"
+      class="im-confirmar-input"
+      type="text"
+      autocomplete="off"
+      autocapitalize="characters"
+      spellcheck="false"
+      [value]="textoConfirmacion()"
+      (input)="textoConfirmacion.set($any($event.target).value)"
+      (keydown.enter)="doExecute()"
+    />
+    <div ngProjectAs="[ventana-pie]" class="im-confirmar-pie">
+      <button type="button" class="boton-app" [disabled]="ejecutando()" (click)="cerrarConfirmacion()">Cancelar</button>
+      <button type="button" class="boton-app accion-peligro" [disabled]="!puedeEjecutar()" (click)="doExecute()">
+        {{ ejecutando() ? 'Importando…' : 'Borrar e importar' }}
+      </button>
+    </div>
+  </app-ventana>
+}

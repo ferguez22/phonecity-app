@@ -11,12 +11,52 @@ export interface ImportStats {
   err: number;
 }
 
-export interface PreviewData {
+export interface ImportBase {
   stats: ImportStats;
   fallbackLog: string[];
 }
 
-export interface ExecuteData extends PreviewData {
+export interface Resumen {
+  filas: number;
+  validas: number;
+  conError: number;
+  vacias: number;
+  separadores: number;
+  errores: number;
+}
+
+export interface ErrorFila {
+  fila: number;
+  motivo: string;
+  valor: string;
+}
+
+export interface InformeEstados {
+  reconocidos: Record<string, number>;
+  noReconocidos: { estado: string; filas: number }[];
+}
+
+export interface InformeClientes {
+  nuevos: number;
+  existentes: number;
+  sinTelefono: number;
+  duplicados: { telefono: string; nombres: string[] }[];
+}
+
+export interface PreviewData extends ImportBase {
+  resumen: Resumen;
+  errores: ErrorFila[];
+  estados: InformeEstados;
+  modelos: { modelo: string; lineas: number }[];
+  clientes: InformeClientes;
+}
+
+export interface Conteo {
+  lineas: number;
+  clientes: number;
+}
+
+export interface ExecuteData extends ImportBase {
   maxId: number;
   nextAutoIncrement: number;
   backup: boolean;
@@ -32,6 +72,12 @@ interface ApiEnvelope<T> {
 export class ImportService {
   private http = inject(HttpClient);
   private base = `${environment.apiUrl}/import/csv`;
+
+  conteo(): Observable<Conteo> {
+    return this.http
+      .get<ApiEnvelope<Conteo>>(`${environment.apiUrl}/import/conteo`)
+      .pipe(map((r) => this.unwrap(r)));
+  }
 
   preview(file: File): Observable<PreviewData> {
     const fd = new FormData();

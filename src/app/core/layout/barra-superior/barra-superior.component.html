@@ -34,11 +34,11 @@
           <span class="menu-titulo">Divisor de fecha</span>
           <app-selector-divisor />
         </div>
-        <a routerLink="/importar" class="menu-item" role="menuitem" (click)="cerrarMenu()">
-          <app-icono nombre="importar" />
-          Importar
-        </a>
         @if (esAdmin()) {
+          <a routerLink="/importar" class="menu-item" role="menuitem" (click)="cerrarMenu()">
+            <app-icono nombre="importar" />
+            Importar
+          </a>
           <a routerLink="/modelos/limpiar" class="menu-item" role="menuitem" (click)="cerrarMenu()">
             <app-icono nombre="limpiar" />
             Limpiar modelos

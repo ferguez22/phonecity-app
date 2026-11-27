@@ -1,25 +1,66 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { ImportService, PreviewData, ExecuteData } from './import.service';
+import { ImportService, PreviewData, ExecuteData, Conteo } from './import.service';
+import { ESTADOS } from '../../core/estados/estados';
+import { normalizar } from '../../core/utils/texto.util';
+import { VentanaComponent } from '../../core/layout/ventana/ventana.component';
+import { IconoComponent } from '../../core/layout/icono/icono.component';
+import { RevisionModelosComponent } from '../revision-modelos/revision-modelos.component';
+import { CambioModelo } from '../../core/modelos/normalizador';
+
+const PALABRA_CONFIRMACION = 'IMPORTAR';
+const COLOR_NEUTRO = '#c7c7cc';
+
+const clave = (texto: string) => normalizar(texto).replace(/[^a-z0-9]/g, '');
+const COLORES = new Map(ESTADOS.map((e) => [clave(e.label), e.color]));
 
 @Component({
   selector: 'app-import',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, VentanaComponent, IconoComponent, RevisionModelosComponent],
   templateUrl: './import.component.html',
   styleUrl: './import.component.scss',
 })
 export class ImportComponent {
   private importService = inject(ImportService);
 
+  readonly palabra = PALABRA_CONFIRMACION;
+
   file = signal<File | null>(null);
+  analizado = signal<File | null>(null);
   preview = signal<PreviewData | null>(null);
   result = signal<ExecuteData | null>(null);
   loading = signal(false);
+  ejecutando = signal(false);
   error = signal<string | null>(null);
-  confirm = signal(false);
   dragOver = signal(false);
-  showFallbacks = signal(false);
+
+  cambiosModelos = signal<CambioModelo[]>([]);
+
+  conteo = signal<Conteo | null>(null);
+  confirmando = signal(false);
+  textoConfirmacion = signal('');
+
+  readonly puedeImportar = computed(
+    () => !this.loading() && this.file() !== null && this.analizado() === this.file() && this.preview() !== null,
+  );
+
+  readonly puedeEjecutar = computed(
+    () => !this.ejecutando() && this.puedeImportar() && this.textoConfirmacion().trim() === PALABRA_CONFIRMACION,
+  );
+
+  readonly lineasCambiadas = computed(() => {
+    const mapa = new Map((this.preview()?.modelos ?? []).map((m) => [m.modelo, m.lineas]));
+    return this.cambiosModelos().reduce((total, c) => total + (mapa.get(c.de) ?? 0), 0);
+  });
+
+  readonly estadosReconocidos = computed(() => {
+    const p = this.preview();
+    if (!p) return [];
+    return Object.entries(p.estados.reconocidos)
+      .map(([etiqueta, filas]) => ({ etiqueta, filas, color: COLORES.get(clave(etiqueta)) ?? COLOR_NEUTRO }))
+      .sort((a, b) => b.filas - a.filas || a.etiqueta.localeCompare(b.etiqueta, 'es'));
+  });
 
   onFileInput(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -51,9 +92,15 @@ export class ImportComponent {
     this.loading.set(true);
     this.error.set(null);
     this.result.set(null);
+    this.preview.set(null);
+    this.analizado.set(null);
+    this.cambiosModelos.set([]);
     this.importService.preview(f).subscribe({
       next: (data) => {
-        this.preview.set(data);
+        if (this.file() === f) {
+          this.preview.set(data);
+          this.analizado.set(f);
+        }
         this.loading.set(false);
       },
       error: (err) => {
@@ -63,39 +110,62 @@ export class ImportComponent {
     });
   }
 
-  doExecute(): void {
-    const f = this.file();
-    if (!f || !this.confirm()) return;
+  abrirConfirmacion(): void {
+    if (!this.puedeImportar()) return;
     this.loading.set(true);
     this.error.set(null);
-    this.importService.execute(f).subscribe({
-      next: (data) => {
-        this.result.set(data);
-        this.preview.set(null);
+    this.importService.conteo().subscribe({
+      next: (c) => {
+        this.conteo.set(c);
+        this.textoConfirmacion.set('');
+        this.confirmando.set(true);
         this.loading.set(false);
       },
       error: (err) => {
         this.error.set(this.msg(err));
         this.loading.set(false);
+      },
+    });
+  }
+
+  cerrarConfirmacion(): void {
+    if (this.ejecutando()) return;
+    this.confirmando.set(false);
+    this.textoConfirmacion.set('');
+  }
+
+  doExecute(): void {
+    const f = this.file();
+    if (!f || !this.puedeEjecutar()) return;
+    this.ejecutando.set(true);
+    this.error.set(null);
+    this.importService.execute(f).subscribe({
+      next: (data) => {
+        this.result.set(data);
+        this.preview.set(null);
+        this.analizado.set(null);
+        this.ejecutando.set(false);
+        this.confirmando.set(false);
+        this.textoConfirmacion.set('');
+      },
+      error: (err) => {
+        this.error.set(this.msg(err));
+        this.ejecutando.set(false);
+        this.confirmando.set(false);
       },
     });
   }
 
   reset(): void {
     this.file.set(null);
+    this.analizado.set(null);
     this.preview.set(null);
     this.result.set(null);
-    this.confirm.set(false);
     this.error.set(null);
-    this.showFallbacks.set(false);
-  }
-
-  toggleConfirm(): void {
-    this.confirm.update((v) => !v);
-  }
-
-  toggleFallbacks(): void {
-    this.showFallbacks.update((v) => !v);
+    this.cambiosModelos.set([]);
+    this.conteo.set(null);
+    this.confirmando.set(false);
+    this.textoConfirmacion.set('');
   }
 
   formatSize(bytes: number): string {
@@ -110,9 +180,10 @@ export class ImportComponent {
       return;
     }
     this.file.set(f);
+    this.analizado.set(null);
+    this.cambiosModelos.set([]);
     this.preview.set(null);
     this.result.set(null);
-    this.confirm.set(false);
     this.error.set(null);
   }
 
