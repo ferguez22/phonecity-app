@@ -1,5 +1,283 @@
 @use 'breakpoints' as *;
 
+.pm-vista {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2px;
+  width: min(320px, 100%);
+  margin: 0 auto var(--esp-4);
+  padding: 2px;
+  border-radius: var(--radio-s);
+  background: rgba(0, 0, 0, 0.05);
+
+  @include movil {
+    width: 100%;
+    margin-bottom: var(--esp-3);
+  }
+}
+
+.pm-vista-opcion {
+  min-height: 32px;
+  padding: 0 var(--esp-2);
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-texto);
+  font: inherit;
+  font-size: 13px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 150ms, transform 150ms;
+
+  &:active {
+    transform: scale(0.97);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--color-acento);
+    outline-offset: -1px;
+  }
+
+  &.activa {
+    background: var(--color-superficie);
+    box-shadow: var(--sombra-1);
+    font-weight: 600;
+  }
+
+  @include movil {
+    min-height: 40px;
+    font-size: 14px;
+  }
+}
+
+.pm-punto {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.pm-ir {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-3);
+  margin-bottom: var(--esp-3);
+}
+
+.pm-ir-texto {
+  color: var(--color-texto-2);
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.pm-fecha {
+  min-width: 0;
+  min-height: 40px;
+  padding: 0 var(--esp-3);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio-s);
+  background: var(--color-superficie);
+  color: var(--color-texto);
+  font: inherit;
+  font-size: 14px;
+
+  &:focus {
+    outline: none;
+    border-color: var(--color-acento);
+    box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.2);
+  }
+
+  @include movil {
+    flex: 1;
+    min-height: 44px;
+    font-size: 16px;
+  }
+}
+
+.pm-dias,
+.pm-filas {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pm-dias {
+  border-radius: var(--radio-m);
+  background: var(--color-superficie);
+  box-shadow: var(--sombra-1);
+  overflow: hidden;
+
+  li + li {
+    border-top: 1px solid var(--color-borde);
+  }
+
+  @include movil {
+    border: 1px solid var(--color-borde);
+    box-shadow: none;
+  }
+}
+
+.pm-dia {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-3);
+  width: 100%;
+  min-height: 44px;
+  padding: var(--esp-2) var(--esp-4);
+  border: 0;
+  background: transparent;
+  color: var(--color-texto);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 150ms;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.03);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--color-acento);
+    outline-offset: -3px;
+  }
+
+  @include movil {
+    padding: var(--esp-2) var(--esp-3);
+  }
+}
+
+.pm-dia-fecha {
+  flex-shrink: 0;
+  min-width: 88px;
+  font-size: 14px;
+  font-weight: 600;
+
+  @include movil {
+    min-width: 76px;
+  }
+}
+
+.pm-insignias {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  gap: var(--esp-1);
+  min-width: 0;
+}
+
+.pm-insignia {
+  padding: 2px var(--esp-2);
+  border-radius: 999px;
+  color: var(--color-texto);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.pm-dia-flecha {
+  flex-shrink: 0;
+  color: var(--color-texto-2);
+  font-size: 20px;
+  line-height: 1;
+}
+
+.pm-dia-cab {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-3);
+  min-width: 0;
+  margin-bottom: var(--esp-3);
+}
+
+.pm-dia-titulo {
+  margin: 0;
+  overflow: hidden;
+  font-size: 16px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pm-filas li + li {
+  border-top: 1px solid var(--color-borde);
+}
+
+.pm-fila {
+  display: flex;
+  align-items: center;
+  gap: var(--esp-3);
+  width: 100%;
+  min-height: 40px;
+  padding: var(--esp-2) 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-texto);
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 3px solid var(--color-acento);
+    outline-offset: 2px;
+  }
+
+  &.abierta .pm-fila-desc {
+    font-weight: 600;
+  }
+
+  @include movil {
+    min-height: 44px;
+  }
+}
+
+.pm-fila-desc {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.pm-fila-cant {
+  flex-shrink: 0;
+  color: var(--color-texto-2);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.pm-ids {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--esp-2);
+  padding: 0 0 var(--esp-3);
+}
+
+.pm-id {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 var(--esp-3);
+  border-radius: var(--radio-s);
+  background: rgba(0, 113, 227, 0.08);
+  color: var(--color-acento);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    background: rgba(0, 113, 227, 0.14);
+  }
+
+  &:focus-visible {
+    outline: 3px solid var(--color-acento);
+    outline-offset: 2px;
+  }
+
+  @include movil {
+    min-height: 44px;
+    font-size: 14px;
+  }
+}
+
 .pm-bloques {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

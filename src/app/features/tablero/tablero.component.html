@@ -450,7 +450,7 @@
 }
 
 @if (pedidoAbierto()) {
-  <app-pedido-modal (cerrado)="cerrarPedido($event)"></app-pedido-modal>
+  <app-pedido-modal (cerrado)="cerrarPedido($event)" (fallo)="error.set($event)"></app-pedido-modal>
 }
 
 @if (toastWa(); as l) {

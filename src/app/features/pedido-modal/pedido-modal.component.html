@@ -1,5 +1,135 @@
-<app-ventana #v titulo="Generar pedido" ancho="1100px" [conPie]="!cargando()" (cerrar)="cerrar()">
-  @if (cargando()) {
+<app-ventana
+  #v
+  titulo="Generar pedido"
+  ancho="1100px"
+  [conPie]="vista() === 'pendientes' ? !cargando() : !pantalla.esMovil()"
+  (cerrar)="cerrar()"
+>
+  <div class="pm-vista" role="radiogroup" aria-label="Vista de pedidos">
+    <button
+      type="button"
+      role="radio"
+      class="pm-vista-opcion"
+      [class.activa]="vista() === 'pendientes'"
+      [attr.aria-checked]="vista() === 'pendientes'"
+      (click)="cambiarVista('pendientes')"
+    >
+      Pendientes
+    </button>
+    <button
+      type="button"
+      role="radio"
+      class="pm-vista-opcion"
+      [class.activa]="vista() === 'historial'"
+      [attr.aria-checked]="vista() === 'historial'"
+      (click)="cambiarVista('historial')"
+    >
+      Historial
+    </button>
+  </div>
+
+  @if (vista() === 'historial') {
+    @let d = detalle();
+    @let lista = dias();
+    @if (fechaAbierta(); as f) {
+      <div class="pm-dia-cab">
+        <button type="button" class="boton-app pequeno" (click)="volverDias()">‹ Días</button>
+        <h3 class="pm-dia-titulo">{{ f | date: 'EEEE d MMM y' }}</h3>
+      </div>
+      @if (cargandoDetalle()) {
+        <p class="ventana-aviso">Cargando pedidos...</p>
+      } @else if (falloDetalle()) {
+        <p class="ventana-aviso">No se pudo cargar</p>
+      } @else if (d) {
+        <div class="pm-bloques">
+          @for (g of grupos; track g.id) {
+            @let filas = d.filas[g.id];
+            @let n = unidades(filas);
+            <section class="pm-bloque">
+              <div class="pm-bloque-cab">
+                <span class="pm-punto" [style.background]="g.color" aria-hidden="true"></span>
+                <h3 class="pm-bloque-titulo">{{ g.nombre }}</h3>
+                @if (filas.length === 0) {
+                  <span class="pildora">Sin pedidos</span>
+                } @else {
+                  <span class="pildora">{{ n }} {{ n === 1 ? 'unidad' : 'unidades' }}</span>
+                  <button type="button" class="boton-app pequeno pm-copiar" (click)="copiar(d.bloques[g.id], g.id)">
+                    <app-icono [nombre]="copiado() === g.id ? 'check' : 'copiar'" />
+                    {{ copiado() === g.id ? 'Copiado' : 'Copiar' }}
+                  </button>
+                }
+              </div>
+              @if (filas.length > 0) {
+                <ul class="pm-filas">
+                  @for (fila of filas; track fila.descripcion) {
+                    @let clave = g.id + '|' + fila.descripcion;
+                    @let abierta = abiertas().has(clave);
+                    <li>
+                      <button
+                        type="button"
+                        class="pm-fila"
+                        [class.abierta]="abierta"
+                        [attr.aria-expanded]="abierta"
+                        (click)="alternarFila(clave)"
+                      >
+                        <span class="pm-fila-desc">{{ fila.descripcion }}</span>
+                        <span class="pm-fila-cant">x{{ fila.cantidad }}</span>
+                      </button>
+                      @if (abierta) {
+                        <div class="pm-ids">
+                          @for (id of fila.ids; track id) {
+                            <a class="pm-id" [routerLink]="['/linea', id]">L-{{ id }}</a>
+                          }
+                        </div>
+                      }
+                    </li>
+                  }
+                </ul>
+              }
+            </section>
+          }
+        </div>
+      }
+    } @else {
+      <div class="pm-ir">
+        <label class="pm-ir-texto" for="pm-fecha">Ir a un día</label>
+        <input
+          id="pm-fecha"
+          type="date"
+          class="pm-fecha"
+          [max]="hoy"
+          (change)="abrirDia($any($event.target).value)"
+        />
+      </div>
+      @if (cargandoDias()) {
+        <p class="ventana-aviso">Cargando días...</p>
+      } @else if (falloDias()) {
+        <p class="ventana-aviso">No se pudo cargar</p>
+      } @else if (lista) {
+        @if (lista.length === 0) {
+          <p class="ventana-aviso">Sin pedidos en los últimos 60 días</p>
+        } @else {
+          <ul class="pm-dias">
+            @for (dia of lista; track dia.fecha) {
+              <li>
+                <button type="button" class="pm-dia" (click)="abrirDia(dia.fecha)">
+                  <span class="pm-dia-fecha">{{ dia.fecha | date: 'EEE d MMM' }}</span>
+                  <span class="pm-insignias">
+                    @for (g of grupos; track g.id) {
+                      @if (dia[g.id] > 0) {
+                        <span class="pm-insignia" [style.background]="g.color">{{ g.corto }} {{ dia[g.id] }}</span>
+                      }
+                    }
+                  </span>
+                  <span class="pm-dia-flecha" aria-hidden="true">›</span>
+                </button>
+              </li>
+            }
+          </ul>
+        }
+      }
+    }
+  } @else if (cargando()) {
     <p class="ventana-aviso">Cargando pendientes...</p>
   } @else {
     @if (error(); as e) {
@@ -12,6 +142,7 @@
         @let vacio = marcado === null && pendientes === 0;
         <section class="pm-bloque">
           <div class="pm-bloque-cab">
+            <span class="pm-punto" [style.background]="g.color" aria-hidden="true"></span>
             <h3 class="pm-bloque-titulo">{{ g.nombre }}</h3>
             @if (marcado !== null) {
               <span class="pildora hecho">✓ Pedido ({{ marcado }})</span>
@@ -47,14 +178,16 @@
     @if (!pantalla.esMovil()) {
       <button type="button" class="boton-app" (click)="v.solicitarCierre()">Cerrar</button>
     }
-    <button
-      type="button"
-      class="boton-app accion-pedido pm-todo"
-      [disabled]="nadaQueMarcar() || guardando() !== null"
-      (click)="marcarTodo()"
-    >
-      <app-icono nombre="check" />
-      {{ guardando() === 'todos' ? 'Marcando...' : 'Marcar todo como pedido' }}
-    </button>
+    @if (vista() === 'pendientes') {
+      <button
+        type="button"
+        class="boton-app accion-pedido pm-todo"
+        [disabled]="nadaQueMarcar() || guardando() !== null"
+        (click)="marcarTodo()"
+      >
+        <app-icono nombre="check" />
+        {{ guardando() === 'todos' ? 'Marcando...' : 'Marcar todo como pedido' }}
+      </button>
+    }
   </ng-container>
 </app-ventana>

@@ -17,6 +17,22 @@ export interface MarcadoResultado {
   detalle: Partial<Record<GrupoPedido, number>>;
 }
 
+export interface HistorialDia extends Record<GrupoPedido, number> {
+  fecha: string;
+}
+
+export interface FilaHistorial {
+  descripcion: string;
+  cantidad: number;
+  ids: number[];
+}
+
+export interface HistorialDetalle {
+  fecha: string;
+  bloques: Record<GrupoPedido, string>;
+  filas: Record<GrupoPedido, FilaHistorial[]>;
+}
+
 @Injectable({ providedIn: 'root' })
 export class PedidosService {
   private readonly http = inject(HttpClient);
@@ -31,6 +47,21 @@ export class PedidosService {
   marcarPedido(grupo: GrupoPedido | 'todos'): Observable<MarcadoResultado> {
     return this.http
       .post<ApiResponse<MarcadoResultado>>(`${this.base}/marcar-pedido`, { grupo })
+      .pipe(map((r) => r.data));
+  }
+
+  historialDias(desde?: string, hasta?: string): Observable<HistorialDia[]> {
+    const params: Record<string, string> = {};
+    if (desde) params['desde'] = desde;
+    if (hasta) params['hasta'] = hasta;
+    return this.http
+      .get<ApiResponse<HistorialDia[]>>(`${this.base}/historial/dias`, { params })
+      .pipe(map((r) => r.data));
+  }
+
+  historialDia(fecha: string): Observable<HistorialDetalle> {
+    return this.http
+      .get<ApiResponse<HistorialDetalle>>(`${this.base}/historial/${fecha}`)
       .pipe(map((r) => r.data));
   }
 }
