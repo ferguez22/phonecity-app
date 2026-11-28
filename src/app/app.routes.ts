@@ -13,6 +13,7 @@ export const routes: Routes = [
   {path: 'clientes', loadComponent: () => import('./features/clientes/clientes.component').then((m) => m.ClientesComponent), canActivate: [authGuard]},
   {path: 'linea/nueva', canActivate: [authGuard], canDeactivate: [sinCambiosGuard], loadComponent: () => import('./features/linea-form/linea-form.component').then((m) => m.LineaFormComponent)},
   {path: 'linea/:id/editar', canActivate: [authGuard], loadComponent: () => import('./features/linea-form/linea-form.component').then((m) => m.LineaFormComponent)},
+  {path: 'guia', canActivate: [authGuard], loadComponent: () => import('./features/guia/guia.component').then((m) => m.GuiaComponent)},
   {path: 'etiquetas', loadComponent: () => import('./features/etiquetas/etiquetas.component').then((m) => m.EtiquetasComponent), canActivate: [authGuard]},
   {path: 'importar', loadComponent: () => import('./features/import/import.component').then((m) => m.ImportComponent), canActivate: [authGuard, adminGuard]},  
   {path: 'modelos/limpiar', canActivate: [authGuard, adminGuard], loadComponent: () => import('./features/limpiar-modelos/limpiar-modelos.component').then((m) => m.LimpiarModelosComponent)},

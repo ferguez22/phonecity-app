@@ -5,7 +5,7 @@ import { LineaService } from '../../core/services/linea.service';
 import { HistorialService, EntradaHistorial } from '../../core/services/historial.service';
 import { Linea } from '../../core/models/linea.model';
 import { getColor, getEtiqueta } from '../tablero/color.util';
-import { etiquetaHistorialCompleta } from '../../core/estados/estados';
+import { etiquetaHistorialCompleta, tituloEstado } from '../../core/estados/estados';
 import { IconoComponent } from '../../core/layout/icono/icono.component';
 import { PantallaService } from '../../core/layout/pantalla.service';
 
@@ -31,6 +31,7 @@ export class LineaDetalleComponent implements OnInit {
 
   getColor    = getColor;
   getEtiqueta = getEtiqueta;
+  tituloEstado = tituloEstado;
   etiquetaHistorial = etiquetaHistorialCompleta;
 
 

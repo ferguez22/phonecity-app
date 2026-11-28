@@ -4,7 +4,7 @@
   <div hoja-cabecera class="cabecera" [style.--color-estado]="getColor(l)">
     <div class="cab-fila">
       <strong class="lid">L-{{ l.id }}</strong>
-      <span class="estado">{{ getEtiqueta(l) }}</span>
+      <span class="estado" [title]="tituloEstado(l)">{{ getEtiqueta(l) }}</span>
       @if (l.fecha_entrada) {
         <span class="dias">{{ diasDesde(l.fecha_entrada) }}d</span>
       }
@@ -22,6 +22,7 @@
           class="chip"
           [class.activo]="esEstadoActual(opt, l)"
           [style.--chip]="opt.color"
+          [title]="opt.descripcion"
           [disabled]="guardando()"
           (click)="cambiarEstado.emit(opt)"
         >

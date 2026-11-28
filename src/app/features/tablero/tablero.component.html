@@ -79,6 +79,7 @@
           class="estado-chip-filtro"
           [class.activo]="estadoActivo()?.id === est.id"
           [style.--chip]="est.color"
+          [title]="est.descripcion"
           (click)="seleccionarEstado(est)"
           type="button"
         >
@@ -140,7 +141,7 @@
                 }
               </td>
               <td class="col-estado">
-                <span class="badge-estado" [title]="getEtiqueta(linea)">{{ getEtiqueta(linea) }}</span>
+                <span class="badge-estado" [title]="tituloEstado(linea)">{{ getEtiqueta(linea) }}</span>
               </td>
               <td class="col-fecha">{{ linea.fecha_entrada ? fechaCorta(linea.fecha_entrada) : "—" }}</td>
               <td class="col-modelo" [title]="linea.modelo ?? ''">{{ linea.modelo ?? '—' }}</td>
@@ -188,6 +189,7 @@
                               type="button"
                               [class.activo]="esEstadoActual(opt, linea)"
                               [style.--chip]="opt.color"
+                              [title]="opt.descripcion"
                               [disabled]="guardando()"
                               (click)="cambiarEstado(opt, linea)"
                             >

@@ -40,6 +40,7 @@ export const ICONOS = {
   cerrar: ['M18 6L6 18', 'M6 6l12 12'],
   copiar: ['M9 9h11a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-9a2 2 0 0 1-2-2V9z', 'M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1'],
   check: ['M20 6L9 17l-5-5'],
+  ayuda: ['M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z', 'M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3', 'M12 17h.01'],
   'alinear-izquierda': ['M17 10H3', 'M21 6H3', 'M21 14H3', 'M17 18H3'],
   'alinear-centro': ['M18 10H6', 'M21 6H3', 'M21 14H3', 'M18 18H6'],
   'alinear-derecha': ['M21 10H7', 'M21 6H3', 'M21 14H3', 'M21 18H7'],

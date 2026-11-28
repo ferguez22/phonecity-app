@@ -34,6 +34,10 @@
           <span class="menu-titulo">Divisor de fecha</span>
           <app-selector-divisor />
         </div>
+        <a routerLink="/guia" class="menu-item" role="menuitem" (click)="cerrarMenu()">
+          <app-icono nombre="ayuda" />
+          Guía rápida
+        </a>
         @if (esAdmin()) {
           <a routerLink="/importar" class="menu-item" role="menuitem" (click)="cerrarMenu()">
             <app-icono nombre="importar" />

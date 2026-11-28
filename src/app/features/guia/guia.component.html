@@ -1,0 +1,101 @@
+<div class="guia">
+  <header class="guia-cabecera">
+    <h1 class="guia-titulo">Guía rápida</h1>
+    <nav class="indice" aria-label="Índice de la guía">
+      @for (s of secciones; track s.id) {
+        <button type="button" class="indice-item" (click)="ir(s.id)">{{ s.titulo }}</button>
+      }
+    </nav>
+  </header>
+
+  <details class="seccion" id="que-es" [open]="estaAbierta('que-es')" (toggle)="alCambiar('que-es', $event)">
+    <summary>Qué es</summary>
+    <div class="cuerpo">
+      <p>PhoneCity sustituye al Google Sheets de reparaciones de la tienda.</p>
+      <p>Cada reparación, pedido o venta es una <strong>línea</strong>, con su etiqueta física <strong>L-XXXX</strong>.</p>
+    </div>
+  </details>
+
+  <details class="seccion" id="dia-a-dia" [open]="estaAbierta('dia-a-dia')" (toggle)="alCambiar('dia-a-dia', $event)">
+    <summary>El día a día</summary>
+    <ol class="pasos cuerpo">
+      <li>
+        <span class="paso-titulo">Crear línea</span>
+        <span>Tablero → botón verde <strong>+</strong>.</span>
+        <span>Elige estado, modelo, cliente y piezas. Imprime la etiqueta.</span>
+      </li>
+      <li>
+        <span class="paso-titulo">Cambiar estado</span>
+        <span>Abre la línea y pulsa el chip del nuevo estado.</span>
+        <span>Solo salen los que tocan; «Ver todos los estados» muestra el resto.</span>
+      </li>
+      <li>
+        <span class="paso-titulo">Avisar</span>
+        <span>Botón verde <strong>Avisar clientes</strong>: lista quién está pendiente.</span>
+        <span>Abre WhatsApp con el mensaje ya escrito.</span>
+      </li>
+      <li>
+        <span class="paso-titulo">Pedidos</span>
+        <span>Botón naranja <strong>Generar pedido</strong>: lo pendiente, por proveedor.</span>
+        <span>Copia el texto de cada proveedor y envíalo.</span>
+      </li>
+      <li>
+        <span class="paso-titulo">Entregar</span>
+        <span>Cuando el cliente recoge, pasa la línea a <strong>Finalizado</strong>.</span>
+        <span>Imprime el ticket si lo pide.</span>
+      </li>
+    </ol>
+  </details>
+
+  <details class="seccion" id="estados" [open]="estaAbierta('estados')" (toggle)="alCambiar('estados', $event)">
+    <summary>Estados</summary>
+    <div class="cuerpo">
+      <div class="estados-cabecera" aria-hidden="true">
+        <span>Estado</span>
+        <span>Tipo</span>
+        <span>Qué significa</span>
+      </div>
+      <ul class="estados">
+        @for (e of estados; track e.id) {
+          <li class="estado-fila">
+            <span class="chip" [style.--chip]="e.color" [title]="e.descripcion">{{ e.label }}</span>
+            <span class="tipo">{{ e.tipo }}</span>
+            <span class="significa">{{ e.descripcion }}</span>
+          </li>
+        }
+      </ul>
+    </div>
+  </details>
+
+  <details class="seccion" id="trucos" [open]="estaAbierta('trucos')" (toggle)="alCambiar('trucos', $event)">
+    <summary>Trucos</summary>
+    <ul class="trucos cuerpo">
+      <li><strong>Búsqueda:</strong> palabras en cualquier orden. <code>"frase exacta"</code> entre comillas.</li>
+      <li><strong>Modelos abreviados:</strong> <code>ip 15 pm</code> → iPhone 15 Pro Max.</li>
+      <li><strong>Historial:</strong> cada cambio de estado, con el tiempo que duró.</li>
+      <li><strong>Avisos:</strong> «1er aviso hace X días» indica cuánto lleva esperando.</li>
+      <li><strong>Pedidos:</strong> agrupados por proveedor, con historial por días.</li>
+      <li><strong>Piezas:</strong> una línea puede llevar varias; el total se calcula solo.</li>
+      <li><strong>Sin guardar:</strong> si sales con cambios, la app te avisa.</li>
+      <li><strong>Privacidad:</strong> los datos del cliente salen acortados en pantalla.</li>
+      <li><strong>Móvil:</strong> «‹ Atrás» vuelve a la tarjeta de la línea.</li>
+      <li><strong>Como app:</strong> Compartir → «Añadir a pantalla de inicio».</li>
+    </ul>
+  </details>
+
+  <details class="seccion" id="funciones" [open]="estaAbierta('funciones')" (toggle)="alCambiar('funciones', $event)">
+    <summary>Funciones, pantalla por pantalla</summary>
+    <div class="cuerpo pantallas">
+      @for (p of pantallas; track p.titulo) {
+        <details class="pantalla">
+          <summary>{{ p.titulo }}</summary>
+          <ul class="puntos">
+            @for (punto of p.puntos; track $index) {
+              <li>{{ punto }}</li>
+            }
+          </ul>
+        </details>
+      }
+    </div>
+  </details>
+</div>

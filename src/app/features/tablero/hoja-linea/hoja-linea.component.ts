@@ -5,7 +5,7 @@ import { RouterLink } from '@angular/router';
 import { HojaComponent } from '../../../core/layout/hoja/hoja.component';
 import { IconoComponent } from '../../../core/layout/icono/icono.component';
 import { Linea, Pieza } from '../../../core/models/linea.model';
-import { EstadoDef, esEstadoActual, getColor, getEtiqueta } from '../../../core/estados/estados';
+import { EstadoDef, esEstadoActual, getColor, getEtiqueta, tituloEstado } from '../../../core/estados/estados';
 import { diasDesde } from '../../../core/utils/fecha.util';
 
 @Component({
@@ -41,6 +41,7 @@ export class HojaLineaComponent implements OnChanges {
   esEstadoActual = esEstadoActual;
   getColor = getColor;
   getEtiqueta = getEtiqueta;
+  tituloEstado = tituloEstado;
   diasDesde = diasDesde;
 
   ngOnChanges(cambios: SimpleChanges): void {

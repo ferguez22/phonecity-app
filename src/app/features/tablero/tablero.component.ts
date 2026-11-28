@@ -26,7 +26,7 @@ import { normalizar, soloDigitos, casaTodos, separarBusqueda, casaFrases } from 
 import { limpiarTelefono } from '../../core/utils/telefono.util';
 import { diasDesde } from '../../core/utils/fecha.util';
 import { nombreCorto, telefonoCorto } from '../../core/utils/privacidad.util';
-import { ESTADO_OPTIONS, EstadoDef, colorEstado, esEstadoActual, getColor, getEtiqueta, etiquetaHistorialCompleta, estadoActualDef, siguientesDe, mensajeWhatsapp, tieneMensajeEspecifico} from '../../core/estados/estados';
+import { ESTADO_OPTIONS, EstadoDef, colorEstado, esEstadoActual, getColor, getEtiqueta, tituloEstado, etiquetaHistorialCompleta, estadoActualDef, siguientesDe, mensajeWhatsapp, tieneMensajeEspecifico} from '../../core/estados/estados';
 
 interface Boton { label: string; color?: string; texto?: string; filtros: LineaFiltros; filtroClient?: (l: Linea) => boolean; aplicaHistorial?: boolean; fasesHistorial?: string[];}
 
@@ -242,6 +242,7 @@ export class TableroComponent implements OnInit {
 
   getColor = getColor;
   getEtiqueta = getEtiqueta;
+  tituloEstado = tituloEstado;
   nombreCorto = nombreCorto;
   telefonoCorto = telefonoCorto;
 

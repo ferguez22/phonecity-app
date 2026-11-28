@@ -28,7 +28,8 @@
           <div>
             <h5 class="mb-1">L-{{ l.id }} — {{ l.modelo ?? 'Sin modelo' }}</h5>
             <span class="badge-estado px-2 py-1 rounded"
-                  [style.background-color]="getColor(l)">
+                  [style.background-color]="getColor(l)"
+                  [title]="tituloEstado(l)">
               {{ getEtiqueta(l) }}
             </span>
           </div>
