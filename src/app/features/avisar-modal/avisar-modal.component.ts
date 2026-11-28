@@ -83,6 +83,7 @@ export class AvisarModalComponent implements OnInit {
       this.aviso.set(`L-${l.id} sin teléfono válido`);
       return;
     }
+    window.open(`https://wa.me/${tel}?text=${encodeURIComponent(mensajeWhatsapp(l))}`, '_blank');
     this.lineaSvc.update(l.id, { fecha_ultimo_aviso: this.fmtEscritura(new Date()), avisado: 1 }).subscribe({
       next: (updated) => {
         this.lineas.update((arr) => arr.map((x) => (x.id === l.id ? { ...x, ...updated } : x)));
@@ -92,7 +93,6 @@ export class AvisarModalComponent implements OnInit {
           return n;
         });
         this.huboEnvio = true;
-        window.open(`https://wa.me/${tel}?text=${encodeURIComponent(mensajeWhatsapp(l))}`, '_blank');
       },
       error: () => {
         this.aviso.set(`Error al marcar L-${l.id}`);
